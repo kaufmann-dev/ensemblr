@@ -7,14 +7,9 @@
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
-	let allowed = $state<string[]>([]);
-	$effect(() => {
-		if (allowed.length === 0) {
-			allowed = data.settings.demoAllowedModels.map(
-				(model) => `${model.providerId}/${model.modelId}`
-			);
-		}
-	});
+	let allowed = $state<string[]>(
+		data.settings.demoAllowedModels.map((model) => `${model.providerId}/${model.modelId}`)
+	);
 </script>
 
 <svelte:head><title>Admin | Ensemblr</title></svelte:head>

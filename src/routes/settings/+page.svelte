@@ -7,10 +7,7 @@
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
-	let providerId = $state('');
-	$effect(() => {
-		if (!providerId) providerId = data.catalog.find((provider) => provider.enabled)?.id ?? '';
-	});
+	let providerId = $state(data.catalog.find((provider) => provider.enabled)?.id ?? '');
 </script>
 
 <svelte:head><title>API Keys | Ensemblr</title></svelte:head>
