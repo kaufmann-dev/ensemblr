@@ -13,7 +13,7 @@ const modelSchema = z.object({
 		})
 		.passthrough()
 		.optional(),
-	cost: z.record(z.string(), z.number()).optional()
+	cost: z.record(z.string(), z.unknown()).optional()
 });
 
 const providerSchema = z.object({
