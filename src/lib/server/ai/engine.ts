@@ -1,0 +1,227 @@
+import { eq } from 'drizzle-orm';
+import { streamText } from 'ai';
+import { db } from '$lib/server/db';
+import {
+	generation,
+	generationOutput,
+	providerApiKey,
+	type ModelSelection
+} from '$lib/server/db/schema';
+import { decryptSecret } from '$lib/server/crypto';
+import { findCatalogModel } from '$lib/server/models/catalog';
+import { getSettings } from '$lib/server/settings';
+import { createLanguageModel } from './providers';
+import type { GenerateRequest } from '$lib/validation';
+
+type RunEvent =
+	| { type: 'generation'; generationId: string }
+	| {
+			type: 'status';
+			phase: 'worker' | 'judge';
+			round: number;
+			model: ModelSelection;
+			status: string;
+	  }
+	| { type: 'text'; phase: 'worker' | 'judge'; round: number; model: ModelSelection; text: string }
+	| {
+			type: 'error';
+			phase: 'worker' | 'judge';
+			round: number;
+			model: ModelSelection;
+			error: string;
+	  }
+	| { type: 'final'; generationId: string; text: string };
+
+type SuccessfulAnswer = {
+	model: ModelSelection;
+	text: string;
+};
+
+function renderTemplate(template: string, prompt: string, answers: SuccessfulAnswer[]) {
+	return template
+		.replaceAll('{{original_prompt}}', prompt)
+		.replaceAll(
+			'{{previous_answers}}',
+			answers
+				.map((answer) => `${answer.model.providerId}/${answer.model.modelId}:\n${answer.text}`)
+				.join('\n\n')
+		);
+}
+
+function sse(event: RunEvent) {
+	return `data: ${JSON.stringify(event)}\n\n`;
+}
+
+async function getUserKey(userId: string, providerId: string) {
+	const [key] = await db
+		.select()
+		.from(providerApiKey)
+		.where(eq(providerApiKey.userId, userId))
+		.then((rows) => rows.filter((row) => row.providerId === providerId));
+
+	if (!key) throw new Error(`No API key saved for ${providerId}`);
+	return decryptSecret(key.encryptedKey);
+}
+
+async function runModel(
+	userId: string,
+	generationId: string,
+	phase: 'worker' | 'judge',
+	round: number,
+	model: ModelSelection,
+	prompt: string,
+	options: GenerateRequest['options'],
+	emit: (event: RunEvent) => void
+): Promise<SuccessfulAnswer | undefined> {
+	const outputId = crypto.randomUUID();
+	await db.insert(generationOutput).values({
+		id: outputId,
+		generationId,
+		phase,
+		round,
+		providerId: model.providerId,
+		modelId: model.modelId,
+		status: 'running',
+		output: ''
+	});
+	emit({ type: 'status', phase, round, model, status: 'running' });
+
+	try {
+		const catalog = await findCatalogModel(model.providerId, model.modelId);
+		if (!catalog?.provider.enabled) throw new Error('Inference is not enabled for this provider');
+
+		const apiKey = await getUserKey(userId, model.providerId);
+		const languageModel = createLanguageModel(catalog.provider, model.modelId, apiKey);
+		const result = streamText({
+			model: languageModel,
+			prompt,
+			temperature: options?.temperature,
+			maxOutputTokens: options?.maxOutputTokens
+		});
+
+		let text = '';
+		for await (const delta of result.textStream) {
+			text += delta;
+			emit({ type: 'text', phase, round, model, text: delta });
+		}
+
+		await db
+			.update(generationOutput)
+			.set({ status: 'completed', output: text })
+			.where(eq(generationOutput.id, outputId));
+		emit({ type: 'status', phase, round, model, status: 'completed' });
+		return { model, text };
+	} catch (error) {
+		const message = error instanceof Error ? error.message : 'Generation failed';
+		await db
+			.update(generationOutput)
+			.set({ status: 'failed', error: message })
+			.where(eq(generationOutput.id, outputId));
+		emit({ type: 'error', phase, round, model, error: message });
+		return undefined;
+	}
+}
+
+export async function createGeneration(userId: string, request: GenerateRequest) {
+	const generationId = crypto.randomUUID();
+	await db.insert(generation).values({
+		id: generationId,
+		userId,
+		prompt: request.prompt,
+		config: request,
+		status: 'running'
+	});
+	return generationId;
+}
+
+export function streamMixture(userId: string, generationId: string, request: GenerateRequest) {
+	const encoder = new TextEncoder();
+
+	return new ReadableStream({
+		async start(controller) {
+			const emit = (event: RunEvent) => controller.enqueue(encoder.encode(sse(event)));
+			emit({ type: 'generation', generationId });
+
+			try {
+				const settings = await getSettings();
+				let answers = (
+					await Promise.all(
+						request.workers.map((worker) =>
+							runModel(
+								userId,
+								generationId,
+								'worker',
+								0,
+								worker,
+								request.prompt,
+								request.options,
+								emit
+							)
+						)
+					)
+				).filter((answer): answer is SuccessfulAnswer => Boolean(answer));
+
+				for (let round = 1; round <= request.rounds && answers.length > 0; round += 1) {
+					const roundPrompt = renderTemplate(
+						settings.intermediateTemplate,
+						request.prompt,
+						answers
+					);
+					answers = (
+						await Promise.all(
+							answers.map((answer) =>
+								runModel(
+									userId,
+									generationId,
+									'worker',
+									round,
+									answer.model,
+									roundPrompt,
+									request.options,
+									emit
+								)
+							)
+						)
+					).filter((answer): answer is SuccessfulAnswer => Boolean(answer));
+				}
+
+				if (answers.length === 0) throw new Error('All worker models failed');
+
+				const judgePrompt = renderTemplate(settings.judgeTemplate, request.prompt, answers);
+				const final = await runModel(
+					userId,
+					generationId,
+					'judge',
+					request.rounds + 1,
+					request.judge,
+					judgePrompt,
+					request.options,
+					emit
+				);
+
+				if (!final) throw new Error('Judge model failed');
+
+				await db
+					.update(generation)
+					.set({ status: 'completed', finalOutput: final.text })
+					.where(eq(generation.id, generationId));
+				emit({ type: 'final', generationId, text: final.text });
+			} catch (error) {
+				const message = error instanceof Error ? error.message : 'Generation failed';
+				await db
+					.update(generation)
+					.set({ status: 'failed', error: message })
+					.where(eq(generation.id, generationId));
+				emit({
+					type: 'error',
+					phase: 'judge',
+					round: request.rounds + 1,
+					model: request.judge,
+					error: message
+				});
+			} finally {
+				controller.close();
+			}
+		}
+	});
+}

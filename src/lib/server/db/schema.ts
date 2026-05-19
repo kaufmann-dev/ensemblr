@@ -1,9 +1,115 @@
-import { pgTable, serial, integer, text } from 'drizzle-orm/pg-core';
+import { relations, sql } from 'drizzle-orm';
+import { index, integer, jsonb, pgTable, primaryKey, text, timestamp } from 'drizzle-orm/pg-core';
+import { user } from './auth.schema';
 
-export const task = pgTable('task', {
-	id: serial('id').primaryKey(),
-	title: text('title').notNull(),
-	priority: integer('priority').notNull().default(1)
+export * from './auth.schema';
+
+export const providerApiKey = pgTable(
+	'provider_api_key',
+	{
+		userId: text('user_id')
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		providerId: text('provider_id').notNull(),
+		encryptedKey: text('encrypted_key').notNull(),
+		createdAt: timestamp('created_at').defaultNow().notNull(),
+		updatedAt: timestamp('updated_at')
+			.defaultNow()
+			.$onUpdate(() => new Date())
+			.notNull()
+	},
+	(table) => [
+		primaryKey({ columns: [table.userId, table.providerId] }),
+		index('provider_api_key_user_idx').on(table.userId)
+	]
+);
+
+export const generation = pgTable(
+	'generation',
+	{
+		id: text('id').primaryKey(),
+		userId: text('user_id')
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		prompt: text('prompt').notNull(),
+		status: text('status', { enum: ['running', 'completed', 'failed'] })
+			.notNull()
+			.default('running'),
+		config: jsonb('config').$type<GenerationConfig>().notNull(),
+		finalOutput: text('final_output'),
+		error: text('error'),
+		createdAt: timestamp('created_at').defaultNow().notNull(),
+		updatedAt: timestamp('updated_at')
+			.defaultNow()
+			.$onUpdate(() => new Date())
+			.notNull()
+	},
+	(table) => [index('generation_user_created_idx').on(table.userId, table.createdAt)]
+);
+
+export const generationOutput = pgTable(
+	'generation_output',
+	{
+		id: text('id').primaryKey(),
+		generationId: text('generation_id')
+			.notNull()
+			.references(() => generation.id, { onDelete: 'cascade' }),
+		phase: text('phase', { enum: ['worker', 'judge'] }).notNull(),
+		round: integer('round').notNull(),
+		providerId: text('provider_id').notNull(),
+		modelId: text('model_id').notNull(),
+		status: text('status', { enum: ['running', 'completed', 'failed'] }).notNull(),
+		output: text('output').notNull().default(''),
+		error: text('error'),
+		createdAt: timestamp('created_at').defaultNow().notNull(),
+		updatedAt: timestamp('updated_at')
+			.defaultNow()
+			.$onUpdate(() => new Date())
+			.notNull()
+	},
+	(table) => [index('generation_output_generation_idx').on(table.generationId)]
+);
+
+export const appSetting = pgTable('app_setting', {
+	id: text('id').primaryKey().default('global'),
+	intermediateTemplate: text('intermediate_template')
+		.notNull()
+		.default(
+			sql`'Original prompt:\n{{original_prompt}}\n\nPrevious answers:\n{{previous_answers}}\n\nImprove your answer using the strongest points above.'`
+		),
+	judgeTemplate: text('judge_template')
+		.notNull()
+		.default(
+			sql`'Original prompt:\n{{original_prompt}}\n\nCandidate answers:\n{{previous_answers}}\n\nSynthesize the best final answer.'`
+		),
+	demoAllowedModels: jsonb('demo_allowed_models').$type<ModelSelection[]>().notNull().default([]),
+	updatedAt: timestamp('updated_at')
+		.defaultNow()
+		.$onUpdate(() => new Date())
+		.notNull()
 });
 
-export *  from './auth.schema';
+export const userRelations = relations(user, ({ many }) => ({
+	apiKeys: many(providerApiKey),
+	generations: many(generation)
+}));
+
+export const generationRelations = relations(generation, ({ one, many }) => ({
+	user: one(user, { fields: [generation.userId], references: [user.id] }),
+	outputs: many(generationOutput)
+}));
+
+export type ModelSelection = {
+	providerId: string;
+	modelId: string;
+};
+
+export type GenerationConfig = {
+	workers: ModelSelection[];
+	judge: ModelSelection;
+	rounds: number;
+	options?: {
+		temperature?: number;
+		maxOutputTokens?: number;
+	};
+};

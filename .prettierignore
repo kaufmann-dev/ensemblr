@@ -6,5 +6,16 @@ bun.lock
 bun.lockb
 
 # Miscellaneous
+.agents/
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+CONCEPT.md
+skills-lock.json
+project.inlang/
+.gemini/
+.opencode/
+.mcp.json
+.prettierrc
 /static/
 /drizzle/

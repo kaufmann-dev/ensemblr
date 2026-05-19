@@ -1,0 +1,12 @@
+export function load({ locals }) {
+	return {
+		user: locals.user
+			? {
+					id: locals.user.id,
+					name: locals.user.name,
+					email: locals.user.email,
+					role: locals.user.role
+				}
+			: undefined
+	};
+}

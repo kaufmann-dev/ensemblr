@@ -6,6 +6,12 @@ enabled = true
 url = "https://shadcn-svelte.mastra.cloud/api/mcp/shadcn/mcp"
 enabled = true
 
+[mcp_servers.shadcn-svelte.tools.shadcnSvelteGetTool]
+approval_mode = "approve"
+
+[mcp_servers.shadcn-svelte.tools.shadcnSvelteSearchTool]
+approval_mode = "approve"
+
 [mcp_servers.playwright]
 command = "pnpm"
 args = ["dlx", "@playwright/mcp@latest"]
