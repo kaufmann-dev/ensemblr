@@ -2,6 +2,32 @@
 
 Svelte 5 introduced a fundamentally new paradigm — runes, snippets, fine-grained reactivity — that is a breaking departure from Svelte 4. Your training data almost certainly reflects Svelte 4 patterns (e.g. `$:`, `export let`, slots, stores) which are either deprecated or behave differently in Svelte 5. **Do not rely on your training data for any Svelte or SvelteKit code.** Always use the MCP tools below to retrieve current documentation before writing or reviewing any Svelte code.
 
+### Common Svelte 5 Trap: `$effect` Infinite Loops
+
+In Svelte 5, `$effect` tracks every state read inside it as a dependency. If you both **read and write** the same state variable inside `$effect`, it triggers itself endlessly and Svelte throws `ERR_SVELTE_TOO_MANY_UPDATES`.
+
+**Wrong:**
+```svelte
+let count = $state(0);
+$effect(() => {
+  count = count + 1; // reads count, then writes count → infinite loop
+});
+```
+
+**Right:** Initialize state directly, or use `untrack()` if you must write inside an effect:
+```svelte
+let count = $state(0);
+$effect(() => {
+  const current = count;
+  untrack(() => { count = current + 1; });
+});
+```
+
+Better yet, avoid `$effect` for one-time initialization. Use direct assignment:
+```svelte
+let count = $state(1);
+```
+
 ---
 
 ## MCP Servers
