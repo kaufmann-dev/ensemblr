@@ -118,23 +118,18 @@ Add any of these by name with the CLI:
 
 ---
 
-## How to Use @iconify/tailwind4
+## How to Use Icons
 
-> **Do not use `@iconify/svelte`.** Do not import `<Icon icon="..." />`. This project uses the Tailwind CSS plugin, so icons are CSS classes on plain elements.
+**Always use `@lucide/svelte`.** Do not use `@iconify/tailwind4`, `@iconify/svelte`, or any other icon library.
 
-Use an inline element with an Iconify dynamic class:
+`@lucide/svelte` is already installed. Import the icon as a Svelte component:
 
 ```svelte
-<span class="icon-[lucide--search] size-4" aria-hidden="true"></span>
-<span class="icon-[mdi-light--home] size-5" aria-hidden="true"></span>
-```
+<script>
+  import { Sun, Moon, Search } from '@lucide/svelte';
+</script>
 
-The class format is `icon-[collection--icon-name]`. The separator between collection and icon name is **two hyphens**. Size and color come from normal Tailwind classes (`size-4`, `text-muted-foreground`, etc.).
-
-If the plugin is not configured yet, add it to the Tailwind CSS entry file:
-
-```css
-@plugin "@iconify/tailwind4";
+<Sun class="size-4 text-muted-foreground" />
 ```
 
 ---
@@ -264,7 +259,7 @@ These packages are part of the core infrastructure and must always be used. Neve
 | --------- | ------------------------------------- | -------------------------------------------------------------------- |
 | Framework | `sveltekit`, `@sveltejs/adapter-node` | All projects use SvelteKit with the Node adapter                     |
 | Styling   | `tailwindcss`, `shadcn-svelte`        | Use shadcn-svelte components and Tailwind utility classes for all UI |
-| Icons     | `@iconify/tailwind4`                  | Use Iconify for all icons via the Tailwind plugin                    |
+| Icons     | `@lucide/svelte`                      | Use for all icons. Do not use `@iconify/tailwind4` or other icon libraries.             |
 | Theme     | `mode-watcher`                        | Use for light/dark mode management                                   |
 | Database  | `postgresql`, `drizzle`               | Drizzle ORM with PostgreSQL for all data persistence                 |
 | Auth      | `better-auth`                         | Use for all authentication and session management                    |

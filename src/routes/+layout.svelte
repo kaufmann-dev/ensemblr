@@ -3,8 +3,9 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { locales, localizeHref } from '$lib/paraglide/runtime';
-	import { ModeWatcher } from 'mode-watcher';
+	import { ModeWatcher, toggleMode } from 'mode-watcher';
 	import { Button } from '$lib/components/ui/button';
+	import { Sun, Moon } from '@lucide/svelte';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 
@@ -39,6 +40,10 @@
 							href={resolve('/admin')}>Admin</a
 						>
 					{/if}
+					<Button type="button" variant="ghost" size="icon" onclick={toggleMode} aria-label="Toggle dark mode">
+						<Sun class="size-4 text-muted-foreground dark:hidden" />
+						<Moon class="size-4 text-muted-foreground hidden dark:block" />
+					</Button>
 					<form method="POST" action={resolve('/logout')}>
 						<Button type="submit" variant="outline" size="sm">Sign out</Button>
 					</form>
