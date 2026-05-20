@@ -12,7 +12,13 @@
 	let { data, children } = $props();
 </script>
 
-<svelte:head><link rel="icon" href={favicon} /></svelte:head>
+<svelte:head>
+	<link rel="icon" href={favicon} />
+	<meta
+		name="description"
+		content="Ensemblr runs mixture-of-agents generations across multiple AI models and saves generation history."
+	/>
+</svelte:head>
 
 <ModeWatcher />
 
@@ -40,9 +46,15 @@
 							href={resolve('/admin')}>Admin</a
 						>
 					{/if}
-					<Button type="button" variant="ghost" size="icon" onclick={toggleMode} aria-label="Toggle dark mode">
+					<Button
+						type="button"
+						variant="ghost"
+						size="icon"
+						onclick={toggleMode}
+						aria-label="Toggle dark mode"
+					>
 						<Sun class="size-4 text-muted-foreground dark:hidden" />
-						<Moon class="size-4 text-muted-foreground hidden dark:block" />
+						<Moon class="hidden size-4 text-muted-foreground dark:block" />
 					</Button>
 					<form method="POST" action={resolve('/logout')}>
 						<Button type="submit" variant="outline" size="sm">Sign out</Button>

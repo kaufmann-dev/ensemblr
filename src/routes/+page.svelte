@@ -43,8 +43,7 @@
 				modelId: model.id,
 				name: model.name ?? model.id,
 				provider: provider.name,
-				enabled: model.enabled,
-				logoUrl: provider.logoUrl
+				enabled: model.enabled
 			}))
 		)
 	);
@@ -167,7 +166,9 @@
 				<Textarea class="min-h-32" placeholder="Prompt" bind:value={prompt} />
 				<div class="grid gap-3 md:grid-cols-2">
 					{#each workers as worker, index (worker.id)}
+						<label class="sr-only" for={worker.id}>Worker {index + 1} model</label>
 						<select
+							id={worker.id}
 							class="h-10 rounded-md border bg-background px-3 text-sm"
 							bind:value={worker.value}
 						>
@@ -179,7 +180,12 @@
 							{/each}
 						</select>
 					{/each}
-					<select class="h-10 rounded-md border bg-background px-3 text-sm" bind:value={judgeId}>
+					<label class="sr-only" for="judge-model">Judge model</label>
+					<select
+						id="judge-model"
+						class="h-10 rounded-md border bg-background px-3 text-sm"
+						bind:value={judgeId}
+					>
 						<option value="">Judge model</option>
 						{#each modelOptions as model (model.id)}
 							<option value={model.id} disabled={!model.enabled}
