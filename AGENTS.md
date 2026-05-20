@@ -273,6 +273,23 @@ During development, use the manually managed Docker PostgreSQL database named `p
 
 Do not turn the local Docker command into production deployment guidance. Production deployment and database provisioning are handled separately through Coolify.
 
+## Coolify and Nixpacks Deployment Checks
+
+When debugging Coolify deploy failures, identify the exact failing command and fix that layer only. A later deploy may uncover the next failure after the previous blocker is resolved.
+
+- If `pnpm-workspace.yaml` exists, it must include a non-empty `packages` list. For a single-package app, use:
+
+```yaml
+packages:
+  - .
+```
+
+- Do not rely on `NIXPACKS_NODE_VERSION=22` to select a compatible Node patch version. Nixpacks selects the major version, while the exact patch comes from its nixpkgs archive. If dependencies require a minimum Node patch such as `22.12+`, set `engines.node` in `package.json` and pin a compatible `nixpkgsArchive` in `nixpacks.toml`.
+- Coolify injects environment variables into the build/runtime environment; it does not create an `.env` file in the image. Scripts used in deployment must read `process.env` directly and only call `process.loadEnvFile('.env')` after checking that `.env` exists.
+- Any seed script that creates Better Auth email/password users must validate deployment env vars before calling Better Auth APIs. In particular, enforce and document the minimum password length for seeded account variables such as `ADMIN_PASSWORD` and `DEMO_PASSWORD`.
+- Nixpacks already performs an install phase for Node apps. Avoid adding a second `pnpm install` to the Coolify build command unless there is a specific reason.
+- Prefer running database migrations and seed scripts as explicit deploy/runtime steps when Coolify supports it. If they are included in the build command, make them idempotent and safe to re-run because image builds may be retried.
+
 ---
 
 ## Technology Stack
