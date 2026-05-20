@@ -8,7 +8,7 @@ SvelteKit app for running mixture-of-agents generations across models from the l
 
 ### Prerequisites
 
-- Node.js 22+
+- Node.js 22.12+
 - pnpm
 - Docker (for local PostgreSQL)
 
@@ -91,6 +91,8 @@ The app will be available at `http://localhost:5173`.
 ## Production Deployment (Coolify)
 
 This project is built with SvelteKit and the Node adapter (`@sveltejs/adapter-node`), so it deploys as a standard Node.js application.
+
+The repository includes `nixpacks.toml` to pin a nixpkgs archive with Node.js 22.12+ support. This is required because Nixpacks only selects Node by major version, and the default Node 22 archive may be too old for the Svelte/Vite toolchain.
 
 ### 1. Create a PostgreSQL database
 
