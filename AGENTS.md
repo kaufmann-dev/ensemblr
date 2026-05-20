@@ -17,7 +17,7 @@ pnpm drizzle-kit migrate
 pnpm dlx shadcn-svelte@latest add <component-name>
 ```
 
-Use `pnpm dev` for local development. Use `pnpm check` before finishing Svelte or TypeScript changes. Use `pnpm build` before finishing deployment, routing, server, adapter, or package changes.
+Use `pnpm dev` for local development. Do not start any development server unless the user explicitly asks for it. Use `pnpm check` before finishing Svelte or TypeScript changes. Use `pnpm build` before finishing deployment, routing, server, adapter, or package changes.
 
 Use `pnpm test` when the project defines a test script. Use `pnpm exec vitest run` only when Vitest is configured and there is no project test script. Use `pnpm exec playwright test` only when Playwright is configured or end-to-end work is part of the task.
 
