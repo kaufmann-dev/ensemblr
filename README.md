@@ -129,10 +129,10 @@ Add the following environment variables in Coolify (or import them from a file):
 | `BETTER_AUTH_SECRET` | **Yes** | High-entropy secret for auth session signing. Generate with `openssl rand -base64 32` |
 | `API_KEY_ENCRYPTION_SECRET` | **Yes** | High-entropy secret for encrypting stored provider API keys. Generate with `openssl rand -base64 32` |
 | `ADMIN_EMAIL` | **Yes** | Email address for the initial admin account |
-| `ADMIN_PASSWORD` | **Yes** | Password for the initial admin account |
+| `ADMIN_PASSWORD` | **Yes** | Password for the initial admin account. Must be at least 8 characters |
 | `ADMIN_NAME` | No | Display name for the admin account (default: `Admin`) |
 | `DEMO_EMAIL` | **Yes** | Email address for the initial demo account |
-| `DEMO_PASSWORD` | **Yes** | Password for the initial demo account |
+| `DEMO_PASSWORD` | **Yes** | Password for the initial demo account. Must be at least 8 characters |
 | `DEMO_NAME` | No | Display name for the demo account (default: `Demo`) |
 | `DEMO_ALLOWED_MODELS` | No | Comma-separated list of `provider/model` IDs allowed for demo users, e.g. `openai/gpt-4o-mini,anthropic/claude-3-5-haiku-latest` |
 
