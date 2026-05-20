@@ -11,10 +11,10 @@
 	let error = $state('');
 	let busy = $state(false);
 
-	async function login(body?: { email: string; password: string }) {
+	async function login(path: string, body?: { email: string; password: string }) {
 		busy = true;
 		error = '';
-		const response = await fetch(body ? '/api/auth/sign-in/email' : '/login/demo', {
+		const response = await fetch(path, {
 			method: 'POST',
 			headers: { 'content-type': 'application/json' },
 			body: body ? JSON.stringify(body) : undefined
@@ -29,7 +29,11 @@
 
 	function submit(event: SubmitEvent) {
 		event.preventDefault();
-		void login({ email, password });
+		void login('/api/auth/sign-in/email', { email, password });
+	}
+
+	function loginAsDemo() {
+		void login('/api/auth/sign-in/demo');
 	}
 </script>
 
@@ -64,7 +68,7 @@
 					type="button"
 					variant="outline"
 					disabled={busy}
-					onclick={() => login()}
+					onclick={loginAsDemo}
 				>
 					Login as Demo
 				</Button>

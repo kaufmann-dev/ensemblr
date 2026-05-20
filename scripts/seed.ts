@@ -15,6 +15,9 @@ const DEFAULT_INTERMEDIATE_TEMPLATE =
 const DEFAULT_JUDGE_TEMPLATE =
 	'Original prompt:\n{{original_prompt}}\n\nCandidate answers:\n{{previous_answers}}\n\nSynthesize the best final answer.';
 
+const DEMO_USER_ID = 'demo';
+const DEMO_USER_INTERNAL_EMAIL = 'guest@ensemblr.local';
+
 function required(name: string) {
 	const value = process.env[name];
 	if (!value) throw new Error(`${name} is required`);
@@ -50,7 +53,7 @@ const auth = betterAuth({
 	emailAndPassword: { enabled: true }
 });
 
-async function upsertUser(role: 'admin' | 'demo', email: string, password: string, name: string) {
+async function upsertAdmin(email: string, password: string, name: string) {
 	const [existing] = await db
 		.select()
 		.from(schema.user)
@@ -63,10 +66,42 @@ async function upsertUser(role: 'admin' | 'demo', email: string, password: strin
 			.from(schema.user)
 			.where(eq(schema.user.email, email.toLowerCase()))
 			.limit(1);
-		if (created) await db.update(schema.user).set({ role }).where(eq(schema.user.id, created.id));
+		if (created)
+			await db.update(schema.user).set({ role: 'admin' }).where(eq(schema.user.id, created.id));
 	} else {
-		await db.update(schema.user).set({ name, role }).where(eq(schema.user.id, existing.id));
+		await db
+			.update(schema.user)
+			.set({ name, role: 'admin' })
+			.where(eq(schema.user.id, existing.id));
 	}
+}
+
+async function upsertDemo(name: string) {
+	const [existing] = await db
+		.select()
+		.from(schema.user)
+		.where(eq(schema.user.role, 'demo'))
+		.limit(1);
+	if (existing) {
+		await db.update(schema.user).set({ name, role: 'demo' }).where(eq(schema.user.id, existing.id));
+		await db.delete(schema.account).where(eq(schema.account.userId, existing.id));
+		return;
+	}
+
+	await db
+		.insert(schema.user)
+		.values({
+			id: DEMO_USER_ID,
+			name,
+			email: DEMO_USER_INTERNAL_EMAIL,
+			emailVerified: true,
+			role: 'demo'
+		})
+		.onConflictDoUpdate({
+			target: schema.user.id,
+			set: { name, role: 'demo', updatedAt: new Date() }
+		});
+	await db.delete(schema.account).where(eq(schema.account.userId, DEMO_USER_ID));
 }
 
 function parseModels(value: string | undefined): ModelSelection[] {
@@ -82,18 +117,12 @@ function parseModels(value: string | undefined): ModelSelection[] {
 		.filter((item) => item.providerId && item.modelId);
 }
 
-await upsertUser(
-	'admin',
+await upsertAdmin(
 	required('ADMIN_EMAIL'),
 	requiredPassword('ADMIN_PASSWORD'),
 	process.env.ADMIN_NAME ?? 'Admin'
 );
-await upsertUser(
-	'demo',
-	required('DEMO_EMAIL'),
-	requiredPassword('DEMO_PASSWORD'),
-	process.env.DEMO_NAME ?? 'Demo'
-);
+await upsertDemo(process.env.DEMO_NAME ?? 'Demo');
 
 await db
 	.insert(appSetting)
