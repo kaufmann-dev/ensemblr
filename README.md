@@ -31,8 +31,6 @@ API_KEY_ENCRYPTION_SECRET="another-long-random-secret"
 ADMIN_EMAIL="admin@example.com"
 ADMIN_PASSWORD="your-admin-password"
 ADMIN_NAME="Admin"
-DEMO_EMAIL="demo@example.com"
-DEMO_PASSWORD="your-demo-password"
 DEMO_NAME="Demo"
 DEMO_ALLOWED_MODELS="openai/gpt-4o-mini,anthropic/claude-3-5-haiku-latest"
 ```
@@ -63,7 +61,7 @@ pnpm db:migrate
 pnpm db:seed
 ```
 
-The seed script creates the admin and demo accounts from your `.env` values. It is idempotent — safe to run multiple times.
+The seed script creates the admin account from your `.env` values and ensures the one-click demo account exists. It is idempotent — safe to run multiple times.
 
 ### 5. Start the development server
 
@@ -75,16 +73,16 @@ The app will be available at `http://localhost:5173`.
 
 ### Development commands
 
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Start the Vite dev server |
-| `pnpm check` | Run Svelte type checking |
-| `pnpm lint` | Run Prettier and ESLint |
-| `pnpm build` | Build for production |
+| Command            | Description                      |
+| ------------------ | -------------------------------- |
+| `pnpm dev`         | Start the Vite dev server        |
+| `pnpm check`       | Run Svelte type checking         |
+| `pnpm lint`        | Run Prettier and ESLint          |
+| `pnpm build`       | Build for production             |
 | `pnpm db:generate` | Generate a new Drizzle migration |
-| `pnpm db:migrate` | Run pending migrations |
-| `pnpm db:seed` | Run the idempotent seed script |
-| `pnpm db:studio` | Open Drizzle Studio |
+| `pnpm db:migrate`  | Run pending migrations           |
+| `pnpm db:seed`     | Run the idempotent seed script   |
+| `pnpm db:studio`   | Open Drizzle Studio              |
 
 ---
 
@@ -106,35 +104,33 @@ Add a new resource in Coolify and point it to this repository.
 
 In the Coolify resource settings, set:
 
-| Setting | Value |
-|---------|-------|
+| Setting           | Value                        |
+| ----------------- | ---------------------------- |
 | **Build Command** | `pnpm install && pnpm build` |
-| **Start Command** | `node build/index.js` |
+| **Start Command** | `node build/index.js`        |
 
 If you prefer to run migrations automatically on every deploy, use:
 
-| Setting | Value |
-|---------|-------|
+| Setting           | Value                                                           |
+| ----------------- | --------------------------------------------------------------- |
 | **Build Command** | `pnpm install && pnpm build && pnpm db:migrate && pnpm db:seed` |
-| **Start Command** | `node build/index.js` |
+| **Start Command** | `node build/index.js`                                           |
 
 ### 4. Configure environment variables
 
 Add the following environment variables in Coolify (or import them from a file):
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `DATABASE_URL` | **Yes** | PostgreSQL connection string, e.g. `postgres://user:pass@host:5432/db` |
-| `ORIGIN` | **Yes** | The public URL of your app, e.g. `https://ensemblr.yourdomain.com` |
-| `BETTER_AUTH_SECRET` | **Yes** | High-entropy secret for auth session signing. Generate with `openssl rand -base64 32` |
-| `API_KEY_ENCRYPTION_SECRET` | **Yes** | High-entropy secret for encrypting stored provider API keys. Generate with `openssl rand -base64 32` |
-| `ADMIN_EMAIL` | **Yes** | Email address for the initial admin account |
-| `ADMIN_PASSWORD` | **Yes** | Password for the initial admin account. Must be at least 8 characters |
-| `ADMIN_NAME` | No | Display name for the admin account (default: `Admin`) |
-| `DEMO_EMAIL` | **Yes** | Email address for the initial demo account |
-| `DEMO_PASSWORD` | **Yes** | Password for the initial demo account. Must be at least 8 characters |
-| `DEMO_NAME` | No | Display name for the demo account (default: `Demo`) |
-| `DEMO_ALLOWED_MODELS` | No | Comma-separated list of `provider/model` IDs allowed for demo users, e.g. `openai/gpt-4o-mini,anthropic/claude-3-5-haiku-latest` |
+| Variable                    | Required | Description                                                                                                                      |
+| --------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`              | **Yes**  | PostgreSQL connection string, e.g. `postgres://user:pass@host:5432/db`                                                           |
+| `ORIGIN`                    | **Yes**  | The public URL of your app, e.g. `https://ensemblr.yourdomain.com`                                                               |
+| `BETTER_AUTH_SECRET`        | **Yes**  | High-entropy secret for auth session signing. Generate with `openssl rand -base64 32`                                            |
+| `API_KEY_ENCRYPTION_SECRET` | **Yes**  | High-entropy secret for encrypting stored provider API keys. Generate with `openssl rand -base64 32`                             |
+| `ADMIN_EMAIL`               | **Yes**  | Email address for the initial admin account                                                                                      |
+| `ADMIN_PASSWORD`            | **Yes**  | Password for the initial admin account. Must be at least 8 characters                                                            |
+| `ADMIN_NAME`                | No       | Display name for the admin account (default: `Admin`)                                                                            |
+| `DEMO_NAME`                 | No       | Display name for the demo account (default: `Demo`)                                                                              |
+| `DEMO_ALLOWED_MODELS`       | No       | Comma-separated list of `provider/model` IDs allowed for demo users, e.g. `openai/gpt-4o-mini,anthropic/claude-3-5-haiku-latest` |
 
 ### 5. Deploy
 
@@ -164,7 +160,7 @@ Or by temporarily updating the **Build Command** to include `pnpm db:migrate` an
 
 ## App Overview
 
-- **Login**: `/login` — supports email/password authentication via Better Auth
+- **Login**: `/login` — supports admin email/password authentication and one-click demo access via Better Auth
 - **Workspace**: `/` — create and run mixture-of-agents generations
 - **History**: `/history` — view past generation runs
 - **Settings**: `/settings` — manage provider API keys (encrypted at rest)
