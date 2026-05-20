@@ -4,16 +4,20 @@
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
+	import * as Select from '$lib/components/ui/select';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
 	let providerId = $derived(data.catalog.find((provider) => provider.enabled)?.id ?? '');
 	let savedProviders = $derived(data.catalog.filter((provider) => data.keys.includes(provider.id)));
+	let selectedProviderName = $derived(
+		data.catalog.find((provider) => provider.id === providerId)?.name ?? 'Select provider'
+	);
 </script>
 
 <svelte:head><title>API Keys | Ensemblr</title></svelte:head>
 
-<main class="mx-auto max-w-4xl space-y-4 px-4 py-6">
+<main class="mx-auto max-w-4xl space-y-4 px-3 py-4 sm:px-4 sm:py-6">
 	<Card>
 		<CardHeader><CardTitle>Provider API keys</CardTitle></CardHeader>
 		<CardContent class="space-y-4">
@@ -23,18 +27,25 @@
 				</p>
 			{:else}
 				<form class="grid gap-3 md:grid-cols-[1fr_1fr_auto]" method="POST" action="?/save">
+					<input type="hidden" name="providerId" value={providerId} />
 					<div class="space-y-2">
 						<Label for="provider">Provider</Label>
-						<select
-							id="provider"
-							name="providerId"
-							class="h-10 w-full rounded-md border bg-background px-3 text-sm"
-							bind:value={providerId}
-						>
-							{#each data.catalog as provider (provider.id)}
-								<option value={provider.id} disabled={!provider.enabled}>{provider.name}</option>
-							{/each}
-						</select>
+						<Select.Root type="single" bind:value={providerId}>
+							<Select.Trigger id="provider" class="w-full">
+								<span class="truncate">{selectedProviderName}</span>
+							</Select.Trigger>
+							<Select.Content class="max-h-80">
+								{#each data.catalog as provider (provider.id)}
+									<Select.Item
+										value={provider.id}
+										label={provider.name}
+										disabled={!provider.enabled}
+									>
+										<span class="truncate">{provider.name}</span>
+									</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
 					</div>
 					<div class="space-y-2">
 						<Label for="api-key">API key</Label>
@@ -49,16 +60,20 @@
 
 			<div class="grid gap-2">
 				{#each savedProviders as provider (provider.id)}
-					<div class="flex items-center justify-between rounded-md border p-3">
-						<div class="flex items-center gap-3">
+					<div
+						class="grid gap-3 rounded-md border p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+					>
+						<div class="flex min-w-0 items-center gap-3">
 							<img class="size-5" src={provider.logoUrl} alt="" />
-							<span class="font-medium">{provider.name}</span>
+							<span class="truncate font-medium">{provider.name}</span>
 							<Badge variant="secondary">saved</Badge>
 						</div>
 						{#if data.role !== 'demo'}
 							<form method="POST" action="?/delete">
 								<input type="hidden" name="providerId" value={provider.id} />
-								<Button type="submit" variant="outline" size="sm">Delete</Button>
+								<Button class="w-full sm:w-auto" type="submit" variant="outline" size="sm"
+									>Delete</Button
+								>
 							</form>
 						{/if}
 					</div>

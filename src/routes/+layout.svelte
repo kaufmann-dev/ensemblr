@@ -4,12 +4,28 @@
 	import { page } from '$app/state';
 	import { locales, localizeHref } from '$lib/paraglide/runtime';
 	import { ModeWatcher, toggleMode } from 'mode-watcher';
-	import { Button } from '$lib/components/ui/button';
-	import { Sun, Moon } from '@lucide/svelte';
+	import { Button, buttonVariants } from '$lib/components/ui/button';
+	import * as Sheet from '$lib/components/ui/sheet';
+	import { cn } from '$lib/utils';
+	import { History, Key, LogOut, Menu, Moon, Settings, Shield, Sun } from '@lucide/svelte';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 
 	let { data, children } = $props();
+	let mobileMenuOpen = $state(false);
+
+	let navItems = $derived([
+		{ href: resolve('/'), label: 'Workspace', icon: Settings },
+		{ href: resolve('/history'), label: 'History', icon: History },
+		{ href: resolve('/settings'), label: 'API Keys', icon: Key },
+		...(data.user?.role === 'admin'
+			? [{ href: resolve('/admin'), label: 'Admin', icon: Shield }]
+			: [])
+	]);
+
+	function isActive(href: string) {
+		return page.url.pathname === href;
+	}
 </script>
 
 <svelte:head>
@@ -24,28 +40,21 @@
 
 <div class="min-h-screen bg-background text-foreground">
 	{#if data.user}
-		<header class="border-b bg-card">
-			<div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-				<a href={resolve('/')} class="text-sm font-semibold tracking-normal">Ensemblr</a>
-				<nav class="flex items-center gap-1">
-					<a
-						class="px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
-						href={resolve('/')}>Workspace</a
-					>
-					<a
-						class="px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
-						href={resolve('/history')}>History</a
-					>
-					<a
-						class="px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
-						href={resolve('/settings')}>API Keys</a
-					>
-					{#if data.user.role === 'admin'}
+		<header class="sticky top-0 z-40 border-b bg-card/95 backdrop-blur">
+			<div class="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-4">
+				<a href={resolve('/')} class="shrink-0 text-sm font-semibold tracking-normal">Ensemblr</a>
+
+				<nav class="hidden items-center gap-1 md:flex">
+					{#each navItems as item (item.href)}
 						<a
-							class="px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
-							href={resolve('/admin')}>Admin</a
+							class={cn(
+								'rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground',
+								isActive(item.href) && 'bg-muted text-foreground'
+							)}
+							aria-current={isActive(item.href) ? 'page' : undefined}
+							href={item.href}>{item.label}</a
 						>
-					{/if}
+					{/each}
 					<Button
 						type="button"
 						variant="ghost"
@@ -60,6 +69,57 @@
 						<Button type="submit" variant="outline" size="sm">Sign out</Button>
 					</form>
 				</nav>
+
+				<div class="flex items-center gap-1 md:hidden">
+					<Button
+						type="button"
+						variant="ghost"
+						size="icon"
+						onclick={toggleMode}
+						aria-label="Toggle dark mode"
+					>
+						<Sun class="size-4 text-muted-foreground dark:hidden" />
+						<Moon class="hidden size-4 text-muted-foreground dark:block" />
+					</Button>
+					<Sheet.Root bind:open={mobileMenuOpen}>
+						<Sheet.Trigger
+							class={buttonVariants({ variant: 'outline', size: 'icon' })}
+							aria-label="Open navigation"
+						>
+							<Menu class="size-4" />
+						</Sheet.Trigger>
+						<Sheet.Content class="w-[19rem] max-w-[calc(100vw-2rem)]" side="right">
+							<Sheet.Header class="border-b px-5 py-4">
+								<Sheet.Title>Ensemblr</Sheet.Title>
+							</Sheet.Header>
+							<nav class="grid gap-1 p-3">
+								{#each navItems as item (item.href)}
+									{@const Icon = item.icon}
+									<a
+										class={cn(
+											'flex items-center gap-3 rounded-md px-3 py-3 text-sm text-muted-foreground hover:bg-muted hover:text-foreground',
+											isActive(item.href) && 'bg-muted text-foreground'
+										)}
+										aria-current={isActive(item.href) ? 'page' : undefined}
+										href={item.href}
+										onclick={() => (mobileMenuOpen = false)}
+									>
+										<Icon class="size-4" />
+										<span>{item.label}</span>
+									</a>
+								{/each}
+							</nav>
+							<div class="mt-auto border-t p-3">
+								<form method="POST" action={resolve('/logout')}>
+									<Button class="w-full justify-start gap-3" type="submit" variant="ghost">
+										<LogOut class="size-4" />
+										Sign out
+									</Button>
+								</form>
+							</div>
+						</Sheet.Content>
+					</Sheet.Root>
+				</div>
 			</div>
 		</header>
 	{/if}
