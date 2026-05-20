@@ -35,9 +35,22 @@ export async function load({ locals }) {
 					}))
 					.filter((provider) => provider.models.length > 0)
 			: catalog;
+	const workspaceCatalog = filteredCatalog
+		.map((provider) => ({
+			id: provider.id,
+			name: provider.name,
+			models: provider.models
+				.filter((model) => model.enabled)
+				.map((model) => ({
+					id: model.id,
+					name: model.name,
+					enabled: model.enabled
+				}))
+		}))
+		.filter((provider) => provider.models.length > 0);
 
 	return {
-		catalog: filteredCatalog,
+		catalog: workspaceCatalog,
 		keyProviders: keys.map((key) => key.providerId),
 		history,
 		userRole: user.role
