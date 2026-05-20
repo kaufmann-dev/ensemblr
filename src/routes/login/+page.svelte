@@ -24,7 +24,7 @@
 			error = 'Invalid credentials';
 			return;
 		}
-		await goto(resolve('/'));
+		await goto(resolve('/'), { invalidateAll: true });
 	}
 
 	function submit(event: SubmitEvent) {
