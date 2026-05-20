@@ -21,6 +21,12 @@ function required(name: string) {
 	return value;
 }
 
+function requiredPassword(name: string) {
+	const value = required(name);
+	if (value.length < 8) throw new Error(`${name} must be at least 8 characters`);
+	return value;
+}
+
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) throw new Error('DATABASE_URL is not set');
 
@@ -79,13 +85,13 @@ function parseModels(value: string | undefined): ModelSelection[] {
 await upsertUser(
 	'admin',
 	required('ADMIN_EMAIL'),
-	required('ADMIN_PASSWORD'),
+	requiredPassword('ADMIN_PASSWORD'),
 	process.env.ADMIN_NAME ?? 'Admin'
 );
 await upsertUser(
 	'demo',
 	required('DEMO_EMAIL'),
-	required('DEMO_PASSWORD'),
+	requiredPassword('DEMO_PASSWORD'),
 	process.env.DEMO_NAME ?? 'Demo'
 );
 
