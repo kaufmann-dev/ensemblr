@@ -10,6 +10,7 @@
 	let { data }: PageProps = $props();
 
 	type Selection = { providerId: string; modelId: string };
+	type WorkerSelection = { id: string; value: string };
 	type Output = {
 		key: string;
 		phase: 'worker' | 'judge';
@@ -21,7 +22,10 @@
 	};
 
 	let prompt = $state('');
-	let workerIds = $state<string[]>(['', '']);
+	let workers = $state<WorkerSelection[]>([
+		{ id: 'worker-1', value: '' },
+		{ id: 'worker-2', value: '' }
+	]);
 	let judgeId = $state('');
 	let rounds = $state(1);
 	let temperature = $state(0.7);
@@ -44,6 +48,8 @@
 			}))
 		)
 	);
+	let selectedWorkers = $derived(workers.filter((worker) => worker.value));
+	let workerOutputs = $derived(outputs.filter((item) => item.phase === 'worker'));
 
 	function parseSelection(value: string): Selection {
 		const [providerId, ...model] = value.split('/');
@@ -93,7 +99,7 @@
 			headers: { 'content-type': 'application/json' },
 			body: JSON.stringify({
 				prompt,
-				workers: workerIds.filter(Boolean).map(parseSelection),
+				workers: selectedWorkers.map((worker) => parseSelection(worker.value)),
 				judge: parseSelection(judgeId),
 				rounds,
 				options: { temperature }
@@ -160,10 +166,10 @@
 			<CardContent class="space-y-4">
 				<Textarea class="min-h-32" placeholder="Prompt" bind:value={prompt} />
 				<div class="grid gap-3 md:grid-cols-2">
-					{#each workerIds, index (index)}
+					{#each workers as worker, index (worker.id)}
 						<select
 							class="h-10 rounded-md border bg-background px-3 text-sm"
-							bind:value={workerIds[index]}
+							bind:value={worker.value}
 						>
 							<option value="">Worker {index + 1}</option>
 							{#each modelOptions as model (model.id)}
@@ -199,7 +205,7 @@
 				</div>
 				<div class="flex items-center gap-2">
 					<Button
-						disabled={running || !prompt || !judgeId || workerIds.filter(Boolean).length < 2}
+						disabled={running || !prompt || !judgeId || selectedWorkers.length < 2}
 						onclick={run}
 					>
 						Run
@@ -229,7 +235,7 @@
 		</Card>
 
 		<Accordion.Root type="multiple">
-			{#each outputs.filter((item) => item.phase === 'worker') as output (output.key)}
+			{#each workerOutputs as output (output.key)}
 				<Accordion.Item value={output.key}>
 					<Accordion.Trigger>
 						Round {output.round} · {output.model.providerId}/{output.model.modelId} · {output.status}

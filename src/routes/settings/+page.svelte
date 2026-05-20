@@ -7,7 +7,8 @@
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
-	let providerId = $state(data.catalog.find((provider) => provider.enabled)?.id ?? '');
+	let providerId = $derived(data.catalog.find((provider) => provider.enabled)?.id ?? '');
+	let savedProviders = $derived(data.catalog.filter((provider) => data.keys.includes(provider.id)));
 </script>
 
 <svelte:head><title>API Keys | Ensemblr</title></svelte:head>
@@ -47,7 +48,7 @@
 			{/if}
 
 			<div class="grid gap-2">
-				{#each data.catalog.filter( (provider) => data.keys.includes(provider.id) ) as provider (provider.id)}
+				{#each savedProviders as provider (provider.id)}
 					<div class="flex items-center justify-between rounded-md border p-3">
 						<div class="flex items-center gap-3">
 							<img class="size-5" src={provider.logoUrl} alt="" />

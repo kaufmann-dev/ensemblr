@@ -7,7 +7,7 @@
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
-	let allowed = $state<string[]>(
+	let allowed = $derived(
 		data.settings.demoAllowedModels.map((model) => `${model.providerId}/${model.modelId}`)
 	);
 </script>
