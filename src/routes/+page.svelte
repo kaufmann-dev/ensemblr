@@ -2,9 +2,20 @@
 	import { resolve } from '$app/paths';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
-	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
+	import {
+		Card,
+		CardContent,
+		CardDescription,
+		CardHeader,
+		CardTitle
+	} from '$lib/components/ui/card';
+	import { Label } from '$lib/components/ui/label';
+	import { ScrollArea } from '$lib/components/ui/scroll-area';
+	import * as Select from '$lib/components/ui/select';
+	import { Slider } from '$lib/components/ui/slider';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import * as Accordion from '$lib/components/ui/accordion';
+	import { Play } from '@lucide/svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -42,6 +53,7 @@
 				providerId: provider.id,
 				modelId: model.id,
 				name: model.name ?? model.id,
+				label: `${provider.name}: ${model.name ?? model.id}`,
 				provider: provider.name,
 				enabled: model.enabled
 			}))
@@ -57,6 +69,11 @@
 
 	function outputKey(phase: 'worker' | 'judge', round: number, model: Selection) {
 		return `${phase}:${round}:${model.providerId}/${model.modelId}`;
+	}
+
+	function modelTriggerLabel(value: string, fallback: string) {
+		const option = modelOptions.find((model) => model.id === value);
+		return option ? `${option.provider}: ${option.name}` : fallback;
 	}
 
 	function upsertOutput(event: {
@@ -139,95 +156,156 @@
 
 <svelte:head><title>Workspace | Ensemblr</title></svelte:head>
 
-<main class="mx-auto grid max-w-7xl gap-4 px-4 py-6 lg:grid-cols-[18rem_1fr]">
-	<aside class="space-y-4">
-		<Card>
-			<CardHeader><CardTitle class="text-base">Recent runs</CardTitle></CardHeader>
-			<CardContent class="space-y-3">
-				{#each data.history as item (item.id)}
-					<a
-						class="block rounded-md border p-3 text-sm hover:bg-muted"
-						href={resolve(`/history/${item.id}`)}
-					>
-						<span class="block font-medium">{item.prompt.slice(0, 72)}</span>
-						<span class="text-xs text-muted-foreground">{item.status}</span>
-					</a>
-				{:else}
-					<p class="text-sm text-muted-foreground">No history yet.</p>
-				{/each}
+<main class="mx-auto grid max-w-7xl gap-4 px-3 py-4 sm:px-4 sm:py-6 lg:grid-cols-[18rem_1fr]">
+	<aside class="order-2 space-y-4 lg:order-1">
+		<Card size="sm">
+			<CardHeader>
+				<CardTitle class="text-base">Recent runs</CardTitle>
+				<CardDescription>Saved generations</CardDescription>
+			</CardHeader>
+			<CardContent>
+				<ScrollArea class="max-h-80">
+					<div class="space-y-2 pr-1">
+						{#each data.history as item (item.id)}
+							<a
+								class="block rounded-md border p-3 text-sm hover:bg-muted"
+								href={resolve(`/history/${item.id}`)}
+							>
+								<span class="line-clamp-2 font-medium break-words">{item.prompt.slice(0, 96)}</span>
+								<span class="mt-1 block text-xs text-muted-foreground">{item.status}</span>
+							</a>
+						{:else}
+							<p class="text-sm text-muted-foreground">No history yet.</p>
+						{/each}
+					</div>
+				</ScrollArea>
 			</CardContent>
 		</Card>
 	</aside>
 
-	<section class="space-y-4">
+	<section class="order-1 min-w-0 space-y-4 lg:order-2">
 		<Card>
-			<CardHeader><CardTitle>Mixture workspace</CardTitle></CardHeader>
-			<CardContent class="space-y-4">
-				<Textarea class="min-h-32" placeholder="Prompt" bind:value={prompt} />
+			<CardHeader>
+				<CardTitle>Mixture workspace</CardTitle>
+				<CardDescription>Compose a prompt and choose the models for this run.</CardDescription>
+			</CardHeader>
+			<CardContent class="space-y-5">
+				<div class="space-y-2">
+					<Label for="prompt">Prompt</Label>
+					<Textarea
+						id="prompt"
+						class="min-h-36 resize-y"
+						placeholder="Prompt"
+						bind:value={prompt}
+					/>
+				</div>
+
 				<div class="grid gap-3 md:grid-cols-2">
 					{#each workers as worker, index (worker.id)}
-						<label class="sr-only" for={worker.id}>Worker {index + 1} model</label>
-						<select
-							id={worker.id}
-							class="h-10 rounded-md border bg-background px-3 text-sm"
-							bind:value={worker.value}
-						>
-							<option value="">Worker {index + 1}</option>
-							{#each modelOptions as model (model.id)}
-								<option value={model.id} disabled={!model.enabled}
-									>{model.provider}: {model.name}</option
-								>
-							{/each}
-						</select>
+						<div class="min-w-0 space-y-2">
+							<Label for={worker.id}>Worker {index + 1}</Label>
+							<Select.Root type="single" bind:value={worker.value}>
+								<Select.Trigger id={worker.id} class="w-full min-w-0">
+									<span class="truncate"
+										>{modelTriggerLabel(worker.value, `Select worker ${index + 1}`)}</span
+									>
+								</Select.Trigger>
+								<Select.Content class="max-h-80">
+									{#each data.catalog as provider (provider.id)}
+										<Select.Group>
+											<Select.Label>{provider.name}</Select.Label>
+											{#each provider.models as model (model.id)}
+												<Select.Item
+													value={`${provider.id}/${model.id}`}
+													label={`${provider.name}: ${model.name ?? model.id}`}
+												>
+													<span class="truncate">{model.name ?? model.id}</span>
+												</Select.Item>
+											{/each}
+										</Select.Group>
+									{/each}
+								</Select.Content>
+							</Select.Root>
+						</div>
 					{/each}
-					<label class="sr-only" for="judge-model">Judge model</label>
-					<select
-						id="judge-model"
-						class="h-10 rounded-md border bg-background px-3 text-sm"
-						bind:value={judgeId}
-					>
-						<option value="">Judge model</option>
-						{#each modelOptions as model (model.id)}
-							<option value={model.id} disabled={!model.enabled}
-								>{model.provider}: {model.name}</option
-							>
-						{/each}
-					</select>
-					<label class="flex h-10 items-center gap-2 rounded-md border px-3 text-sm">
-						Rounds
-						<input class="w-16 bg-transparent" type="number" min="0" max="3" bind:value={rounds} />
-					</label>
-					<label class="flex h-10 items-center gap-2 rounded-md border px-3 text-sm">
-						Temperature
+
+					<div class="min-w-0 space-y-2">
+						<Label for="judge-model">Judge</Label>
+						<Select.Root type="single" bind:value={judgeId}>
+							<Select.Trigger id="judge-model" class="w-full min-w-0">
+								<span class="truncate">{modelTriggerLabel(judgeId, 'Select judge')}</span>
+							</Select.Trigger>
+							<Select.Content class="max-h-80">
+								{#each data.catalog as provider (provider.id)}
+									<Select.Group>
+										<Select.Label>{provider.name}</Select.Label>
+										{#each provider.models as model (model.id)}
+											<Select.Item
+												value={`${provider.id}/${model.id}`}
+												label={`${provider.name}: ${model.name ?? model.id}`}
+											>
+												<span class="truncate">{model.name ?? model.id}</span>
+											</Select.Item>
+										{/each}
+									</Select.Group>
+								{/each}
+							</Select.Content>
+						</Select.Root>
+					</div>
+
+					<div class="grid gap-2 rounded-md border p-3">
+						<Label for="rounds">Rounds</Label>
 						<input
-							class="w-20 bg-transparent"
+							id="rounds"
+							class="h-9 rounded-md bg-input/50 px-3 text-sm"
 							type="number"
 							min="0"
-							max="2"
-							step="0.1"
-							bind:value={temperature}
+							max="3"
+							bind:value={rounds}
 						/>
-					</label>
+					</div>
+
+					<div class="grid gap-3 rounded-md border p-3 md:col-span-2">
+						<div class="flex items-center justify-between gap-3">
+							<Label for="temperature">Temperature</Label>
+							<span class="text-sm text-muted-foreground tabular-nums"
+								>{temperature.toFixed(1)}</span
+							>
+						</div>
+						<Slider
+							id="temperature"
+							type="single"
+							bind:value={temperature}
+							min={0}
+							max={2}
+							step={0.1}
+						/>
+					</div>
 				</div>
-				<div class="flex items-center gap-2">
+
+				<div class="flex flex-col gap-3 sm:flex-row sm:items-center">
 					<Button
+						class="w-full gap-2 sm:w-auto"
 						disabled={running || !prompt || !judgeId || selectedWorkers.length < 2}
 						onclick={run}
 					>
-						Run
+						<Play class="size-4" />
+						{running ? 'Running' : 'Run'}
 					</Button>
-					{#if data.userRole === 'demo'}
-						<Badge variant="secondary">Demo restricted</Badge>
-					{/if}
-					{#if generationId}
-						<a
-							class="text-sm text-muted-foreground underline"
-							href={resolve(`/history/${generationId}`)}>Open saved run</a
-						>
-					{/if}
+					<div class="flex min-w-0 flex-wrap items-center gap-2">
+						{#if data.userRole === 'demo'}
+							<Badge variant="secondary">Demo restricted</Badge>
+						{/if}
+						{#if generationId}
+							<a
+								class="text-sm text-muted-foreground underline"
+								href={resolve(`/history/${generationId}`)}>Open saved run</a
+							>
+						{/if}
+					</div>
 				</div>
 				{#if error}
-					<p class="text-sm text-destructive">{error}</p>
+					<p class="text-sm break-words text-destructive">{error}</p>
 				{/if}
 			</CardContent>
 		</Card>
@@ -235,20 +313,28 @@
 		<Card>
 			<CardHeader><CardTitle>Final judge output</CardTitle></CardHeader>
 			<CardContent>
-				<pre class="min-h-56 rounded-md bg-muted p-4 text-sm whitespace-pre-wrap">{final ||
-						'Waiting for judge output.'}</pre>
+				<ScrollArea class="max-h-[34rem] rounded-md bg-muted">
+					<pre
+						class="min-h-56 max-w-full overflow-x-auto p-4 text-sm break-words whitespace-pre-wrap">{final ||
+							'Waiting for judge output.'}</pre>
+				</ScrollArea>
 			</CardContent>
 		</Card>
 
-		<Accordion.Root type="multiple">
+		<Accordion.Root type="multiple" class="min-w-0">
 			{#each workerOutputs as output (output.key)}
 				<Accordion.Item value={output.key}>
-					<Accordion.Trigger>
-						Round {output.round} · {output.model.providerId}/{output.model.modelId} · {output.status}
+					<Accordion.Trigger class="min-w-0 text-left">
+						<span class="min-w-0 break-words">
+							Round {output.round} · {output.model.providerId}/{output.model.modelId} · {output.status}
+						</span>
 					</Accordion.Trigger>
 					<Accordion.Content>
-						<pre class="rounded-md bg-muted p-4 text-sm whitespace-pre-wrap">{output.error ??
-								output.text}</pre>
+						<ScrollArea class="max-h-96 rounded-md bg-muted">
+							<pre
+								class="max-w-full overflow-x-auto p-4 text-sm break-words whitespace-pre-wrap">{output.error ??
+									output.text}</pre>
+						</ScrollArea>
 					</Accordion.Content>
 				</Accordion.Item>
 			{/each}
