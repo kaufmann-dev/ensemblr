@@ -2,11 +2,12 @@ import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { existsSync } from 'node:fs';
 import postgres from 'postgres';
 import * as schema from '../src/lib/server/db/auth.schema';
 import { appSetting, type ModelSelection } from '../src/lib/server/db/schema';
 
-process.loadEnvFile('.env');
+if (existsSync('.env')) process.loadEnvFile('.env');
 
 const DEFAULT_INTERMEDIATE_TEMPLATE =
 	'Original prompt:\n{{original_prompt}}\n\nPrevious answers:\n{{previous_answers}}\n\nImprove your answer using the strongest points above.';
