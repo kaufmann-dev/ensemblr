@@ -162,7 +162,7 @@ Or by temporarily updating the **Build Command** to include `pnpm db:migrate` an
 
 - **Login**: `/login` — supports admin email/password authentication and one-click demo access via Better Auth
 - **Workspace**: `/` — create and run mixture-of-agents generations
-- **History**: `/history` — view past generation runs
+- **History**: `/history` — view, delete, or clear past generation runs
 - **Settings**: `/settings` — manage provider API keys (encrypted at rest)
 - **Admin**: `/admin` — configure prompt templates and demo model access (admin only)
 

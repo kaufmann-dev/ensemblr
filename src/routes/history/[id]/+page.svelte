@@ -14,7 +14,8 @@
 		Layers, 
 		FileText, 
 		Cpu,
-		ShieldCheck
+		ShieldCheck,
+		Trash2
 	} from '@lucide/svelte';
 	import { resolve } from '$app/paths';
 	import type { PageProps } from './$types';
@@ -59,6 +60,16 @@
 			</span>
 		{/snippet}
 	</PageHeader>
+
+	<div class="flex justify-end px-1">
+		<form method="POST" action={`${resolve('/history')}?/delete`}>
+			<input type="hidden" name="id" value={data.generation.id} />
+			<Button type="submit" variant="destructive" size="sm" class="h-7.5 rounded text-[10px]">
+				<Trash2 class="size-3.5 mr-1" />
+				Delete saved run
+			</Button>
+		</form>
+	</div>
 
 	<!-- Source Prompt Panel -->
 	<Card class="border border-border bg-card rounded overflow-hidden">
