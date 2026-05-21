@@ -118,9 +118,9 @@
 		<Accordion.Root type="multiple" class="w-full grid gap-2">
 			{#each data.outputs as output (output.id)}
 				<Accordion.Item value={output.id} class="rounded border border-border bg-card overflow-hidden">
-					<Accordion.Trigger class="px-4 py-2.5 text-xs font-mono font-medium hover:no-underline hover:bg-muted/40 transition-colors flex items-center justify-between gap-4">
+					<Accordion.Trigger class="px-4 py-2.5 text-xs font-mono font-medium hover:no-underline hover:bg-muted/40 transition-colors flex items-center justify-between gap-4 min-w-0 w-full">
 						<div class="flex items-center gap-2.5 min-w-0">
-							<span class="font-mono text-[9px] uppercase px-1.5 py-0.5 border border-border bg-muted text-muted-foreground tracking-wide rounded-sm">
+							<span class="font-mono text-[9px] uppercase px-1.5 py-0.5 border border-border bg-muted text-muted-foreground tracking-wide rounded-sm whitespace-nowrap shrink-0">
 								{output.phase} · Round {output.round}
 							</span>
 							<span class="truncate text-foreground/90 font-mono text-[11px]">
@@ -130,7 +130,7 @@
 						
 						<span 
 							class={cn(
-								"text-[9px] uppercase px-1.5 py-0.5 rounded font-mono font-medium border",
+								"text-[9px] uppercase px-1.5 py-0.5 rounded font-mono font-medium border shrink-0",
 								output.status === 'completed'
 									? "border-border bg-foreground/5 text-foreground"
 									: output.status === 'failed'
