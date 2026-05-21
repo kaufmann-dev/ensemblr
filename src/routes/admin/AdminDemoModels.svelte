@@ -295,11 +295,11 @@
 			<div 
 				bind:this={scrollViewport} 
 				class={cn(
-					"overflow-y-auto max-h-[35rem] w-full border border-border rounded bg-card custom-scrollbar",
+					"overflow-y-auto max-h-[35rem] w-full custom-scrollbar",
 					filteredModels.length === 0 && "hidden"
 				)}
 			>
-				<div class="pr-5 py-1">
+				<div class="pr-2">
 					<Table.Root>
 						<Table.Header class="hover:bg-transparent">
 							<Table.Row class="hover:bg-transparent border-border">
@@ -332,10 +332,10 @@
 									<!-- Model Column -->
 									<Table.Cell class="py-3">
 										<div class={cn(
-											"flex min-w-0 items-center gap-3 rounded border p-2.5 transition-all duration-150",
+											"flex min-w-0 items-center gap-3 rounded px-3 py-2 transition-colors duration-150",
 											allowedSet.has(row.value)
-												? "bg-foreground/5 border-foreground/30 shadow-none"
-												: "bg-muted/5 border-border/60 hover:bg-muted/15 hover:border-border/80"
+												? "bg-foreground/8"
+												: "bg-muted/40 hover:bg-muted/60"
 										)}>
 											<Checkbox
 												id={row.id}
