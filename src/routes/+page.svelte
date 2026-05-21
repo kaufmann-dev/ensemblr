@@ -205,51 +205,50 @@
 	}
 </script>
 
-<svelte:head><title>Workspace | Ensemblr</title></svelte:head>
+<svelte:head><title>Workspace | ensemblr</title></svelte:head>
 
-<main class="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[20rem_1fr] flex-1 min-h-0">
+<main class="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[18rem_1fr] flex-1 min-h-0">
 	<!-- Sidebar Pane: History -->
-	<aside class="order-2 space-y-5 lg:order-1 lg:max-w-[20rem]">
-		<Card class="glass-panel border-border/30 premium-glow-cyan h-full flex flex-col">
-			<CardHeader class="pb-3 border-b border-border/20">
+	<aside class="order-2 space-y-5 lg:order-1 lg:max-w-[18rem]">
+		<Card class="border border-border bg-card rounded shadow-xs h-full flex flex-col">
+			<CardHeader class="pb-3 pt-4 px-4 border-b border-border">
 				<div class="flex items-center gap-2">
-					<History class="size-4 text-cyan-400" />
-					<CardTitle class="text-base font-bold">Recent runs</CardTitle>
+					<History class="size-4 text-foreground/85" />
+					<CardTitle class="text-sm font-bold font-mono tracking-tight">Recent runs</CardTitle>
 				</div>
-				<CardDescription class="text-xs">Your saved mixture history</CardDescription>
+				<CardDescription class="text-[10px] font-mono text-muted-foreground mt-0.5">Saved mixture history</CardDescription>
 			</CardHeader>
-			<CardContent class="p-3 flex-1 overflow-hidden">
+			<CardContent class="p-2 flex-1 overflow-hidden">
 				<ScrollArea class="h-[25rem] lg:h-[calc(100vh-17rem)]">
-					<div class="space-y-2 pr-2 py-1">
+					<div class="space-y-1.5 pr-2 py-0.5">
 						{#each data.history as item (item.id)}
 							<a
-								class="group/item block rounded-xl border border-border/25 bg-muted/10 p-3 text-sm transition-all hover:bg-muted/40 hover:border-cyan-500/30 hover:scale-[0.99] active:scale-95"
+								class="group/item block rounded border border-border bg-muted/20 p-2.5 transition-all hover:bg-muted/65 hover:border-foreground/30"
 								href={resolve(`/history/${item.id}`)}
 							>
-								<div class="line-clamp-2 font-medium text-foreground/90 group-hover/item:text-foreground break-words transition-colors">
+								<div class="line-clamp-2 font-mono text-[11px] leading-relaxed text-foreground/80 group-hover/item:text-foreground break-words transition-colors">
 									{item.prompt}
 								</div>
-								<div class="mt-2 flex items-center justify-between gap-2">
-									<span class="text-[10px] uppercase font-bold text-muted-foreground/60 tabular-nums">
+								<div class="mt-2.5 flex items-center justify-between gap-2">
+									<span class="text-[9px] font-mono text-muted-foreground/75 tabular-nums">
 										{new Date(item.createdAt).toLocaleDateString()}
 									</span>
-									<Badge 
-										variant="outline" 
+									<span 
 										class={cn(
-											"text-[9px] px-1.5 py-0 font-bold uppercase",
+											"text-[9px] font-mono font-medium uppercase px-1.5 py-0.5 rounded border tracking-wide",
 											item.status === 'completed' 
-												? "border-emerald-500/20 bg-emerald-500/5 text-emerald-400" 
-												: "border-amber-500/20 bg-amber-500/5 text-amber-400"
+												? "border-border bg-foreground/5 text-foreground" 
+												: "border-destructive/25 bg-destructive/5 text-destructive"
 										)}
 									>
 										{item.status}
-									</Badge>
+									</span>
 								</div>
 							</a>
 						{:else}
 							<div class="flex flex-col items-center justify-center py-12 text-center">
-								<History class="size-8 text-muted-foreground/35 mb-2 stroke-[1.5]" />
-								<p class="text-xs text-muted-foreground/80">No generations saved yet.</p>
+								<History class="size-7 text-muted-foreground/35 mb-2 stroke-[1.5]" />
+								<p class="text-[11px] font-mono text-muted-foreground/75">No generations saved yet.</p>
 							</div>
 						{/each}
 					</div>
@@ -259,40 +258,40 @@
 	</aside>
 
 	<!-- Main Workspace Area -->
-	<section class="order-1 min-w-0 space-y-6 lg:order-2 flex flex-col">
-		<Card class="glass-panel border-border/30 premium-glow-purple">
-			<CardHeader class="pb-3 border-b border-border/20">
+	<section class="order-1 min-w-0 space-y-5 lg:order-2 flex flex-col">
+		<Card class="border border-border bg-card rounded shadow-xs">
+			<CardHeader class="pb-3 pt-4 px-5 border-b border-border">
 				<div class="flex items-center justify-between gap-3">
 					<div class="flex items-center gap-2.5">
-						<div class="flex size-8 items-center justify-center rounded-xl bg-primary/10 border border-primary/20">
-							<Sparkles class="size-4 text-primary animate-pulse" />
+						<div class="flex size-7 items-center justify-center rounded border border-border bg-muted">
+							<Sparkles class="size-3.5 text-foreground/80" />
 						</div>
 						<div>
-							<CardTitle class="text-lg font-bold tracking-tight">Mixture workspace</CardTitle>
-							<CardDescription class="text-xs">Synthesize responses using Mixture-of-Agents (MoA)</CardDescription>
+							<CardTitle class="text-sm font-bold font-mono tracking-tight">Mixture workspace</CardTitle>
+							<CardDescription class="text-[10px] font-mono text-muted-foreground mt-0.5">Orchestrate LLMs via Mixture-of-Agents (MoA)</CardDescription>
 						</div>
 					</div>
 					{#if running}
-						<Badge variant="outline" class="flex items-center gap-1.5 border-primary/30 bg-primary/5 text-primary py-1 px-2.5 rounded-full font-semibold animate-pulse">
+						<span class="flex items-center gap-1.5 border border-border bg-foreground/5 text-foreground py-0.5 px-2 rounded font-mono text-[9px] uppercase tracking-wider animate-pulse">
 							<Loader2 class="size-3 animate-spin" />
 							<span>Synthesizing</span>
-						</Badge>
+						</span>
 					{/if}
 				</div>
 			</CardHeader>
 
-			<CardContent class="space-y-6 pt-5">
+			<CardContent class="space-y-4.5 p-5">
 				<!-- Prompt Area -->
-				<div class="space-y-2.5">
+				<div class="space-y-2">
 					<div class="flex justify-between items-center">
-						<Label for="prompt" class="text-xs font-bold uppercase tracking-wider text-foreground/85">System prompt input</Label>
-						<span class="text-[10px] font-mono text-muted-foreground/60 tabular-nums">
+						<Label for="prompt" class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">System prompt input</Label>
+						<span class="text-[9px] font-mono text-muted-foreground/60 tabular-nums">
 							{prompt.length} chars
 						</span>
 					</div>
 					<Textarea
 						id="prompt"
-						class="min-h-36 resize-y font-sans text-sm focus-visible:ring-primary/15"
+						class="min-h-32 resize-y font-mono text-xs rounded border border-border focus-visible:ring-1 focus-visible:ring-foreground/20 p-3"
 						placeholder="What would you like the Mixture-of-Agents to synthesize? Enter a complex task, coding query, or reasoning prompt..."
 						bind:value={prompt}
 						disabled={running}
@@ -301,30 +300,30 @@
 
 				{#if hasModelOptions}
 					<!-- Workers and Judge Select Grid -->
-					<div class="grid gap-5 md:grid-cols-2">
+					<div class="grid gap-4 md:grid-cols-2">
 						<!-- Loop through Workers -->
 						{#each workers as worker, index (worker.id)}
-							<div class="space-y-2 group/select">
+							<div class="space-y-1.5 group/select">
 								<div class="flex items-center gap-1.5">
-									<Cpu class="size-3.5 text-muted-foreground/80 group-hover/select:text-primary transition-colors" />
-									<Label for={worker.id} class="text-xs font-bold uppercase tracking-wider text-foreground/80">Worker Model {index + 1}</Label>
+									<Cpu class="size-3.5 text-muted-foreground/70" />
+									<Label for={worker.id} class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Worker Model {index + 1}</Label>
 								</div>
 								
 								<Select.Root type="single" bind:value={worker.value} disabled={running}>
-									<Select.Trigger id={worker.id} class="w-full">
+									<Select.Trigger id={worker.id} class="h-8.5 rounded border border-border bg-card text-xs font-mono font-medium focus:ring-0 focus:ring-offset-0 focus-visible:ring-1 focus-visible:ring-foreground/20 focus-visible:ring-offset-0">
 										<span class="truncate">
-											{modelTriggerLabel(worker.value, `Select synthesis worker ${index + 1}`)}
+											{modelTriggerLabel(worker.value, `Select worker ${index + 1}`)}
 										</span>
 									</Select.Trigger>
-									<Select.Content class="max-h-80 border-border/30 bg-popover/95 backdrop-blur-2xl">
+									<Select.Content class="max-h-80 border border-border bg-popover rounded p-1 shadow-md">
 										{#each data.catalog as provider (provider.id)}
 											<Select.Group>
-												<Select.Label class="text-[10px] uppercase font-black text-muted-foreground/50 tracking-widest px-2 py-1">{provider.name}</Select.Label>
+												<Select.Label class="text-[9px] uppercase font-mono font-black text-muted-foreground px-2.5 py-1.5 tracking-widest">{provider.name}</Select.Label>
 												{#each provider.models as model (model.id)}
 													<Select.Item
 														value={`${provider.id}/${model.id}`}
 														label={`${provider.name}: ${model.name ?? model.id}`}
-														class="rounded-xl mx-1"
+														class="rounded-sm mx-0.5 text-xs font-mono px-2 py-1.5 cursor-pointer"
 													>
 														<span class="truncate font-medium">{model.name ?? model.id}</span>
 													</Select.Item>
@@ -337,27 +336,27 @@
 						{/each}
 
 						<!-- Select Judge -->
-						<div class="space-y-2 group/select">
+						<div class="space-y-1.5 group/select">
 							<div class="flex items-center gap-1.5">
-								<ShieldCheck class="size-3.5 text-cyan-400/80 group-hover/select:text-cyan-400 transition-colors" />
-								<Label for="judge-model" class="text-xs font-bold uppercase tracking-wider text-foreground/80">Synthesizing Judge Model</Label>
+								<ShieldCheck class="size-3.5 text-muted-foreground" />
+								<Label for="judge-model" class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Synthesizing Judge Model</Label>
 							</div>
 							
 							<Select.Root type="single" bind:value={judgeId} disabled={running}>
-								<Select.Trigger id="judge-model" class="w-full border-cyan-500/20 bg-cyan-500/5 hover:border-cyan-500/40 text-cyan-200">
-									<span class="truncate font-semibold text-cyan-200">
+								<Select.Trigger id="judge-model" class="w-full h-8.5 rounded border border-border bg-muted/30 hover:border-foreground/30 text-xs font-mono font-medium focus:ring-0 focus-visible:ring-1 focus-visible:ring-foreground/20">
+									<span class="truncate font-bold">
 										{modelTriggerLabel(judgeId, 'Select judge model')}
 									</span>
 								</Select.Trigger>
-								<Select.Content class="max-h-80 border-cyan-500/20 bg-popover/95 backdrop-blur-2xl">
+								<Select.Content class="max-h-80 border border-border bg-popover rounded p-1 shadow-md">
 									{#each data.catalog as provider (provider.id)}
 										<Select.Group>
-											<Select.Label class="text-[10px] uppercase font-black text-muted-foreground/50 tracking-widest px-2 py-1">{provider.name}</Select.Label>
+											<Select.Label class="text-[9px] uppercase font-mono font-black text-muted-foreground px-2.5 py-1.5 tracking-widest">{provider.name}</Select.Label>
 											{#each provider.models as model (model.id)}
 												<Select.Item
 													value={`${provider.id}/${model.id}`}
 													label={`${provider.name}: ${model.name ?? model.id}`}
-													class="rounded-xl mx-1 focus:bg-cyan-500/10 focus:text-cyan-200"
+													class="rounded-sm mx-0.5 text-xs font-mono focus:bg-muted focus:text-foreground"
 												>
 													<span class="truncate font-medium">{model.name ?? model.id}</span>
 												</Select.Item>
@@ -369,40 +368,40 @@
 						</div>
 
 						<!-- Stepper Config: Rounds -->
-						<div class="space-y-2">
+						<div class="space-y-1.5">
 							<div class="flex items-center gap-1.5">
 								<Layers class="size-3.5 text-muted-foreground/80" />
-								<Label for="rounds" class="text-xs font-bold uppercase tracking-wider text-foreground/80">Rounds of mixture</Label>
+								<Label for="rounds" class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Rounds of mixture</Label>
 							</div>
 							<div class="relative flex items-center">
 								<input
 									id="rounds"
-									class="h-9 w-full rounded-xl border border-border/40 bg-card/45 backdrop-blur-sm px-4 text-sm font-medium transition-all focus:border-primary/80 focus:ring-3 focus:ring-primary/15 outline-none"
+									class="h-8.5 w-full rounded border border-border bg-card px-3 text-xs font-mono focus-visible:ring-1 focus-visible:ring-foreground/20 outline-none"
 									type="number"
 									min="1"
 									max="3"
 									bind:value={rounds}
 									disabled={running}
 								/>
-								<span class="absolute right-3 text-[10px] text-muted-foreground/50 uppercase font-bold tracking-wider">
-									Rounds (Max 3)
+								<span class="absolute right-3 text-[9px] text-muted-foreground uppercase font-mono tracking-widest">
+									Max 3
 								</span>
 							</div>
 						</div>
 
 						<!-- Config Slider: Temperature -->
-						<div class="grid gap-3 rounded-xl border border-border/30 bg-muted/10 p-3 md:col-span-2">
+						<div class="grid gap-3 rounded border border-border bg-muted/30 p-3 md:col-span-2">
 							<div class="flex items-center justify-between gap-3">
 								<div class="flex items-center gap-1.5">
-									<Thermometer class="size-3.5 text-amber-400" />
-									<Label for="temperature" class="text-xs font-bold uppercase tracking-wider text-foreground/80">Generation Temperature</Label>
+									<Thermometer class="size-3.5 text-foreground/80" />
+									<Label for="temperature" class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Generation Temperature</Label>
 								</div>
-								<span class="text-xs font-mono font-bold bg-amber-400/10 px-2 py-0.5 rounded-full text-amber-400 tabular-nums">
+								<span class="text-[10px] font-mono font-bold bg-foreground/10 px-2 py-0.5 rounded text-foreground tabular-nums">
 									{temperature.toFixed(1)}
 								</span>
 							</div>
 							<div class="flex items-center gap-3 pt-1">
-								<span class="text-[10px] font-bold text-muted-foreground/60 uppercase">Precise</span>
+								<span class="text-[9px] font-mono font-medium text-muted-foreground uppercase tracking-widest">Precise</span>
 								<Slider
 									id="temperature"
 									type="single"
@@ -413,26 +412,26 @@
 									disabled={running}
 									class="flex-1"
 								/>
-								<span class="text-[10px] font-bold text-muted-foreground/60 uppercase">Creative</span>
+								<span class="text-[9px] font-mono font-medium text-muted-foreground uppercase tracking-widest">Creative</span>
 							</div>
 						</div>
 					</div>
 				{:else}
 					<!-- Key Setup Callout -->
-					<div class="flex flex-col gap-4 rounded-xl border border-amber-500/20 bg-amber-500/5 p-5 sm:flex-row sm:items-center sm:justify-between">
+					<div class="flex flex-col gap-4 rounded border border-border bg-muted/40 p-4 sm:flex-row sm:items-center sm:justify-between">
 						<div class="flex items-start gap-3 min-w-0">
-							<div class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400">
-								<Key class="size-4" />
+							<div class="flex size-8 shrink-0 items-center justify-center rounded border border-border bg-muted text-muted-foreground">
+								<Key class="size-3.5" />
 							</div>
 							<div class="min-w-0">
-								<h4 class="text-sm font-bold text-amber-200">No Models Available</h4>
-								<p class="text-xs text-muted-foreground/80 mt-0.5 break-words">
+								<h4 class="text-xs font-mono font-bold text-foreground">No Models Available</h4>
+								<p class="text-[10px] font-mono text-muted-foreground mt-0.5 break-words">
 									{emptyModelsMessage}
 								</p>
 							</div>
 						</div>
 						{#if data.userRole !== 'demo'}
-							<Button href={resolve('/settings')} variant="outline" size="sm" class="rounded-xl shrink-0 border-amber-500/25 text-amber-400 hover:bg-amber-500/10 hover:text-amber-300">
+							<Button href={resolve('/settings')} variant="outline" size="sm" class="rounded h-8 text-[10px] font-mono shrink-0 border-border text-foreground hover:bg-muted">
 								Configure keys
 							</Button>
 						{/if}
@@ -440,31 +439,31 @@
 				{/if}
 
 				<!-- Execution Bar -->
-				<div class="flex flex-col gap-4 sm:flex-row sm:items-center border-t border-border/20 pt-4">
+				<div class="flex flex-col gap-4 sm:flex-row sm:items-center border-t border-border pt-4">
 					<Button 
-						class="w-full gap-2 sm:w-auto h-11 px-6 font-bold shadow-lg shadow-primary/20 hover:shadow-primary/30 text-base" 
+						class="w-full gap-2 sm:w-auto h-8.5 px-4 font-mono text-xs font-bold rounded shadow-none" 
 						disabled={!canRun} 
 						onclick={run}
 					>
 						{#if running}
-							<Loader2 class="size-4 animate-spin" />
+							<Loader2 class="size-3.5 animate-spin" />
 							<span>Running Mixture</span>
 						{:else}
-							<Play class="size-4 fill-current" />
+							<Play class="size-3.5 fill-current" />
 							<span>Run Synthesis</span>
 						{/if}
 					</Button>
 					
 					<div class="flex min-w-0 flex-wrap items-center gap-3">
 						{#if data.userRole === 'demo'}
-							<Badge variant="secondary" class="border-cyan-500/20 bg-cyan-500/10 text-cyan-300 font-semibold px-2 py-0.5">
+							<span class="border border-border bg-muted text-muted-foreground font-mono text-[9px] uppercase px-1.5 py-0.5 rounded">
 								Demo restricted
-							</Badge>
+							</span>
 						{/if}
 						
 						{#if generationId}
 							<a
-								class="text-xs text-cyan-400 hover:text-cyan-300 underline underline-offset-4 font-bold flex items-center gap-1.5 transition-colors"
+								class="text-[11px] font-mono text-foreground hover:underline underline-offset-4 flex items-center gap-1.5 transition-colors"
 								href={resolve(`/history/${generationId}`)}
 							>
 								<Activity class="size-3" />
@@ -475,22 +474,22 @@
 				</div>
 				
 				{#if error}
-					<div class="rounded-xl border border-destructive/20 bg-destructive/5 p-3 flex items-start gap-2.5">
+					<div class="rounded border border-destructive/20 bg-destructive/5 p-3 flex items-start gap-2.5">
 						<AlertCircle class="size-4 text-destructive shrink-0 mt-0.5" />
-						<p class="text-xs font-semibold text-destructive break-words">{error}</p>
+						<p class="text-[11px] font-mono text-destructive break-words">{error}</p>
 					</div>
 				{/if}
 			</CardContent>
 		</Card>
 
 		<!-- Live Streaming / Synthesis Final Result -->
-		<Card class="glass-panel border-border/30 premium-glow-cyan flex flex-col min-h-80 overflow-hidden">
-			<CardHeader class="pb-3 border-b border-border/20 flex flex-row items-center justify-between gap-4">
+		<Card class="border border-border bg-card rounded shadow-xs flex flex-col min-h-[350px] overflow-hidden">
+			<CardHeader class="pb-3 pt-4 px-5 flex flex-row items-center justify-between gap-4">
 				<div class="flex items-center gap-2">
-					<ShieldCheck class="size-4 text-cyan-400" />
+					<ShieldCheck class="size-4 text-foreground/80" />
 					<div>
-						<CardTitle class="text-base font-bold">Synthesis Synthesis Output</CardTitle>
-						<CardDescription class="text-[10px]">Real-time finalized MoA judge synthesis</CardDescription>
+						<CardTitle class="text-sm font-bold font-mono tracking-tight">Synthesis Output</CardTitle>
+						<CardDescription class="text-[10px] font-mono text-muted-foreground mt-0.5">Real-time finalized MoA judge synthesis</CardDescription>
 					</div>
 				</div>
 				{#if final}
@@ -498,30 +497,30 @@
 						variant="ghost" 
 						size="icon" 
 						onclick={copyFinalOutput} 
-						class="size-8 rounded-lg text-muted-foreground hover:text-cyan-400 active:scale-95 transition-all"
+						class="size-7 rounded text-muted-foreground hover:bg-muted hover:text-foreground active:scale-95 transition-all"
 						aria-label="Copy output"
 					>
 						{#if copySuccess}
-							<Check class="size-3.5 text-emerald-400" />
+							<Check class="size-3.5 text-foreground" />
 						{:else}
 							<Copy class="size-3.5" />
 						{/if}
 					</Button>
 				{/if}
 			</CardHeader>
-			<CardContent class="p-0 flex-1 flex flex-col bg-muted/15">
+			<CardContent class="p-0 flex-1 flex flex-col bg-muted/5 border-t border-border">
 				<ScrollArea class="h-80 lg:h-[26rem] w-full flex-1">
 					{#if final}
-						<pre class="code-area p-5 text-foreground/90 whitespace-pre-wrap selection:bg-cyan-500/25 break-words select-text">{final}</pre>
+						<pre class="code-area p-5 text-foreground/90 whitespace-pre-wrap selection:bg-foreground/10 break-words select-text outline-none">{final}</pre>
 					{:else if running}
 						<div class="flex flex-col items-center justify-center p-20 text-center h-full">
-							<Loader2 class="size-8 text-cyan-400 animate-spin mb-3 stroke-[1.5]" />
-							<p class="text-xs font-medium text-muted-foreground animate-pulse">Mixture-of-Agents is generating synthesis... Please wait.</p>
+							<Loader2 class="size-6 text-muted-foreground/60 animate-spin mb-3 stroke-[1.5]" />
+							<p class="text-xs font-mono text-muted-foreground/80 animate-pulse">Mixture-of-Agents is generating synthesis... Please wait.</p>
 						</div>
 					{:else}
 						<div class="flex flex-col items-center justify-center p-20 text-center text-muted-foreground/50 h-full">
-							<Cpu class="size-10 text-muted-foreground/35 mb-3 stroke-[1.2] animate-bounce duration-[3s]" />
-							<p class="text-xs font-medium max-w-sm leading-relaxed text-muted-foreground/70">
+							<Cpu class="size-8 text-muted-foreground/35 mb-2 stroke-[1.2]" />
+							<p class="text-[11px] font-mono max-w-sm leading-relaxed text-muted-foreground/75">
 								Waiting for execution. Fill the system prompt and trigger the mixture synthesis.
 							</p>
 						</div>
@@ -534,40 +533,39 @@
 		{#if workerOutputs.length > 0}
 			<div class="space-y-3 pt-2">
 				<div class="flex items-center gap-2 px-1">
-					<Layers class="size-4 text-primary" />
-					<h3 class="text-xs font-bold uppercase tracking-wider text-foreground/80">Worker Mixture Layers ({workerOutputs.length})</h3>
+					<Layers class="size-4 text-foreground/80" />
+					<h3 class="text-xs font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Worker Mixture Layers ({workerOutputs.length})</h3>
 				</div>
 				
 				<Accordion.Root type="multiple" class="w-full grid gap-2">
 					{#each workerOutputs as output (output.key)}
-						<Accordion.Item value={output.key} class="rounded-xl border border-border/25 bg-card/45 backdrop-blur-md overflow-hidden transition-all duration-300 hover:border-primary/25 shadow-sm">
-							<Accordion.Trigger class="px-4 py-3 text-sm font-semibold hover:no-underline hover:bg-muted/10 transition-colors flex items-center justify-between gap-4">
+						<Accordion.Item value={output.key} class="rounded border border-border bg-card overflow-hidden transition-all duration-150 hover:border-foreground/30 shadow-xs">
+							<Accordion.Trigger class="px-4 py-2.5 text-xs font-mono font-medium hover:no-underline hover:bg-muted/40 transition-colors flex items-center justify-between gap-4">
 								<div class="flex items-center gap-2.5 min-w-0">
-									<Badge variant="outline" class="font-mono text-[9px] uppercase px-1.5 py-0 border-primary/25 bg-primary/5 text-primary tracking-wide">
+									<span class="font-mono text-[9px] uppercase px-1.5 py-0.5 border border-border bg-muted text-muted-foreground tracking-wide rounded-sm">
 										Round {output.round}
-									</Badge>
-									<span class="truncate text-foreground/90 font-medium font-mono text-xs">
+									</span>
+									<span class="truncate text-foreground/90 font-mono text-[11px]">
 										{output.model.providerId}/{output.model.modelId}
 									</span>
 								</div>
 								
-								<Badge 
-									variant="outline" 
+								<span 
 									class={cn(
-										"text-[9px] uppercase px-2 py-0.5 rounded-full font-bold",
+										"text-[9px] uppercase px-1.5 py-0.5 rounded font-mono font-medium border",
 										output.status === 'completed'
-											? "border-emerald-500/25 bg-emerald-500/5 text-emerald-400"
+											? "border-border bg-foreground/5 text-foreground"
 											: output.status === 'failed'
-												? "border-destructive/25 bg-destructive/5 text-destructive"
-												: "border-primary/25 bg-primary/5 text-primary animate-pulse"
+												? "border-destructive/30 bg-destructive/5 text-destructive"
+												: "border-border bg-muted text-muted-foreground animate-pulse"
 									)}
 								>
 									{output.status}
-								</Badge>
+								</span>
 							</Accordion.Trigger>
-							<Accordion.Content class="p-0 border-t border-border/20 bg-muted/5">
+							<Accordion.Content class="p-0 border-t border-border bg-muted/5">
 								<ScrollArea class="max-h-96 w-full">
-									<pre class="code-area p-4 text-foreground/85 whitespace-pre-wrap break-words">{output.error ?? output.text}</pre>
+									<pre class="code-area p-4 text-foreground/85 whitespace-pre-wrap break-words bg-muted/10 selection:bg-foreground/10 outline-none">{output.error ?? output.text}</pre>
 								</ScrollArea>
 							</Accordion.Content>
 						</Accordion.Item>
