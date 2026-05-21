@@ -18,14 +18,23 @@ type RunEvent =
 	| { type: 'generation'; generationId: string }
 	| {
 			type: 'status';
+			outputId: string;
 			phase: 'worker' | 'judge';
 			round: number;
 			model: ModelSelection;
 			status: string;
 	  }
-	| { type: 'text'; phase: 'worker' | 'judge'; round: number; model: ModelSelection; text: string }
+	| {
+			type: 'text';
+			outputId: string;
+			phase: 'worker' | 'judge';
+			round: number;
+			model: ModelSelection;
+			text: string;
+	  }
 	| {
 			type: 'error';
+			outputId?: string;
 			phase: 'worker' | 'judge';
 			round: number;
 			model: ModelSelection;
@@ -97,7 +106,7 @@ async function runModel(
 		status: 'running',
 		output: ''
 	});
-	emit({ type: 'status', phase, round, model, status: 'running' });
+	emit({ type: 'status', outputId, phase, round, model, status: 'running' });
 
 	try {
 		const catalog = await findCatalogModel(model.providerId, model.modelId);
@@ -115,7 +124,7 @@ async function runModel(
 		let text = '';
 		for await (const delta of result.textStream) {
 			text += delta;
-			emit({ type: 'text', phase, round, model, text: delta });
+			emit({ type: 'text', outputId, phase, round, model, text: delta });
 		}
 
 		if (text.trim().length === 0) throw new Error('Model returned an empty response');
@@ -124,7 +133,7 @@ async function runModel(
 			.update(generationOutput)
 			.set({ status: 'completed', output: text })
 			.where(eq(generationOutput.id, outputId));
-		emit({ type: 'status', phase, round, model, status: 'completed' });
+		emit({ type: 'status', outputId, phase, round, model, status: 'completed' });
 		return { model, text };
 	} catch (error) {
 		const message = error instanceof Error ? error.message : 'Generation failed';
@@ -132,7 +141,7 @@ async function runModel(
 			.update(generationOutput)
 			.set({ status: 'failed', error: message })
 			.where(eq(generationOutput.id, outputId));
-		emit({ type: 'error', phase, round, model, error: message });
+		emit({ type: 'error', outputId, phase, round, model, error: message });
 		return undefined;
 	}
 }
