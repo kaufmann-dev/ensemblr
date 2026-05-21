@@ -37,63 +37,59 @@
 	}
 </script>
 
-<svelte:head><title>Saved generation | Ensemblr</title></svelte:head>
+<svelte:head><title>Saved generation | ensemblr</title></svelte:head>
 
-<main class="relative flex-1 flex flex-col justify-start max-w-5xl mx-auto w-full px-4 py-8 space-y-6 bg-background">
-	<!-- Glowing background accent orb -->
-	<div class="absolute top-[20%] right-[10%] -z-10 size-[25rem] rounded-full bg-primary/5 blur-[90px]"></div>
-
+<main class="relative flex-1 flex flex-col justify-start max-w-5xl mx-auto w-full px-4 py-8 space-y-5 bg-background">
 	<!-- Header Nav Back -->
 	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-1">
 		<div class="flex items-center gap-3">
 			<a
 				href={resolve('/history')}
-				class="flex size-9 items-center justify-center rounded-xl border border-border/50 bg-card/65 backdrop-blur-md hover:bg-muted text-muted-foreground hover:text-foreground active:scale-95 transition-all shadow-sm"
+				class="flex size-7 items-center justify-center rounded border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground active:scale-95 transition-all shadow-xs"
 				aria-label="Back to history"
 			>
 				<ArrowLeft class="size-4" />
 			</a>
 			<div>
-				<h1 class="text-xl font-bold tracking-tight text-foreground flex flex-wrap items-center gap-2.5">
+				<h1 class="text-sm font-bold font-mono tracking-tight text-foreground flex flex-wrap items-center gap-2">
 					Saved generation
-					<Badge 
-						variant="outline"
+					<span 
 						class={cn(
-							"text-[9px] uppercase font-bold px-2 py-0.5 rounded-full border shadow-sm",
+							"text-[9px] font-mono font-medium uppercase px-1.5 py-0.5 rounded border tracking-wide",
 							data.generation.status === 'completed'
-								? "border-emerald-500/25 bg-emerald-500/5 text-emerald-400"
-								: "border-amber-500/25 bg-amber-500/5 text-amber-400"
+								? "border-border bg-foreground/5 text-foreground"
+								: "border-destructive/30 bg-destructive/5 text-destructive"
 						)}
 					>
 						{data.generation.status}
-					</Badge>
+					</span>
 				</h1>
-				<p class="text-xs text-muted-foreground/85">Review mixture configurations and generated LLM responses</p>
+				<p class="text-[10px] font-mono text-muted-foreground mt-0.5">Review mixture configurations and generated LLM responses</p>
 			</div>
 		</div>
 	</div>
 
 	<!-- Main Details Card -->
-	<Card class="glass-panel border-border/30 premium-glow-purple">
-		<CardHeader class="pb-3 border-b border-border/20">
+	<Card class="border border-border bg-card rounded shadow-xs overflow-hidden">
+		<CardHeader class="pb-3 pt-4 px-5 border-b border-border">
 			<div class="flex items-center gap-2">
-				<FileText class="size-4 text-primary" />
-				<CardTitle class="text-base font-bold">Source prompt</CardTitle>
+				<FileText class="size-3.5 text-foreground/80" />
+				<CardTitle class="text-sm font-bold font-mono tracking-tight">Source prompt</CardTitle>
 			</div>
 		</CardHeader>
-		<CardContent class="p-0 bg-muted/5 border-b border-border/20">
-			<ScrollArea class="max-h-56 w-full">
-				<pre class="code-area p-5 text-foreground/80 break-words whitespace-pre-wrap select-text">{data.generation.prompt}</pre>
+		<CardContent class="p-0 bg-muted/5 border-b border-border">
+			<ScrollArea class="max-h-52 w-full">
+				<pre class="code-area p-5 text-foreground/80 break-words whitespace-pre-wrap select-text outline-none">{data.generation.prompt}</pre>
 			</ScrollArea>
 		</CardContent>
 
 		<!-- Final Synthesis Output -->
-		<CardHeader class="pb-3 border-t border-border/10 flex flex-row items-center justify-between gap-4">
+		<CardHeader class="pb-3 pt-4 px-5 border-t border-border flex flex-row items-center justify-between gap-4">
 			<div class="flex items-center gap-2">
-				<ShieldCheck class="size-4 text-cyan-400" />
+				<ShieldCheck class="size-4 text-foreground/80" />
 				<div>
-					<CardTitle class="text-base font-bold">Synthesized output</CardTitle>
-					<CardDescription class="text-[10px]">The final synthesized Mixture-of-Agents response</CardDescription>
+					<CardTitle class="text-sm font-bold font-mono tracking-tight">Synthesized output</CardTitle>
+					<CardDescription class="text-[10px] font-mono text-muted-foreground mt-0.5">Final synthesized response</CardDescription>
 				</div>
 			</div>
 			{#if data.generation.finalOutput || data.generation.error}
@@ -101,20 +97,20 @@
 					variant="ghost" 
 					size="icon" 
 					onclick={copyFinalOutput} 
-					class="size-8 rounded-lg text-muted-foreground hover:text-cyan-400 active:scale-95 transition-all"
+					class="size-7 rounded text-muted-foreground hover:bg-muted hover:text-foreground active:scale-95 transition-all"
 					aria-label="Copy output"
 				>
 					{#if copySuccess}
-						<Check class="size-3.5 text-emerald-400" />
+						<Check class="size-3.5 text-foreground" />
 					{:else}
 						<Copy class="size-3.5" />
 					{/if}
 				</Button>
 			{/if}
 		</CardHeader>
-		<CardContent class="p-0 bg-muted/15">
+		<CardContent class="p-0 bg-muted/5 border-t border-border">
 			<ScrollArea class="max-h-[30rem] w-full">
-				<pre class="code-area p-5 text-foreground whitespace-pre-wrap selection:bg-cyan-500/25 break-words select-text">{data.generation.finalOutput ?? data.generation.error ?? 'No final output saved.'}</pre>
+				<pre class="code-area p-5 text-foreground whitespace-pre-wrap selection:bg-foreground/10 break-words select-text outline-none">{data.generation.finalOutput ?? data.generation.error ?? 'No final output saved.'}</pre>
 			</ScrollArea>
 		</CardContent>
 	</Card>
@@ -122,45 +118,44 @@
 	<!-- Worker Mixture Steps -->
 	<div class="space-y-3">
 		<div class="flex items-center gap-2 px-1">
-			<Layers class="size-4 text-cyan-400" />
-			<h2 class="text-xs font-bold uppercase tracking-wider text-foreground/80">Worker Mixture Steps ({data.outputs.length})</h2>
+			<Layers class="size-4 text-foreground/80" />
+			<h2 class="text-xs font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Worker Mixture Steps ({data.outputs.length})</h2>
 		</div>
 
 		<Accordion.Root type="multiple" class="w-full grid gap-2">
 			{#each data.outputs as output (output.id)}
-				<Accordion.Item value={output.id} class="rounded-xl border border-border/25 bg-card/45 backdrop-blur-md overflow-hidden transition-all duration-300 hover:border-primary/25 shadow-sm">
-					<Accordion.Trigger class="px-4 py-3 text-sm font-semibold hover:no-underline hover:bg-muted/10 transition-colors flex items-center justify-between gap-4">
+				<Accordion.Item value={output.id} class="rounded border border-border bg-card overflow-hidden transition-all duration-150 hover:border-foreground/30 shadow-xs">
+					<Accordion.Trigger class="px-4 py-2.5 text-xs font-mono font-medium hover:no-underline hover:bg-muted/40 transition-colors flex items-center justify-between gap-4">
 						<div class="flex items-center gap-2.5 min-w-0">
-							<Badge variant="outline" class="font-mono text-[9px] uppercase px-1.5 py-0 border-primary/25 bg-primary/5 text-primary tracking-wide">
+							<span class="font-mono text-[9px] uppercase px-1.5 py-0.5 border border-border bg-muted text-muted-foreground tracking-wide rounded-sm">
 								{output.phase} · Round {output.round}
-							</Badge>
-							<span class="truncate text-foreground/90 font-medium font-mono text-xs">
+							</span>
+							<span class="truncate text-foreground/90 font-mono text-[11px]">
 								{output.providerId}/{output.modelId}
 							</span>
 						</div>
 						
-						<Badge 
-							variant="outline" 
+						<span 
 							class={cn(
-								"text-[9px] uppercase px-2 py-0.5 rounded-full font-bold",
+								"text-[9px] uppercase px-1.5 py-0.5 rounded font-mono font-medium border",
 								output.status === 'completed'
-									? "border-emerald-500/25 bg-emerald-500/5 text-emerald-400"
+									? "border-border bg-foreground/5 text-foreground"
 									: output.status === 'failed'
-										? "border-destructive/25 bg-destructive/5 text-destructive"
-										: "border-primary/25 bg-primary/5 text-primary"
+										? "border-destructive/30 bg-destructive/5 text-destructive"
+										: "border-border bg-muted text-muted-foreground"
 							)}
 						>
 							{output.status}
-						</Badge>
+						</span>
 					</Accordion.Trigger>
-					<Accordion.Content class="p-0 border-t border-border/20 bg-muted/5">
+					<Accordion.Content class="p-0 border-t border-border bg-muted/5">
 						<ScrollArea class="max-h-96 w-full">
-							<pre class="code-area p-4 text-foreground/85 whitespace-pre-wrap break-words">{output.error ?? output.output}</pre>
+							<pre class="code-area p-4 text-foreground/85 whitespace-pre-wrap break-words bg-muted/10 selection:bg-foreground/10 outline-none">{output.error ?? output.output}</pre>
 						</ScrollArea>
 					</Accordion.Content>
 				</Accordion.Item>
 			{:else}
-				<div class="rounded-xl border border-border/25 bg-card/45 backdrop-blur-md p-6 text-center text-xs text-muted-foreground/80">
+				<div class="border border-dashed border-border rounded bg-card/40 p-6 text-center text-xs font-mono text-muted-foreground">
 					No detailed step outputs were archived for this run.
 				</div>
 			{/each}
