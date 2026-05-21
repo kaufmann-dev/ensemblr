@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '$lib/components/ui/card';
+	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { Label } from '$lib/components/ui/label';
 	import * as Tabs from '$lib/components/ui/tabs';
@@ -73,37 +73,33 @@
 			<input type="hidden" name="demoAllowedModels" value={model} />
 		{/each}
 
-		<div class="flex items-center gap-3 px-1">
-			<div class="flex size-9 items-center justify-center rounded border border-border bg-muted/20 text-foreground">
-				<Shield class="size-4.5" />
-			</div>
-			<div>
-				<h1 class="text-base font-bold font-mono uppercase tracking-tight text-foreground">Admin console</h1>
-				<p class="text-xs font-mono text-muted-foreground mt-0.5">Manage global Mixture-of-Agents system prompts and enabled catalog models</p>
-			</div>
-		</div>
+		<PageHeader
+			title="Admin console"
+			description="Manage global Mixture-of-Agents system prompts and enabled catalog models"
+			icon={Shield}
+		/>
 
-		<Card class="border border-border bg-card rounded shadow-xs">
-			<CardHeader class="pb-0 pt-4 px-4 border-b border-border">
+		<div class="space-y-6">
+			<div class="border-b border-border pb-px">
 				<Tabs.Root value={activeTab} onValueChange={setActiveTab} class="w-full">
 					<Tabs.List class="w-full justify-start bg-transparent border-b-0 p-0 rounded-none gap-6 flex">
 						<Tabs.Trigger 
 							value="prompts" 
-							class="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-1 pb-3 pt-1 font-mono text-xs uppercase tracking-wider font-bold transition-all text-muted-foreground data-[state=active]:text-foreground"
+							class="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-1 pb-3 pt-1 font-mono text-xs uppercase tracking-wider font-bold text-muted-foreground data-[state=active]:text-foreground"
 						>
 							Prompt templates
 						</Tabs.Trigger>
 						<Tabs.Trigger 
 							value="demo" 
-							class="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-1 pb-3 pt-1 font-mono text-xs uppercase tracking-wider font-bold transition-all text-muted-foreground data-[state=active]:text-foreground"
+							class="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-1 pb-3 pt-1 font-mono text-xs uppercase tracking-wider font-bold text-muted-foreground data-[state=active]:text-foreground"
 						>
 							Demo models
 						</Tabs.Trigger>
 					</Tabs.List>
 				</Tabs.Root>
-			</CardHeader>
+			</div>
 			
-			<CardContent class="pt-5 px-4">
+			<div class="pt-2">
 				{#if activeTab === 'prompts'}
 					<div class="space-y-5">
 						<!-- Intermediate Prompt Template -->
@@ -158,8 +154,8 @@
 						{/await}
 					{/if}
 				{/if}
-			</CardContent>
-		</Card>
+			</div>
+		</div>
 
 		<!-- Admin Form Actions Bar -->
 		<div class="flex flex-col gap-4 sm:flex-row sm:items-center border-t border-border/20 pt-4">

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { cn } from '$lib/utils.js';
+	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
 	import {
@@ -209,24 +210,24 @@
 
 <main class="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[18rem_1fr] flex-1 min-h-0">
 	<!-- Sidebar Pane: History -->
-	<aside class="order-2 space-y-5 lg:order-1 lg:max-w-[18rem]">
-		<Card class="border border-border bg-card rounded shadow-xs h-full flex flex-col">
-			<CardHeader class="pb-3 pt-4 px-4 border-b border-border">
-				<div class="flex items-center gap-2">
-					<History class="size-4 text-foreground/85" />
-					<CardTitle class="text-sm font-bold font-mono tracking-tight">Recent runs</CardTitle>
+	<aside class="order-2 space-y-4 lg:order-1 lg:max-w-[18rem]">
+		<div class="h-full flex flex-col">
+			<div class="pb-3 pt-4 px-1 border-b border-border flex items-center gap-2">
+				<History class="size-4 text-foreground/80" />
+				<div>
+					<h3 class="text-xs font-bold font-mono tracking-tight text-foreground uppercase">Recent runs</h3>
+					<p class="text-[9px] font-mono text-muted-foreground mt-0.5">Saved mixture history</p>
 				</div>
-				<CardDescription class="text-[10px] font-mono text-muted-foreground mt-0.5">Saved mixture history</CardDescription>
-			</CardHeader>
-			<CardContent class="p-2 flex-1 overflow-hidden">
+			</div>
+			<div class="py-2.5 flex-1 overflow-hidden">
 				<ScrollArea class="h-[25rem] lg:h-[calc(100vh-17rem)]">
 					<div class="space-y-1.5 pr-2 py-0.5">
 						{#each data.history as item (item.id)}
 							<a
-								class="group/item block rounded border border-border bg-muted/20 p-2.5 transition-all hover:bg-muted/65 hover:border-foreground/30"
+								class="group/item block rounded border border-border bg-muted/20 p-2.5 hover:bg-muted/65 hover:border-foreground/30"
 								href={resolve(`/history/${item.id}`)}
 							>
-								<div class="line-clamp-2 font-mono text-[11px] leading-relaxed text-foreground/80 group-hover/item:text-foreground break-words transition-colors">
+								<div class="line-clamp-2 font-mono text-[11px] leading-relaxed text-foreground/80 group-hover/item:text-foreground break-words">
 									{item.prompt}
 								</div>
 								<div class="mt-2.5 flex items-center justify-between gap-2">
@@ -253,34 +254,28 @@
 						{/each}
 					</div>
 				</ScrollArea>
-			</CardContent>
-		</Card>
+			</div>
+		</div>
 	</aside>
 
 	<!-- Main Workspace Area -->
 	<section class="order-1 min-w-0 space-y-5 lg:order-2 flex flex-col">
-		<Card class="border border-border bg-card rounded shadow-xs">
-			<CardHeader class="pb-3 pt-4 px-5 border-b border-border">
-				<div class="flex items-center justify-between gap-3">
-					<div class="flex items-center gap-2.5">
-						<div class="flex size-7 items-center justify-center rounded border border-border bg-muted">
-							<Sparkles class="size-3.5 text-foreground/80" />
-						</div>
-						<div>
-							<CardTitle class="text-sm font-bold font-mono tracking-tight">Mixture workspace</CardTitle>
-							<CardDescription class="text-[10px] font-mono text-muted-foreground mt-0.5">Orchestrate LLMs via Mixture-of-Agents (MoA)</CardDescription>
-						</div>
-					</div>
-					{#if running}
-						<span class="flex items-center gap-1.5 border border-border bg-foreground/5 text-foreground py-0.5 px-2 rounded font-mono text-[9px] uppercase tracking-wider animate-pulse">
-							<Loader2 class="size-3 animate-spin" />
-							<span>Synthesizing</span>
-						</span>
-					{/if}
-				</div>
-			</CardHeader>
+		<PageHeader
+			title="Mixture workspace"
+			description="Orchestrate LLMs via Mixture-of-Agents (MoA)"
+			icon={Sparkles}
+		>
+			{#snippet badge()}
+				{#if running}
+					<span class="flex items-center gap-1.5 border border-border bg-foreground/5 text-foreground py-0.5 px-2 rounded font-mono text-[9px] uppercase tracking-wider animate-pulse ml-2">
+						<Loader2 class="size-3 animate-spin" />
+						<span>Synthesizing</span>
+					</span>
+				{/if}
+			{/snippet}
+		</PageHeader>
 
-			<CardContent class="space-y-4.5 p-5">
+		<div class="space-y-4.5 px-1 pb-2">
 				<!-- Prompt Area -->
 				<div class="space-y-2">
 					<div class="flex justify-between items-center">
@@ -479,11 +474,10 @@
 						<p class="text-[11px] font-mono text-destructive break-words">{error}</p>
 					</div>
 				{/if}
-			</CardContent>
-		</Card>
+		</div>
 
 		<!-- Live Streaming / Synthesis Final Result -->
-		<Card class="border border-border bg-card rounded shadow-xs flex flex-col min-h-[350px] overflow-hidden">
+		<Card class="border border-border bg-card rounded flex flex-col min-h-[350px] overflow-hidden">
 			<CardHeader class="pb-3 pt-4 px-5 flex flex-row items-center justify-between gap-4">
 				<div class="flex items-center gap-2">
 					<ShieldCheck class="size-4 text-foreground/80" />
@@ -539,7 +533,7 @@
 				
 				<Accordion.Root type="multiple" class="w-full grid gap-2">
 					{#each workerOutputs as output (output.key)}
-						<Accordion.Item value={output.key} class="rounded border border-border bg-card overflow-hidden transition-all duration-150 hover:border-foreground/30 shadow-xs">
+						<Accordion.Item value={output.key} class="rounded border border-border bg-card overflow-hidden hover:border-foreground/30">
 							<Accordion.Trigger class="px-4 py-2.5 text-xs font-mono font-medium hover:no-underline hover:bg-muted/40 transition-colors flex items-center justify-between gap-4">
 								<div class="flex items-center gap-2.5 min-w-0">
 									<span class="font-mono text-[9px] uppercase px-1.5 py-0.5 border border-border bg-muted text-muted-foreground tracking-wide rounded-sm">

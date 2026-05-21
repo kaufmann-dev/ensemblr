@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { cn } from '$lib/utils.js';
+	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '$lib/components/ui/card';
 	import { History, Activity, Calendar, Sparkles } from '@lucide/svelte';
@@ -11,22 +12,17 @@
 
 <svelte:head><title>History | ensemblr</title></svelte:head>
 
-<main class="relative flex-1 flex flex-col justify-start max-w-4xl mx-auto w-full px-4 py-8 space-y-5 bg-background">
-	<div class="flex items-center gap-3 px-1">
-		<div class="flex size-7 items-center justify-center rounded border border-border bg-muted text-foreground/80">
-			<History class="size-3.5" />
-		</div>
-		<div>
-			<h1 class="text-sm font-bold font-mono tracking-tight text-foreground">Generation history</h1>
-			<p class="text-[10px] font-mono text-muted-foreground mt-0.5">Inspect historical Mixture-of-Agents synthesis runs</p>
-		</div>
-	</div>
+<main class="relative flex-1 flex flex-col justify-start max-w-4xl mx-auto w-full px-4 py-8 space-y-6 bg-background">
+	<PageHeader
+		title="Generation history"
+		description="Inspect historical Mixture-of-Agents synthesis runs"
+		icon={History}
+	/>
 
-	<Card class="border border-border bg-card rounded shadow-xs">
-		<CardContent class="space-y-2 p-5">
+	<div class="space-y-2 px-1">
 			{#each data.generations as item (item.id)}
 				<a
-					class="group block relative rounded border border-border bg-muted/20 p-4 transition-all duration-150 hover:bg-muted/50 hover:border-foreground/30 min-w-0"
+					class="group block relative rounded border border-border bg-muted/20 p-4 hover:bg-muted/50 hover:border-foreground/30 min-w-0"
 					href={resolve(`/history/${item.id}`)}
 				>
 					<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
@@ -68,6 +64,5 @@
 					</p>
 				</div>
 			{/each}
-		</CardContent>
-	</Card>
-</main>
+		</div>
+	</main>

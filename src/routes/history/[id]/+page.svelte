@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils.js';
+	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '$lib/components/ui/card';
@@ -39,52 +40,44 @@
 
 <svelte:head><title>Saved generation | ensemblr</title></svelte:head>
 
-<main class="relative flex-1 flex flex-col justify-start max-w-5xl mx-auto w-full px-4 py-8 space-y-5 bg-background">
-	<!-- Header Nav Back -->
-	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-1">
-		<div class="flex items-center gap-3">
-			<a
-				href={resolve('/history')}
-				class="flex size-7 items-center justify-center rounded border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground active:scale-95 transition-all shadow-xs"
-				aria-label="Back to history"
+<main class="relative flex-1 flex flex-col justify-start max-w-5xl mx-auto w-full px-4 py-8 space-y-6 bg-background">
+	<PageHeader
+		title="Saved generation"
+		description="Review mixture configurations and generated LLM responses"
+		backHref="/history"
+	>
+		{#snippet badge()}
+			<span 
+				class={cn(
+					"text-[9px] font-mono font-medium uppercase px-1.5 py-0.5 rounded border tracking-wide ml-2.5",
+					data.generation.status === 'completed'
+						? "border-border bg-foreground/5 text-foreground"
+						: "border-destructive/30 bg-destructive/5 text-destructive"
+				)}
 			>
-				<ArrowLeft class="size-4" />
-			</a>
-			<div>
-				<h1 class="text-sm font-bold font-mono tracking-tight text-foreground flex flex-wrap items-center gap-2">
-					Saved generation
-					<span 
-						class={cn(
-							"text-[9px] font-mono font-medium uppercase px-1.5 py-0.5 rounded border tracking-wide",
-							data.generation.status === 'completed'
-								? "border-border bg-foreground/5 text-foreground"
-								: "border-destructive/30 bg-destructive/5 text-destructive"
-						)}
-					>
-						{data.generation.status}
-					</span>
-				</h1>
-				<p class="text-[10px] font-mono text-muted-foreground mt-0.5">Review mixture configurations and generated LLM responses</p>
-			</div>
-		</div>
-	</div>
+				{data.generation.status}
+			</span>
+		{/snippet}
+	</PageHeader>
 
-	<!-- Main Details Card -->
-	<Card class="border border-border bg-card rounded shadow-xs overflow-hidden">
+	<!-- Source Prompt Panel -->
+	<Card class="border border-border bg-card rounded overflow-hidden">
 		<CardHeader class="pb-3 pt-4 px-5 border-b border-border">
 			<div class="flex items-center gap-2">
 				<FileText class="size-3.5 text-foreground/80" />
 				<CardTitle class="text-sm font-bold font-mono tracking-tight">Source prompt</CardTitle>
 			</div>
 		</CardHeader>
-		<CardContent class="p-0 bg-muted/5 border-b border-border">
+		<CardContent class="p-0 bg-muted/5">
 			<ScrollArea class="max-h-52 w-full">
 				<pre class="code-area p-5 text-foreground/80 break-words whitespace-pre-wrap select-text outline-none">{data.generation.prompt}</pre>
 			</ScrollArea>
 		</CardContent>
+	</Card>
 
-		<!-- Final Synthesis Output -->
-		<CardHeader class="pb-3 pt-4 px-5 border-t border-border flex flex-row items-center justify-between gap-4">
+	<!-- Final Synthesis Output Panel -->
+	<Card class="border border-border bg-card rounded overflow-hidden">
+		<CardHeader class="pb-3 pt-4 px-5 border-b border-border flex flex-row items-center justify-between gap-4">
 			<div class="flex items-center gap-2">
 				<ShieldCheck class="size-4 text-foreground/80" />
 				<div>
@@ -108,7 +101,7 @@
 				</Button>
 			{/if}
 		</CardHeader>
-		<CardContent class="p-0 bg-muted/5 border-t border-border">
+		<CardContent class="p-0 bg-muted/5">
 			<ScrollArea class="max-h-[30rem] w-full">
 				<pre class="code-area p-5 text-foreground whitespace-pre-wrap selection:bg-foreground/10 break-words select-text outline-none">{data.generation.finalOutput ?? data.generation.error ?? 'No final output saved.'}</pre>
 			</ScrollArea>
@@ -124,7 +117,7 @@
 
 		<Accordion.Root type="multiple" class="w-full grid gap-2">
 			{#each data.outputs as output (output.id)}
-				<Accordion.Item value={output.id} class="rounded border border-border bg-card overflow-hidden transition-all duration-150 hover:border-foreground/30 shadow-xs">
+				<Accordion.Item value={output.id} class="rounded border border-border bg-card overflow-hidden hover:border-foreground/30">
 					<Accordion.Trigger class="px-4 py-2.5 text-xs font-mono font-medium hover:no-underline hover:bg-muted/40 transition-colors flex items-center justify-between gap-4">
 						<div class="flex items-center gap-2.5 min-w-0">
 							<span class="font-mono text-[9px] uppercase px-1.5 py-0.5 border border-border bg-muted text-muted-foreground tracking-wide rounded-sm">
