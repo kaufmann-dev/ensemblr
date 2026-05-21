@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { cn } from '$lib/utils.js';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { Badge } from '$lib/components/ui/badge';
@@ -57,7 +58,6 @@
 		| Extract<StreamEvent, { type: 'text' }>
 		| (Extract<StreamEvent, { type: 'error' }> & { outputId: string });
 
-	let activeGenerationId = $state('');
 	let liveGeneration = $state<Generation | undefined>();
 	let liveOutputs = $state<GenerationOutput[] | undefined>();
 	let generation = $derived(liveGeneration ?? data.generation);
@@ -169,32 +169,51 @@
 		}
 	}
 
-	$effect(() => {
-		if (data.generation.id === activeGenerationId) return;
+	function generationStream(node: HTMLElement, params: { generationId: string; running: boolean }) {
+		if (!browser) return {};
 
-		activeGenerationId = data.generation.id;
-		liveGeneration = undefined;
-		liveOutputs = undefined;
-		copySuccess = false;
-	});
+		let source: EventSource | null = null;
 
-	$effect(() => {
-		if (generation.status !== 'running') return;
+		function connect() {
+			if (!params.running || source) return;
+			source = new EventSource(resolve(`/api/generations/${params.generationId}/events`));
+			source.onmessage = (message) => {
+				applyStreamEvent(JSON.parse(message.data));
+			};
+		}
 
-		const source = new EventSource(resolve(`/api/generations/${generation.id}/events`));
-		source.onmessage = (message) => {
-			applyStreamEvent(JSON.parse(message.data));
+		function disconnect() {
+			if (source) {
+				source.close();
+				source = null;
+			}
+		}
+
+		connect();
+
+		return {
+			update(newParams: typeof params) {
+				params = newParams;
+				if (params.running && !source) {
+					connect();
+				} else if (!params.running && source) {
+					disconnect();
+				}
+			},
+			destroy() {
+				disconnect();
+			}
 		};
-
-		return () => {
-			source.close();
-		};
-	});
+	}
 </script>
 
 <svelte:head><title>Saved generation | ensemblr</title></svelte:head>
 
-<main class="relative flex-1 flex flex-col justify-start max-w-5xl mx-auto w-full px-4 py-8 space-y-6 bg-background">
+{#key data.generation.id}
+<main
+	class="relative flex-1 flex flex-col justify-start max-w-5xl mx-auto w-full px-4 py-8 space-y-6 bg-background"
+	use:generationStream={{ generationId: data.generation.id, running: generation.status === 'running' }}
+>
 	<PageHeader
 		title="Saved generation"
 		description="Review mixture configurations and generated LLM responses"
@@ -307,3 +326,4 @@
 		</Accordion.Root>
 	</div>
 </main>
+{/key}

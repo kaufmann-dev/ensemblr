@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
 	import { cn } from '$lib/utils.js';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
@@ -88,6 +87,7 @@
 		clearTimeout(providerDebounce);
 		providerDebounce = setTimeout(() => {
 			providerSearch = val;
+			resetLimitAndScroll();
 		}, 150);
 	}
 
@@ -100,6 +100,7 @@
 		clearTimeout(modelDebounce);
 		modelDebounce = setTimeout(() => {
 			modelSearch = val;
+			resetLimitAndScroll();
 		}, 150);
 	}
 
@@ -151,64 +152,57 @@
 			: [...allowed, value];
 	}
 
-	// Reset rendering limit and scroll position when search queries update
-	$effect(() => {
-		providerSearch;
-		modelSearch;
-		activationFilter;
+	function resetLimitAndScroll() {
 		limit = 50;
 		if (scrollViewport) {
 			scrollViewport.scrollTop = 0;
 		}
-	});
+	}
 
-	// Setup scroll listener once on the element
-	$effect(() => {
-		const el = scrollViewport;
-		if (!el) return;
+	function loadMore() {
+		if (loadingMore) return;
+		if (limit >= filteredModels.length) return;
+		loadingMore = true;
+		limit = Math.min(limit + 50, filteredModels.length);
+		setTimeout(() => {
+			loadingMore = false;
+		}, 100);
+	}
 
-		function handleScroll() {
-			if (!el) return;
-			const threshold = 300;
-			const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
-			if (isNearBottom && limit < filteredModels.length) {
-				if (loadingMore) return;
-				loadingMore = true;
-				limit = Math.min(limit + 50, filteredModels.length);
-				setTimeout(() => {
-					loadingMore = false;
-				}, 100);
+	function handleScroll() {
+		loadMore();
+	}
+
+	function infiniteScroll(node: HTMLElement, callback: () => void) {
+		const threshold = 300;
+
+		function check() {
+			const isNearBottom = node.scrollHeight - node.scrollTop - node.clientHeight < threshold;
+			if (isNearBottom) {
+				callback();
 			}
 		}
 
-		el.addEventListener('scroll', handleScroll, { passive: true });
-		return () => {
-			el.removeEventListener('scroll', handleScroll);
-		};
-	});
+		function onScroll() {
+			check();
+		}
 
-	// Auto-expand limit if there's no scrollbar but still more items to show
-	$effect(() => {
-		const count = filteredModels.length;
-		const currentLimit = limit;
-		const el = scrollViewport;
-		if (!el) return;
-
-		// Re-run this check when the DOM updates (which is when the effect runs)
-		untrack(() => {
-			if (!el) return;
-			const threshold = 300;
-			const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
-			if (isNearBottom && currentLimit < count) {
-				if (loadingMore) return;
-				loadingMore = true;
-				limit = Math.min(currentLimit + 50, count);
-				setTimeout(() => {
-					loadingMore = false;
-				}, 100);
-			}
+		const resizeObserver = new ResizeObserver(() => {
+			check();
 		});
-	});
+		resizeObserver.observe(node);
+
+		node.addEventListener('scroll', onScroll, { passive: true });
+
+		requestAnimationFrame(check);
+
+		return {
+			destroy() {
+				node.removeEventListener('scroll', onScroll);
+				resizeObserver.disconnect();
+			}
+		};
+	}
 </script>
 
 <div class="space-y-4">
@@ -293,6 +287,7 @@
 							aria-pressed={activationFilter === option.value}
 							onclick={() => {
 								activationFilter = option.value;
+								resetLimitAndScroll();
 							}}
 						>
 							{option.label}
@@ -370,6 +365,8 @@
 
 			<div 
 				bind:this={scrollViewport} 
+				onscroll={handleScroll}
+				use:infiniteScroll={loadMore}
 				class={cn(
 					"overflow-y-auto max-h-[35rem] w-full",
 					filteredModels.length === 0 && "hidden"
