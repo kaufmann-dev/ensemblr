@@ -5,6 +5,7 @@ import { appSetting, type ModelSelection, user, providerApiKey } from '$lib/serv
 import { requireAdmin } from '$lib/server/authz';
 import { getSettings } from '$lib/server/settings';
 import { encryptSecret } from '$lib/server/crypto';
+import { getRunnableModelKeys } from '$lib/server/models/catalog';
 
 export async function load({ locals, url }) {
 	requireAdmin(locals);
@@ -55,10 +56,25 @@ export const actions = {
 	saveDemoModels: async ({ request, locals }) => {
 		requireAdmin(locals);
 		const form = await request.formData();
+		let runnableModels: Set<string>;
+		try {
+			runnableModels = await getRunnableModelKeys();
+		} catch {
+			return fail(400, {
+				message: 'Could not validate the live model catalog. Try again before saving demo models.',
+				action: 'saveDemoModels'
+			});
+		}
+		const seen = new Set<string>();
 		const demoAllowedModels: ModelSelection[] = form
 			.getAll('demoAllowedModels')
 			.map(String)
 			.filter(Boolean)
+			.filter((value) => {
+				if (!runnableModels.has(value) || seen.has(value)) return false;
+				seen.add(value);
+				return true;
+			})
 			.map((value) => {
 				const [providerId, ...model] = value.split('/');
 				return { providerId, modelId: model.join('/') };
@@ -114,4 +130,3 @@ export const actions = {
 		redirect(303, '/admin?tab=demo-keys');
 	}
 };
-

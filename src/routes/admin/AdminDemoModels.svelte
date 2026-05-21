@@ -22,6 +22,12 @@
 		logoUrl: string;
 		models: CatalogModel[];
 	};
+	type ActivationFilter = 'all' | 'activated' | 'not-activated';
+	const activationOptions: { value: ActivationFilter; label: string }[] = [
+		{ value: 'all', label: 'All' },
+		{ value: 'activated', label: 'Activated' },
+		{ value: 'not-activated', label: 'Not activated' }
+	];
 
 	let {
 		allowed = $bindable(),
@@ -36,6 +42,7 @@
 		error: string;
 		retry: () => void;
 	} = $props();
+	let activationFilter = $state<ActivationFilter>('all');
 
 	// Flatten catalog structures into a single flat array of model entries
 	type FlatModelRow = {
@@ -96,11 +103,29 @@
 		}, 150);
 	}
 
+	// Derived Set for O(1) allowed checkups
+	let allowedSet = $derived(new Set(allowed));
+	let catalogValueSet = $derived(new Set(flatModels.map((item) => item.value)));
+	let enabledCatalogValueSet = $derived(
+		new Set(flatModels.filter((item) => item.modelEnabled).map((item) => item.value))
+	);
+	let staleAllowed = $derived(allowed.filter((value) => !catalogValueSet.has(value)));
+	let unavailableAllowed = $derived(
+		flatModels.filter((item) => allowedSet.has(item.value) && !item.modelEnabled)
+	);
+	let submittedAllowed = $derived(
+		loading || error ? allowed : allowed.filter((value) => enabledCatalogValueSet.has(value))
+	);
+
 	// Filtered list using both queries independently
 	let filteredModels = $derived.by(() => {
 		const pQuery = providerSearch.trim().toLowerCase();
 		const mQuery = modelSearch.trim().toLowerCase();
 		return flatModels.filter((item) => {
+			const matchActivation =
+				activationFilter === 'all' ||
+				(activationFilter === 'activated' && allowedSet.has(item.value)) ||
+				(activationFilter === 'not-activated' && !allowedSet.has(item.value));
 			const matchProvider =
 				!pQuery ||
 				item.providerName.toLowerCase().includes(pQuery) ||
@@ -109,7 +134,7 @@
 				!mQuery ||
 				item.modelName.toLowerCase().includes(mQuery) ||
 				item.modelId.toLowerCase().includes(mQuery);
-			return matchProvider && matchModel;
+			return matchActivation && matchProvider && matchModel;
 		});
 	});
 
@@ -119,9 +144,6 @@
 
 	// Slice current list for rendering
 	let visibleModels = $derived(filteredModels.slice(0, limit));
-
-	// Derived Set for O(1) allowed checkups
-	let allowedSet = $derived(new Set(allowed));
 
 	function toggleAllowed(value: string) {
 		allowed = allowedSet.has(value)
@@ -133,6 +155,7 @@
 	$effect(() => {
 		providerSearch;
 		modelSearch;
+		activationFilter;
 		limit = 50;
 		if (scrollViewport) {
 			scrollViewport.scrollTop = 0;
@@ -189,6 +212,10 @@
 </script>
 
 <div class="space-y-4">
+	{#each submittedAllowed as model (model)}
+		<input type="hidden" name="demoAllowedModels" value={model} />
+	{/each}
+
 	<div>
 		<h3 class="text-xs font-bold font-mono text-foreground uppercase tracking-tight">Demo allowed models</h3>
 		<p class="text-xs font-mono text-muted-foreground/80 mt-0.5">Select which catalog models are accessible to demo role users</p>
@@ -201,7 +228,7 @@
 		</div>
 	{:else}
 		<!-- Search & Stats Bar -->
-		<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-1">
+		<div class="flex flex-col gap-3 pb-1">
 			<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full sm:max-w-xl">
 				<!-- Provider Search -->
 				<div class="relative w-full">
@@ -252,13 +279,35 @@
 				</div>
 			</div>
 
-			<!-- Dynamic stats badge -->
-			<div class="text-[10px] font-mono text-muted-foreground shrink-0 self-start sm:self-center">
-				{#if providerSearch || modelSearch}
-					Found <span class="font-bold text-foreground">{filteredModels.length}</span> matching models
-				{:else}
-					Catalog: <span class="font-bold text-foreground">{flatModels.length}</span> models
-				{/if}
+			<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+				<div class="inline-flex w-full rounded border border-border bg-muted/30 p-0.5 sm:w-auto">
+					{#each activationOptions as option (option.value)}
+						<button
+							type="button"
+							class={cn(
+								"min-h-7 flex-1 rounded px-2.5 text-[10px] font-bold font-mono uppercase tracking-tight transition-colors sm:flex-none",
+								activationFilter === option.value
+									? "bg-background text-foreground shadow-sm"
+									: "text-muted-foreground hover:text-foreground"
+							)}
+							aria-pressed={activationFilter === option.value}
+							onclick={() => {
+								activationFilter = option.value;
+							}}
+						>
+							{option.label}
+						</button>
+					{/each}
+				</div>
+
+				<!-- Dynamic stats badge -->
+				<div class="text-[10px] font-mono text-muted-foreground shrink-0 self-start sm:self-center">
+					{#if providerSearch || modelSearch || activationFilter !== 'all'}
+						Found <span class="font-bold text-foreground">{filteredModels.length}</span> matching models
+					{:else}
+						Catalog: <span class="font-bold text-foreground">{flatModels.length}</span> models
+					{/if}
+				</div>
 			</div>
 		</div>
 
@@ -275,6 +324,32 @@
 				</Button>
 			</div>
 		{:else}
+			{#if staleAllowed.length > 0 || unavailableAllowed.length > 0}
+				<div class="rounded border border-destructive/20 bg-destructive/5 p-3">
+					<div class="flex items-start gap-2.5">
+						<AlertTriangle class="size-4 text-destructive shrink-0 mt-0.5" />
+						<div class="min-w-0 space-y-1">
+							<h4 class="text-xs font-bold font-mono text-destructive uppercase tracking-tight">Unavailable demo selections</h4>
+							<p class="text-[10px] font-mono text-destructive/85 leading-relaxed">
+								{staleAllowed.length + unavailableAllowed.length} saved selection{staleAllowed.length + unavailableAllowed.length === 1 ? '' : 's'} no longer resolve to runnable catalog models and will be removed on save.
+							</p>
+							<div class="flex flex-wrap gap-1.5 pt-1">
+								{#each staleAllowed as model (model)}
+									<span class="rounded border border-destructive/20 bg-background px-1.5 py-0.5 text-[9px] font-mono text-destructive">
+										{model}
+									</span>
+								{/each}
+								{#each unavailableAllowed as model (model.value)}
+									<span class="rounded border border-destructive/20 bg-background px-1.5 py-0.5 text-[9px] font-mono text-destructive">
+										{model.providerId}/{model.modelId}
+									</span>
+								{/each}
+							</div>
+						</div>
+					</div>
+				</div>
+			{/if}
+
 			{#if filteredModels.length === 0}
 				<div class="flex flex-col items-center justify-center py-16 text-center border border-dashed border-border rounded bg-muted/10">
 					<Cpu class="size-7 text-muted-foreground/30 mb-2 stroke-[1.5]" />
@@ -285,9 +360,10 @@
 						onclick={() => {
 							handleProviderInput('');
 							handleModelInput('');
+							activationFilter = 'all';
 						}}
 					>
-						Clear search filters
+						Clear filters
 					</Button>
 				</div>
 			{/if}
@@ -362,4 +438,3 @@
 		{/if}
 	{/if}
 </div>
-

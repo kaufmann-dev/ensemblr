@@ -92,3 +92,14 @@ export async function findCatalogModel(providerId: string, modelId: string) {
 	if (!provider || !model) return undefined;
 	return { provider, model };
 }
+
+export async function getRunnableModelKeys() {
+	const catalog = await getCatalog();
+	return new Set(
+		catalog.flatMap((provider) =>
+			provider.models
+				.filter((model) => model.enabled)
+				.map((model) => `${provider.id}/${model.id}`)
+		)
+	);
+}

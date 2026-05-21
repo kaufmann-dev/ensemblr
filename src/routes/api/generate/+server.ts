@@ -5,6 +5,7 @@ import { providerApiKey } from '$lib/server/db/schema';
 import { requireUser } from '$lib/server/authz';
 import { createGeneration, streamMixture } from '$lib/server/ai/engine';
 import { getSettings } from '$lib/server/settings';
+import { getRunnableModelKeys } from '$lib/server/models/catalog';
 import { generateRequestSchema } from '$lib/validation';
 
 function key(model: { providerId: string; modelId: string }) {
@@ -18,10 +19,10 @@ export async function POST({ request, locals }) {
 
 	const selected = [...parsed.data.workers, parsed.data.judge];
 	if (user.role === 'demo') {
-		const settings = await getSettings();
+		const [settings, runnableModels] = await Promise.all([getSettings(), getRunnableModelKeys()]);
 		const allowed = new Set(settings.demoAllowedModels.map(key));
-		if (selected.some((model) => !allowed.has(key(model)))) {
-			error(403, 'Demo users can only use admin-approved models');
+		if (selected.some((model) => !allowed.has(key(model)) || !runnableModels.has(key(model)))) {
+			error(403, 'Demo users can only use active admin-approved models');
 		}
 	} else {
 		const keys = await db
