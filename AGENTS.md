@@ -308,6 +308,7 @@ For Coolify and Nixpacks:
 - Load `.env` only after checking that the file exists.
 - Validate seed script environment variables before calling Better Auth APIs.
 - Document and enforce minimum seeded account password lengths.
+- Seed app settings only when they are missing; do not overwrite admin-edited settings during redeploys.
 - Let Nixpacks handle the install phase unless a project-specific reason requires otherwise.
 - Prefer explicit deploy or runtime migration and seed steps when Coolify supports them.
 - Keep build-time migration and seed scripts idempotent when they must run during image builds.
