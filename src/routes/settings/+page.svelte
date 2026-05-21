@@ -47,10 +47,10 @@
 					<div class="space-y-1.5">
 						<Label for="provider" class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">LLM Provider</Label>
 						<Select.Root type="single" bind:value={providerId}>
-							<Select.Trigger id="provider" class="w-full h-8.5 text-xs font-mono rounded border-border focus-visible:ring-1 focus-visible:ring-foreground/20">
+							<Select.Trigger id="provider" class="text-xs font-mono">
 								<span class="truncate">{selectedProviderName}</span>
 							</Select.Trigger>
-							<Select.Content class="max-h-80 border border-border bg-popover rounded p-1 shadow-md">
+							<Select.Content class="p-1">
 								{#each data.catalog as provider (provider.id)}
 									<Select.Item
 										value={provider.id}
@@ -75,7 +75,7 @@
 								type={showApiKey ? 'text' : 'password'} 
 								autocomplete="new-password" 
 								placeholder="Paste your API key here..."
-								class="h-8.5 text-xs rounded border-border pr-8 focus-visible:ring-1 focus-visible:ring-foreground/20 font-mono"
+								class="text-xs pr-8 font-mono"
 								required
 							/>
 							<Button

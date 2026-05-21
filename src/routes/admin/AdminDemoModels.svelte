@@ -211,7 +211,7 @@
 						placeholder="Search providers..."
 						value={providerInput}
 						oninput={(e) => handleProviderInput(e.currentTarget.value)}
-						class="h-8.5 pl-8 pr-8 text-xs rounded border border-border focus-visible:ring-1 focus-visible:ring-foreground/20 font-mono w-full"
+						class="pl-8 pr-8 text-xs font-mono w-full"
 					/>
 					{#if providerInput}
 						<Button
@@ -235,7 +235,7 @@
 						placeholder="Search models..."
 						value={modelInput}
 						oninput={(e) => handleModelInput(e.currentTarget.value)}
-						class="h-8.5 pl-8 pr-8 text-xs rounded border border-border focus-visible:ring-1 focus-visible:ring-foreground/20 font-mono w-full"
+						class="pl-8 pr-8 text-xs font-mono w-full"
 					/>
 					{#if modelInput}
 						<Button

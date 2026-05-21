@@ -64,28 +64,28 @@
 				<form class="space-y-3.5" onsubmit={submit}>
 					<!-- Email Field -->
 					<div class="space-y-1">
-						<Label for="email" class="text-[9px] font-mono font-medium text-muted-foreground uppercase tracking-widest">Email</Label>
+						<Label for="email" class="text-[9px] font-mono font-bold text-muted-foreground/90 uppercase tracking-widest">Email</Label>
 						<Input 
 							id="email" 
 							type="email" 
 							autocomplete="email" 
 							bind:value={email}
 							placeholder="you@domain.com"
-							class="h-8.5 text-xs rounded border-border focus-visible:ring-1 focus-visible:ring-foreground/20 font-mono"
+							class="text-xs font-mono"
 							required
 						/>
 					</div>
 
 					<!-- Password Field -->
 					<div class="space-y-1">
-						<Label for="password" class="text-[9px] font-mono font-medium text-muted-foreground uppercase tracking-widest">Password</Label>
+						<Label for="password" class="text-[9px] font-mono font-bold text-muted-foreground/90 uppercase tracking-widest">Password</Label>
 						<Input 
 							id="password" 
 							type="password" 
 							autocomplete="current-password" 
 							bind:value={password}
 							placeholder="••••••••"
-							class="h-8.5 text-xs rounded border-border focus-visible:ring-1 focus-visible:ring-foreground/20 font-mono"
+							class="text-xs font-mono"
 							required
 						/>
 					</div>
