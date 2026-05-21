@@ -239,7 +239,7 @@
 											"text-[9px] font-mono font-medium uppercase px-1.5 py-0.5 rounded border tracking-wide",
 											item.status === 'completed' 
 												? "border-border bg-foreground/5 text-foreground" 
-												: "border-destructive/25 bg-destructive/5 text-destructive"
+												: "border-destructive/20 bg-destructive/5 text-destructive"
 										)}
 									>
 										{item.status}
@@ -338,7 +338,7 @@
 							</div>
 							
 							<Select.Root type="single" bind:value={judgeId} disabled={running}>
-								<Select.Trigger id="judge-model" class="w-full h-8.5 rounded border border-border bg-muted/30 hover:border-foreground/30 text-xs font-mono font-medium focus:ring-0 focus-visible:ring-1 focus-visible:ring-foreground/20">
+								<Select.Trigger id="judge-model" class="w-full h-8.5 rounded border border-border bg-card hover:border-foreground/30 text-xs font-mono font-medium focus:ring-0 focus-visible:ring-1 focus-visible:ring-foreground/20">
 									<span class="truncate font-bold">
 										{modelTriggerLabel(judgeId, 'Select judge model')}
 									</span>

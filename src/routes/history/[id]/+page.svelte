@@ -112,7 +112,7 @@
 	<div class="space-y-3">
 		<div class="flex items-center gap-2 px-1">
 			<Layers class="size-4 text-foreground/80" />
-			<h2 class="text-xs font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Worker Mixture Steps ({data.outputs.length})</h2>
+			<h3 class="text-xs font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Worker Mixture Steps ({data.outputs.length})</h3>
 		</div>
 
 		<Accordion.Root type="multiple" class="w-full grid gap-2">
