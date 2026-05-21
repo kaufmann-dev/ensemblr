@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
 import { error } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { generation, generationOutput } from '$lib/server/db/schema';
@@ -17,7 +17,12 @@ export async function load({ locals, params }) {
 	const outputs = await db
 		.select()
 		.from(generationOutput)
-		.where(eq(generationOutput.generationId, item.id));
+		.where(eq(generationOutput.generationId, item.id))
+		.orderBy(
+			asc(generationOutput.round),
+			asc(generationOutput.phase),
+			asc(generationOutput.createdAt)
+		);
 
 	return { generation: item, outputs };
 }

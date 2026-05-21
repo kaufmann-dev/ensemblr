@@ -49,6 +49,12 @@
 					</ScrollArea>
 				</Accordion.Content>
 			</Accordion.Item>
+		{:else}
+			<Card>
+				<CardContent class="p-4 text-sm text-muted-foreground">
+					No model output has been saved for this run yet.
+				</CardContent>
+			</Card>
 		{/each}
 	</Accordion.Root>
 </main>

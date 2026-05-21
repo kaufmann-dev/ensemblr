@@ -91,7 +91,13 @@
 			</Tabs.Content>
 			<Tabs.Content value="demo" class="mt-4">
 				{#if demoModelsComponent}
-					{#await demoModelsComponent then { default: AdminDemoModels }}
+					{#await demoModelsComponent}
+						<Card>
+							<CardContent class="p-4 text-sm text-muted-foreground">
+								Loading demo model controls...
+							</CardContent>
+						</Card>
+					{:then { default: AdminDemoModels }}
 						<AdminDemoModels
 							bind:allowed
 							{catalog}

@@ -1,5 +1,6 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { streamText } from 'ai';
+import { env } from '$env/dynamic/private';
 import { db } from '$lib/server/db';
 import {
 	generation,
@@ -37,6 +38,8 @@ type SuccessfulAnswer = {
 	text: string;
 };
 
+type RunUser = Pick<NonNullable<App.Locals['user']>, 'id' | 'role'>;
+
 function renderTemplate(template: string, prompt: string, answers: SuccessfulAnswer[]) {
 	return template
 		.replaceAll('{{original_prompt}}', prompt)
@@ -52,19 +55,29 @@ function sse(event: RunEvent) {
 	return `data: ${JSON.stringify(event)}\n\n`;
 }
 
-async function getUserKey(userId: string, providerId: string) {
+async function getApiKey(
+	user: RunUser,
+	provider: NonNullable<Awaited<ReturnType<typeof findCatalogModel>>>['provider']
+) {
 	const [key] = await db
 		.select()
 		.from(providerApiKey)
-		.where(eq(providerApiKey.userId, userId))
-		.then((rows) => rows.filter((row) => row.providerId === providerId));
+		.where(and(eq(providerApiKey.userId, user.id), eq(providerApiKey.providerId, provider.id)))
+		.limit(1);
 
-	if (!key) throw new Error(`No API key saved for ${providerId}`);
-	return decryptSecret(key.encryptedKey);
+	if (key) return decryptSecret(key.encryptedKey);
+
+	if (user.role === 'demo') {
+		const managedKey = provider.env?.map((name) => env[name]).find(Boolean);
+		if (managedKey) return managedKey;
+		throw new Error(`No admin-managed API key configured for ${provider.name}`);
+	}
+
+	throw new Error(`No API key saved for ${provider.name}`);
 }
 
 async function runModel(
-	userId: string,
+	user: RunUser,
 	generationId: string,
 	phase: 'worker' | 'judge',
 	round: number,
@@ -90,7 +103,7 @@ async function runModel(
 		const catalog = await findCatalogModel(model.providerId, model.modelId);
 		if (!catalog?.provider.enabled) throw new Error('Inference is not enabled for this provider');
 
-		const apiKey = await getUserKey(userId, model.providerId);
+		const apiKey = await getApiKey(user, catalog.provider);
 		const languageModel = createLanguageModel(catalog.provider, model.modelId, apiKey);
 		const result = streamText({
 			model: languageModel,
@@ -134,7 +147,7 @@ export async function createGeneration(userId: string, request: GenerateRequest)
 	return generationId;
 }
 
-export function streamMixture(userId: string, generationId: string, request: GenerateRequest) {
+export function streamMixture(user: RunUser, generationId: string, request: GenerateRequest) {
 	const encoder = new TextEncoder();
 
 	return new ReadableStream({
@@ -148,7 +161,7 @@ export function streamMixture(userId: string, generationId: string, request: Gen
 					await Promise.all(
 						request.workers.map((worker) =>
 							runModel(
-								userId,
+								user,
 								generationId,
 								'worker',
 								0,
@@ -171,7 +184,7 @@ export function streamMixture(userId: string, generationId: string, request: Gen
 						await Promise.all(
 							answers.map((answer) =>
 								runModel(
-									userId,
+									user,
 									generationId,
 									'worker',
 									round,
@@ -189,7 +202,7 @@ export function streamMixture(userId: string, generationId: string, request: Gen
 
 				const judgePrompt = renderTemplate(settings.judgeTemplate, request.prompt, answers);
 				const final = await runModel(
-					userId,
+					user,
 					generationId,
 					'judge',
 					request.rounds + 1,
