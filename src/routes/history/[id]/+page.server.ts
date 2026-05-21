@@ -2,6 +2,7 @@ import { and, asc, eq } from 'drizzle-orm';
 import { error } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { generation, generationOutput } from '$lib/server/db/schema';
+import { visibleGenerationsFor } from '$lib/server/generation-access';
 import { requireUser } from '$lib/server/authz';
 
 export async function load({ locals, params }) {
@@ -9,7 +10,7 @@ export async function load({ locals, params }) {
 	const [item] = await db
 		.select()
 		.from(generation)
-		.where(and(eq(generation.id, params.id), eq(generation.userId, user.id)))
+		.where(and(eq(generation.id, params.id), visibleGenerationsFor(user, locals.session!.id)))
 		.limit(1);
 
 	if (!item) error(404, 'Generation not found');

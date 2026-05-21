@@ -168,3 +168,4 @@ Or by temporarily updating the **Build Command** to include `pnpm db:migrate` an
 
 Model and provider options are fetched live from `https://models.dev/api.json`. Workspace selectors show only models from providers the current user has configured with an API key; demo users see only the admin-approved demo model list.
 For demo users, generation uses admin-managed provider credentials from the environment variables advertised by the selected provider in the live catalog, such as `OPENAI_API_KEY` for OpenAI.
+Demo generation history is scoped to the current login session, so visitors using the shared demo account do not see Recent runs or history entries from other demo sessions.

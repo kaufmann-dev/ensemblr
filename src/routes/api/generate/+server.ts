@@ -34,7 +34,7 @@ export async function POST({ request, locals }) {
 		}
 	}
 
-	const generationId = await createGeneration(user.id, parsed.data);
+	const generationId = await createGeneration(user, locals.session!.id, parsed.data);
 	return new Response(streamMixture(user, generationId, parsed.data), {
 		headers: {
 			'content-type': 'text/event-stream',

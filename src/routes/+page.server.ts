@@ -1,6 +1,7 @@
 import { desc, eq } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { generation, providerApiKey } from '$lib/server/db/schema';
+import { visibleGenerationsFor } from '$lib/server/generation-access';
 import { requireUser } from '$lib/server/authz';
 import { getCatalog } from '$lib/server/models/catalog';
 import type { CatalogProvider } from '$lib/server/models/catalog';
@@ -16,7 +17,7 @@ export async function load({ locals }) {
 		db
 			.select()
 			.from(generation)
-			.where(eq(generation.userId, user.id))
+			.where(visibleGenerationsFor(user, locals.session!.id))
 			.orderBy(desc(generation.createdAt))
 			.limit(8)
 	]);

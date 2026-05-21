@@ -31,6 +31,7 @@ export const generation = pgTable(
 		userId: text('user_id')
 			.notNull()
 			.references(() => user.id, { onDelete: 'cascade' }),
+		demoSessionId: text('demo_session_id'),
 		prompt: text('prompt').notNull(),
 		status: text('status', { enum: ['running', 'completed', 'failed'] })
 			.notNull()
@@ -44,7 +45,14 @@ export const generation = pgTable(
 			.$onUpdate(() => new Date())
 			.notNull()
 	},
-	(table) => [index('generation_user_created_idx').on(table.userId, table.createdAt)]
+	(table) => [
+		index('generation_user_created_idx').on(table.userId, table.createdAt),
+		index('generation_user_demo_session_created_idx').on(
+			table.userId,
+			table.demoSessionId,
+			table.createdAt
+		)
+	]
 );
 
 export const generationOutput = pgTable(
