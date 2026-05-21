@@ -60,7 +60,7 @@
 				<h4 class="text-xs font-bold font-mono text-destructive uppercase tracking-tight">Catalog loading failed</h4>
 				<p class="text-xs font-mono text-muted-foreground/85 max-w-sm leading-relaxed">{error}</p>
 			</div>
-			<Button class="rounded border border-border bg-card px-4 h-9 font-mono text-xs uppercase tracking-wider font-bold transition-all text-foreground hover:bg-muted gap-2" type="button" onclick={retry}>
+			<Button class="rounded border border-border bg-card px-4 h-9 font-mono text-xs uppercase tracking-wider font-bold text-foreground hover:bg-muted gap-2 shadow-none" type="button" onclick={retry}>
 				<RefreshCw class="size-3.5" />
 				Retry load
 			</Button>
@@ -69,7 +69,7 @@
 		<ScrollArea class="max-h-[35rem] w-full">
 			<div class="grid gap-4 pr-3 py-1">
 				{#each catalog as provider (provider.id)}
-					<div class="rounded border border-border bg-muted/20 p-4 space-y-4 transition-all duration-150 hover:border-foreground/30">
+					<div class="rounded border border-border bg-muted/20 p-4 space-y-4 hover:border-foreground/30">
 						<!-- Provider Header -->
 						<div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-border">
 							<div class="flex min-w-0 items-center gap-3">
@@ -98,7 +98,7 @@
 								{@const value = `${provider.id}/${model.id}`}
 								{@const id = `demo-${provider.id}-${model.id}`}
 								<div class={cn(
-									"flex min-w-0 items-center gap-3 rounded border p-2.5 transition-all duration-150",
+									"flex min-w-0 items-center gap-3 rounded border p-2.5",
 									allowed.includes(value)
 										? "bg-foreground/5 border-foreground/30 shadow-none"
 										: "bg-muted/20 border-border hover:bg-muted/50 hover:border-foreground/20"

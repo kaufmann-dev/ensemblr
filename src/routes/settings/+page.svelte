@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
+	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
@@ -20,22 +21,15 @@
 
 <svelte:head><title>API Keys | ensemblr</title></svelte:head>
 
-<main class="relative flex-1 flex flex-col justify-start max-w-4xl mx-auto w-full px-4 py-8 space-y-5 bg-background">
-	<Card class="border border-border bg-card rounded shadow-xs">
-		<CardHeader class="pb-3 pt-4 px-5 border-b border-border">
-			<div class="flex items-center gap-3">
-				<div class="flex size-7 items-center justify-center rounded border border-border bg-muted text-foreground/80">
-					<Key class="size-3.5" />
-				</div>
-				<div>
-					<CardTitle class="text-sm font-bold font-mono tracking-tight">Provider API keys</CardTitle>
-					<CardDescription class="text-[10px] font-mono text-muted-foreground mt-0.5">Securely configure access to LLM model endpoints</CardDescription>
-				</div>
-			</div>
-		</CardHeader>
-		
-		<CardContent class="space-y-5 p-5">
-			{#if data.role === 'demo'}
+<main class="relative flex-1 flex flex-col justify-start max-w-4xl mx-auto w-full px-4 py-8 space-y-6 bg-background">
+	<PageHeader
+		title="Provider API keys"
+		description="Securely configure access to LLM model endpoints"
+		icon={Key}
+	/>
+
+	<div class="space-y-6 px-1">
+		{#if data.role === 'demo'}
 				<div class="flex items-start gap-3 rounded border border-border bg-muted/40 p-4">
 					<ShieldAlert class="size-4.5 text-foreground shrink-0 mt-0.5" />
 					<div class="space-y-1">
@@ -119,9 +113,9 @@
 				<h3 class="text-xs font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Configured Providers ({savedProviders.length})</h3>
 				<div class="grid gap-2">
 					{#each savedProviders as provider (provider.id)}
-						<div class="flex flex-col gap-4 rounded border border-border bg-muted/20 p-3 sm:flex-row sm:items-center sm:justify-between hover:border-foreground/30 transition-all duration-150">
+						<div class="flex flex-col gap-4 rounded border border-border bg-muted/20 p-3 sm:flex-row sm:items-center sm:justify-between hover:border-foreground/30">
 							<div class="flex min-w-0 items-center gap-3.5">
-								<div class="flex size-8 items-center justify-center rounded bg-card border border-border overflow-hidden shadow-xs shrink-0">
+								<div class="flex size-8 items-center justify-center rounded bg-card border border-border overflow-hidden shrink-0">
 									<img class="size-5 object-contain" src={provider.logoUrl} alt="" />
 								</div>
 								<div class="min-w-0">
@@ -156,6 +150,5 @@
 					{/each}
 				</div>
 			</div>
-		</CardContent>
-	</Card>
-</main>
+		</div>
+	</main>

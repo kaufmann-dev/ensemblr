@@ -8,5 +8,12 @@ export default defineConfig({
 		tailwindcss(),
 		sveltekit(),
 		paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide' })
-	]
+	],
+	build: {
+		sourcemap: false,
+		minify: true,
+		rollupOptions: {
+			maxParallelFileOps: 2
+		}
+	}
 });

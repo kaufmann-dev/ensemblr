@@ -4,19 +4,19 @@
 	import { type VariantProps, tv } from 'tailwind-variants';
 
 	export const buttonVariants = tv({
-		base: "focus-visible:border-ring focus-visible:ring-ring/30 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-xl border border-transparent bg-clip-padding text-sm font-medium focus-visible:ring-3 active:not-aria-[haspopup]:scale-98 aria-invalid:ring-3 [&_svg:not([class*='size-'])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all duration-200 outline-none select-none disabled:pointer-events-none disabled:opacity-40 [&_svg]:pointer-events-none [&_svg]:shrink-0 shadow-sm",
+		base: "focus-visible:border-ring focus-visible:ring-ring/30 rounded border border-transparent bg-clip-padding text-xs font-mono uppercase tracking-wider font-semibold active:scale-95 transition-all duration-150 outline-none select-none disabled:pointer-events-none disabled:opacity-40 [&_svg]:pointer-events-none [&_svg]:shrink-0 shadow-none",
 		variants: {
 			variant: {
-				default: 'bg-primary text-primary-foreground shadow-md hover:bg-primary/95 hover:shadow-lg hover:shadow-primary/25',
+				default: 'bg-foreground text-background hover:bg-foreground/90',
 				outline:
-					'border-border/60 bg-background/50 backdrop-blur-md hover:bg-muted hover:text-foreground dark:hover:bg-input/40 aria-expanded:bg-muted aria-expanded:text-foreground dark:bg-transparent',
+					'border-border bg-card hover:bg-muted hover:text-foreground text-foreground',
 				secondary:
-					'bg-secondary text-secondary-foreground hover:bg-secondary/90 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground',
+					'bg-secondary text-secondary-foreground hover:bg-secondary/90',
 				ghost:
-					'hover:bg-muted hover:text-foreground dark:hover:bg-muted/40 aria-expanded:bg-muted aria-expanded:text-foreground',
+					'hover:bg-muted hover:text-foreground text-muted-foreground',
 				destructive:
-					'bg-destructive/10 hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/20 text-destructive focus-visible:border-destructive/40 dark:hover:bg-destructive/30',
-				link: 'text-primary underline-offset-4 hover:underline'
+					'border border-destructive/20 bg-destructive/5 text-destructive hover:bg-destructive/10',
+				link: 'text-foreground underline-offset-4 hover:underline'
 			},
 			size: {
 				default:
