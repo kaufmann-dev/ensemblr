@@ -171,10 +171,6 @@
 				</form>
 			{:else if activeTab === 'demo'}
 				<form method="POST" action="?/saveDemoModels" use:enhance class="space-y-6">
-					{#each allowed as model (model)}
-						<input type="hidden" name="demoAllowedModels" value={model} />
-					{/each}
-
 					{#if demoModelsComponent}
 						{#await demoModelsComponent}
 							<div class="flex flex-col items-center justify-center py-20 text-center">
@@ -263,4 +259,3 @@
 		</div>
 	</div>
 </main>
-
