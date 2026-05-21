@@ -52,7 +52,9 @@
 	let prompt = $state('');
 	let workers = $state<WorkerSelection[]>([
 		{ id: 'worker-1', value: '' },
-		{ id: 'worker-2', value: '' }
+		{ id: 'worker-2', value: '' },
+		{ id: 'worker-3', value: '' },
+		{ id: 'worker-4', value: '' }
 	]);
 	let judgeId = $state('');
 	let rounds = $state(1);
