@@ -92,6 +92,13 @@ Always write new Svelte code in runes mode:
 - Use CSS custom properties for parent-to-child styling boundaries.
 - Use `createContext` for typed context instead of unscoped shared module state when state must be per request or per tree.
 
+For large or rarely used UI sections, especially admin tabs, live catalogs, and long model/provider lists, keep the initial route lightweight:
+
+- Do not fetch large catalogs in the initial server `load` unless the first viewport needs them.
+- Do not mount thousands of hidden rows inside inactive tabs or panels.
+- Lazy-load the heavy component and fetch its data when the user opens that section.
+- Store large fetched arrays or objects in `$state.raw` when they are reassigned as whole values.
+
 Always treat props as changeable. Values derived from props should normally be `$derived`.
 
 Use `$effect` with extra suspicion. It tracks every state read inside its closure. Reading and writing the same state in one tracked effect can trigger `ERR_SVELTE_TOO_MANY_UPDATES`.
