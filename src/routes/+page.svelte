@@ -15,7 +15,7 @@
 	import { Slider } from '$lib/components/ui/slider';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import * as Accordion from '$lib/components/ui/accordion';
-	import { Play } from '@lucide/svelte';
+	import { Key, Play } from '@lucide/svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -61,6 +61,21 @@
 	);
 	let selectedWorkers = $derived(workers.filter((worker) => worker.value));
 	let workerOutputs = $derived(outputs.filter((item) => item.phase === 'worker'));
+	let hasModelOptions = $derived(modelOptions.length > 0);
+	let emptyModelsMessage = $derived(
+		data.userRole === 'demo'
+			? 'No demo models are currently enabled.'
+			: data.keyProviders.length === 0
+				? 'Add an API key before selecting models.'
+				: 'None of your saved providers currently have enabled models.'
+	);
+	let canRun = $derived(
+		!running &&
+			hasModelOptions &&
+			Boolean(prompt) &&
+			Boolean(judgeId) &&
+			selectedWorkers.length >= 2
+	);
 
 	function parseSelection(value: string): Selection {
 		const [providerId, ...model] = value.split('/');
@@ -104,53 +119,59 @@
 	}
 
 	async function run() {
+		if (!canRun) return;
+
 		error = '';
 		final = '';
 		generationId = '';
 		outputs = [];
 		running = true;
 
-		const response = await fetch('/api/generate', {
-			method: 'POST',
-			headers: { 'content-type': 'application/json' },
-			body: JSON.stringify({
-				prompt,
-				workers: selectedWorkers.map((worker) => parseSelection(worker.value)),
-				judge: parseSelection(judgeId),
-				rounds,
-				options: { temperature }
-			})
-		});
+		try {
+			const response = await fetch('/api/generate', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({
+					prompt,
+					workers: selectedWorkers.map((worker) => parseSelection(worker.value)),
+					judge: parseSelection(judgeId),
+					rounds,
+					options: { temperature }
+				})
+			});
 
-		if (!response.ok || !response.body) {
-			error = await response.text();
-			running = false;
-			return;
-		}
-
-		const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
-		let buffer = '';
-		while (true) {
-			const { value, done } = await reader.read();
-			if (done) break;
-			buffer += value;
-			const events = buffer.split('\n\n');
-			buffer = events.pop() ?? '';
-			for (const chunk of events) {
-				const line = chunk.split('\n').find((item) => item.startsWith('data: '));
-				if (!line) continue;
-				const event = JSON.parse(line.slice(6));
-				if (event.type === 'generation') generationId = event.generationId;
-				if (event.type === 'status') upsertOutput(event);
-				if (event.type === 'text') {
-					upsertOutput(event);
-					if (event.phase === 'judge') final += event.text;
-				}
-				if (event.type === 'error') upsertOutput({ ...event, status: 'failed' });
-				if (event.type === 'final') final = event.text;
+			if (!response.ok || !response.body) {
+				error = await response.text();
+				return;
 			}
+
+			const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+			let buffer = '';
+			while (true) {
+				const { value, done } = await reader.read();
+				if (done) break;
+				buffer += value;
+				const events = buffer.split('\n\n');
+				buffer = events.pop() ?? '';
+				for (const chunk of events) {
+					const line = chunk.split('\n').find((item) => item.startsWith('data: '));
+					if (!line) continue;
+					const event = JSON.parse(line.slice(6));
+					if (event.type === 'generation') generationId = event.generationId;
+					if (event.type === 'status') upsertOutput(event);
+					if (event.type === 'text') {
+						upsertOutput(event);
+						if (event.phase === 'judge') final += event.text;
+					}
+					if (event.type === 'error') upsertOutput({ ...event, status: 'failed' });
+					if (event.type === 'final') final = event.text;
+				}
+			}
+		} catch {
+			error = 'Generation could not be started. Try again.';
+		} finally {
+			running = false;
 		}
-		running = false;
 	}
 </script>
 
@@ -200,15 +221,41 @@
 					/>
 				</div>
 
-				<div class="grid gap-3 md:grid-cols-2">
-					{#each workers as worker, index (worker.id)}
+				{#if hasModelOptions}
+					<div class="grid gap-3 md:grid-cols-2">
+						{#each workers as worker, index (worker.id)}
+							<div class="min-w-0 space-y-2">
+								<Label for={worker.id}>Worker {index + 1}</Label>
+								<Select.Root type="single" bind:value={worker.value}>
+									<Select.Trigger id={worker.id} class="w-full min-w-0">
+										<span class="truncate"
+											>{modelTriggerLabel(worker.value, `Select worker ${index + 1}`)}</span
+										>
+									</Select.Trigger>
+									<Select.Content class="max-h-80">
+										{#each data.catalog as provider (provider.id)}
+											<Select.Group>
+												<Select.Label>{provider.name}</Select.Label>
+												{#each provider.models as model (model.id)}
+													<Select.Item
+														value={`${provider.id}/${model.id}`}
+														label={`${provider.name}: ${model.name ?? model.id}`}
+													>
+														<span class="truncate">{model.name ?? model.id}</span>
+													</Select.Item>
+												{/each}
+											</Select.Group>
+										{/each}
+									</Select.Content>
+								</Select.Root>
+							</div>
+						{/each}
+
 						<div class="min-w-0 space-y-2">
-							<Label for={worker.id}>Worker {index + 1}</Label>
-							<Select.Root type="single" bind:value={worker.value}>
-								<Select.Trigger id={worker.id} class="w-full min-w-0">
-									<span class="truncate"
-										>{modelTriggerLabel(worker.value, `Select worker ${index + 1}`)}</span
-									>
+							<Label for="judge-model">Judge</Label>
+							<Select.Root type="single" bind:value={judgeId}>
+								<Select.Trigger id="judge-model" class="w-full min-w-0">
+									<span class="truncate">{modelTriggerLabel(judgeId, 'Select judge')}</span>
 								</Select.Trigger>
 								<Select.Content class="max-h-80">
 									{#each data.catalog as provider (provider.id)}
@@ -227,68 +274,52 @@
 								</Select.Content>
 							</Select.Root>
 						</div>
-					{/each}
 
-					<div class="min-w-0 space-y-2">
-						<Label for="judge-model">Judge</Label>
-						<Select.Root type="single" bind:value={judgeId}>
-							<Select.Trigger id="judge-model" class="w-full min-w-0">
-								<span class="truncate">{modelTriggerLabel(judgeId, 'Select judge')}</span>
-							</Select.Trigger>
-							<Select.Content class="max-h-80">
-								{#each data.catalog as provider (provider.id)}
-									<Select.Group>
-										<Select.Label>{provider.name}</Select.Label>
-										{#each provider.models as model (model.id)}
-											<Select.Item
-												value={`${provider.id}/${model.id}`}
-												label={`${provider.name}: ${model.name ?? model.id}`}
-											>
-												<span class="truncate">{model.name ?? model.id}</span>
-											</Select.Item>
-										{/each}
-									</Select.Group>
-								{/each}
-							</Select.Content>
-						</Select.Root>
-					</div>
-
-					<div class="grid gap-2 rounded-md border p-3">
-						<Label for="rounds">Rounds</Label>
-						<input
-							id="rounds"
-							class="h-9 rounded-md bg-input/50 px-3 text-sm"
-							type="number"
-							min="0"
-							max="3"
-							bind:value={rounds}
-						/>
-					</div>
-
-					<div class="grid gap-3 rounded-md border p-3 md:col-span-2">
-						<div class="flex items-center justify-between gap-3">
-							<Label for="temperature">Temperature</Label>
-							<span class="text-sm text-muted-foreground tabular-nums"
-								>{temperature.toFixed(1)}</span
-							>
+						<div class="grid gap-2 rounded-md border p-3">
+							<Label for="rounds">Rounds</Label>
+							<input
+								id="rounds"
+								class="h-9 rounded-md bg-input/50 px-3 text-sm"
+								type="number"
+								min="0"
+								max="3"
+								bind:value={rounds}
+							/>
 						</div>
-						<Slider
-							id="temperature"
-							type="single"
-							bind:value={temperature}
-							min={0}
-							max={2}
-							step={0.1}
-						/>
+
+						<div class="grid gap-3 rounded-md border p-3 md:col-span-2">
+							<div class="flex items-center justify-between gap-3">
+								<Label for="temperature">Temperature</Label>
+								<span class="text-sm text-muted-foreground tabular-nums"
+									>{temperature.toFixed(1)}</span
+								>
+							</div>
+							<Slider
+								id="temperature"
+								type="single"
+								bind:value={temperature}
+								min={0}
+								max={2}
+								step={0.1}
+							/>
+						</div>
 					</div>
-				</div>
+				{:else}
+					<div
+						class="grid gap-3 rounded-md border bg-muted/40 p-4 sm:grid-cols-[auto_1fr_auto] sm:items-center"
+					>
+						<div class="flex size-9 items-center justify-center rounded-md bg-background">
+							<Key class="size-4 text-muted-foreground" />
+						</div>
+						<p class="text-sm text-muted-foreground">{emptyModelsMessage}</p>
+						{#if data.userRole !== 'demo'}
+							<Button href={resolve('/settings')} variant="outline">Add API key</Button>
+						{/if}
+					</div>
+				{/if}
 
 				<div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-					<Button
-						class="w-full gap-2 sm:w-auto"
-						disabled={running || !prompt || !judgeId || selectedWorkers.length < 2}
-						onclick={run}
-					>
+					<Button class="w-full gap-2 sm:w-auto" disabled={!canRun} onclick={run}>
 						<Play class="size-4" />
 						{running ? 'Running' : 'Run'}
 					</Button>

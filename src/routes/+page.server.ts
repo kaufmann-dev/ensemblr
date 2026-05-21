@@ -8,8 +8,7 @@ import { getSettings } from '$lib/server/settings';
 
 export async function load({ locals }) {
 	const user = requireUser(locals);
-	const [catalog, keys, history, settings] = await Promise.all([
-		getCatalog(),
+	const [keys, history] = await Promise.all([
 		db
 			.select({ providerId: providerApiKey.providerId })
 			.from(providerApiKey)
@@ -19,22 +18,29 @@ export async function load({ locals }) {
 			.from(generation)
 			.where(eq(generation.userId, user.id))
 			.orderBy(desc(generation.createdAt))
-			.limit(8),
-		getSettings()
+			.limit(8)
 	]);
+	const keyProviders = keys.map((key) => key.providerId);
+	const configuredProviders = new Set(keyProviders);
 
-	const allowed = new Set(
-		settings.demoAllowedModels.map((model) => `${model.providerId}/${model.modelId}`)
-	);
-	const filteredCatalog: CatalogProvider[] =
-		user.role === 'demo'
-			? catalog
-					.map((provider) => ({
-						...provider,
-						models: provider.models.filter((model) => allowed.has(`${provider.id}/${model.id}`))
-					}))
-					.filter((provider) => provider.models.length > 0)
-			: catalog;
+	let filteredCatalog: CatalogProvider[] = [];
+	if (user.role === 'demo') {
+		const [catalog, settings] = await Promise.all([getCatalog(), getSettings()]);
+		const allowed = new Set(
+			settings.demoAllowedModels.map((model) => `${model.providerId}/${model.modelId}`)
+		);
+		filteredCatalog = catalog
+			.map((provider) => ({
+				...provider,
+				models: provider.models.filter((model) => allowed.has(`${provider.id}/${model.id}`))
+			}))
+			.filter((provider) => provider.models.length > 0);
+	} else if (keyProviders.length > 0) {
+		filteredCatalog = (await getCatalog()).filter((provider) =>
+			configuredProviders.has(provider.id)
+		);
+	}
+
 	const workspaceCatalog = filteredCatalog
 		.map((provider) => ({
 			id: provider.id,
@@ -51,7 +57,7 @@ export async function load({ locals }) {
 
 	return {
 		catalog: workspaceCatalog,
-		keyProviders: keys.map((key) => key.providerId),
+		keyProviders,
 		history,
 		userRole: user.role
 	};
