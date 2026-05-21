@@ -29,7 +29,6 @@
 		Cpu, 
 		Layers,
 		Thermometer,
-		Activity,
 		Loader2,
 		AlertCircle
 	} from '@lucide/svelte';
@@ -39,6 +38,12 @@
 
 	type Selection = { providerId: string; modelId: string };
 	type WorkerSelection = { id: string; value: string };
+	type RecentRun = {
+		id: string;
+		prompt: string;
+		status: 'running' | 'completed' | 'failed';
+		createdAt: Date;
+	};
 	type Output = {
 		key: string;
 		outputId?: string;
@@ -65,6 +70,7 @@
 	let error = $state('');
 	let generationId = $state('');
 	let outputs = $state<Output[]>([]);
+	let optimisticRecentRuns = $state<RecentRun[]>([]);
 
 	let copySuccess = $state(false);
 
@@ -97,6 +103,13 @@
 			Boolean(judgeId) &&
 			selectedWorkers.length >= 2
 	);
+	let recentRuns = $derived.by(() => {
+		const optimisticIds = new Set(optimisticRecentRuns.map((item) => item.id));
+		return [
+			...optimisticRecentRuns,
+			...data.history.filter((item) => !optimisticIds.has(item.id))
+		].slice(0, 8);
+	});
 
 	function parseSelection(value: string): Selection {
 		const [providerId, ...model] = value.split('/');
@@ -142,6 +155,35 @@
 		});
 	}
 
+	function upsertRecentRun(id: string, status: RecentRun['status']) {
+		const existing = optimisticRecentRuns.find((item) => item.id === id);
+		if (existing) {
+			existing.status = status;
+			return;
+		}
+
+		optimisticRecentRuns = [
+			{
+				id,
+				prompt,
+				status,
+				createdAt: new Date()
+			},
+			...optimisticRecentRuns.filter((item) => item.id !== id)
+		].slice(0, 8);
+	}
+
+	function statusClass(status: RecentRun['status']) {
+		return cn(
+			"text-[9px] font-mono font-medium uppercase px-1.5 py-0.5 rounded border tracking-wide",
+			status === 'completed'
+				? "border-border bg-foreground/5 text-foreground"
+				: status === 'failed'
+					? "border-destructive/20 bg-destructive/5 text-destructive"
+					: "border-border bg-muted text-muted-foreground animate-pulse"
+		);
+	}
+
 	async function run() {
 		if (!canRun) return;
 
@@ -181,14 +223,23 @@
 					const line = chunk.split('\n').find((item) => item.startsWith('data: '));
 					if (!line) continue;
 					const event = JSON.parse(line.slice(6));
-					if (event.type === 'generation') generationId = event.generationId;
+					if (event.type === 'generation') {
+						generationId = event.generationId;
+						upsertRecentRun(event.generationId, 'running');
+					}
 					if (event.type === 'status') upsertOutput(event);
 					if (event.type === 'text') {
 						upsertOutput(event);
 						if (event.phase === 'judge') final += event.text;
 					}
-					if (event.type === 'error') upsertOutput({ ...event, status: 'failed' });
-					if (event.type === 'final') final = event.text;
+					if (event.type === 'error') {
+						upsertOutput({ ...event, status: 'failed' });
+						if (!event.outputId && generationId) upsertRecentRun(generationId, 'failed');
+					}
+					if (event.type === 'final') {
+						final = event.text;
+						upsertRecentRun(event.generationId, 'completed');
+					}
 				}
 			}
 		} catch {
@@ -228,7 +279,7 @@
 			<div class="py-2.5 flex-1 overflow-hidden">
 				<ScrollArea class="h-[25rem] lg:h-[calc(100vh-17rem)]">
 					<div class="space-y-1.5 pr-2 py-0.5">
-						{#each data.history as item (item.id)}
+						{#each recentRuns as item (item.id)}
 							<a
 								class="group/item block rounded border border-border bg-muted/20 p-2.5 hover:bg-muted/65 hover:border-foreground/30"
 								href={resolve(`/history/${item.id}`)}
@@ -241,12 +292,7 @@
 										{new Date(item.createdAt).toLocaleDateString()}
 									</span>
 									<span 
-										class={cn(
-											"text-[9px] font-mono font-medium uppercase px-1.5 py-0.5 rounded border tracking-wide",
-											item.status === 'completed' 
-												? "border-border bg-foreground/5 text-foreground" 
-												: "border-destructive/20 bg-destructive/5 text-destructive"
-										)}
+										class={statusClass(item.status)}
 									>
 										{item.status}
 									</span>
@@ -462,15 +508,6 @@
 							</span>
 						{/if}
 						
-						{#if generationId}
-							<a
-								class="text-[11px] font-mono text-foreground hover:underline underline-offset-4 flex items-center gap-1.5 transition-colors"
-								href={resolve(`/history/${generationId}`)}
-							>
-								<Activity class="size-3" />
-								<span>Open saved run details</span>
-							</a>
-						{/if}
 					</div>
 				</div>
 				
