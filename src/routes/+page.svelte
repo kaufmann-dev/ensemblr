@@ -41,6 +41,7 @@
 	type WorkerSelection = { id: string; value: string };
 	type Output = {
 		key: string;
+		outputId?: string;
 		phase: 'worker' | 'judge';
 		round: number;
 		model: Selection;
@@ -81,7 +82,6 @@
 		)
 	);
 	let selectedWorkers = $derived(workers.filter((worker) => worker.value));
-	let workerOutputs = $derived(outputs.filter((item) => item.phase === 'worker'));
 	let hasModelOptions = $derived(modelOptions.length > 0);
 	let emptyModelsMessage = $derived(
 		data.userRole === 'demo'
@@ -113,6 +113,7 @@
 	}
 
 	function upsertOutput(event: {
+		outputId?: string;
 		phase: 'worker' | 'judge';
 		round: number;
 		model: Selection;
@@ -120,9 +121,10 @@
 		text?: string;
 		error?: string;
 	}) {
-		const key = outputKey(event.phase, event.round, event.model);
+		const key = event.outputId ?? outputKey(event.phase, event.round, event.model);
 		const existing = outputs.find((item) => item.key === key);
 		if (existing) {
+			existing.outputId = event.outputId ?? existing.outputId;
 			existing.status = event.status ?? existing.status;
 			existing.text += event.text ?? '';
 			existing.error = event.error ?? existing.error;
@@ -130,6 +132,7 @@
 		}
 		outputs.push({
 			key,
+			outputId: event.outputId,
 			phase: event.phase,
 			round: event.round,
 			model: event.model,
@@ -526,21 +529,21 @@
 			</CardContent>
 		</Card>
 
-		<!-- Worker Outputs Collapse Accordion -->
-		{#if workerOutputs.length > 0}
+		<!-- Mixture Step Outputs Collapse Accordion -->
+		{#if outputs.length > 0}
 			<div class="space-y-3 pt-2">
 				<div class="flex items-center gap-2 px-1">
 					<Layers class="size-4 text-foreground/80" />
-					<h3 class="text-xs font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Worker Mixture Layers ({workerOutputs.length})</h3>
+					<h3 class="text-xs font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Mixture Steps ({outputs.length})</h3>
 				</div>
 				
 				<Accordion.Root type="multiple" class="w-full grid gap-2">
-					{#each workerOutputs as output (output.key)}
+					{#each outputs as output (output.key)}
 						<Accordion.Item value={output.key} class="rounded border border-border bg-card overflow-hidden hover:border-foreground/30">
 							<Accordion.Trigger class="px-4 py-2.5 text-xs font-mono font-medium hover:no-underline hover:bg-muted/40 transition-colors flex items-center justify-between gap-4 min-w-0 w-full">
 								<div class="flex items-center gap-2.5 min-w-0">
 									<span class="font-mono text-[9px] uppercase px-1.5 py-0.5 border border-border bg-muted text-muted-foreground tracking-wide rounded-sm whitespace-nowrap shrink-0">
-										Round {output.round}
+										{output.phase} · Round {output.round}
 									</span>
 									<span class="truncate text-foreground/90 font-mono text-[11px]">
 										{output.model.providerId}/{output.model.modelId}
