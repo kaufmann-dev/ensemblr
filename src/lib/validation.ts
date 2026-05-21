@@ -7,7 +7,7 @@ export const modelSelectionSchema = z.object({
 
 export const generateRequestSchema = z.object({
 	prompt: z.string().trim().min(1),
-	workers: z.array(modelSelectionSchema).min(2).max(5),
+	workers: z.array(modelSelectionSchema).min(2).max(4),
 	judge: modelSelectionSchema,
 	rounds: z.coerce.number().int().min(0).max(3),
 	options: z
