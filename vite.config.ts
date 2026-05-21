@@ -11,9 +11,6 @@ export default defineConfig({
 	],
 	build: {
 		sourcemap: false,
-		minify: true,
-		rollupOptions: {
-			maxParallelFileOps: 2
-		}
+		minify: true
 	}
 });
