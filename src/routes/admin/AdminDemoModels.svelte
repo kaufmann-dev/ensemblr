@@ -331,8 +331,8 @@
 
 									<!-- Model Column -->
 									<Table.Cell class="py-3">
-										<div class={cn(
-											"flex min-w-0 items-center gap-3 rounded border px-3 py-2 transition-colors duration-150",
+										<label for={row.id} class={cn(
+											"flex min-w-0 items-center gap-3 rounded border px-3 py-2 transition-colors duration-150 cursor-pointer",
 											allowedSet.has(row.value)
 												? "bg-foreground/10 border-foreground/20"
 												: "bg-muted/40 border-border/40 hover:bg-muted/60"
@@ -344,14 +344,14 @@
 												onCheckedChange={() => toggleAllowed(row.value)}
 												class="rounded border-border/60 data-[state=checked]:bg-foreground data-[state=checked]:text-background data-[state=checked]:border-foreground focus-visible:ring-1 focus-visible:ring-foreground"
 											/>
-											<Label class="min-w-0 flex-1 text-[11px] font-mono font-bold text-foreground/85 flex items-center justify-between gap-1.5 cursor-pointer select-none" for={row.id}>
+											<div class="min-w-0 flex-1 text-[11px] font-mono font-bold text-foreground/85 flex items-center justify-between gap-1.5 cursor-pointer select-none">
 												<div class="flex items-center gap-1.5 min-w-0">
 													<Cpu class={cn("size-3.5 shrink-0 transition-colors", allowedSet.has(row.value) ? "text-foreground" : "text-muted-foreground/60")} />
 													<span class="truncate">{row.modelName}</span>
 												</div>
 												<span class="text-[9px] font-mono text-muted-foreground/60 shrink-0 hidden sm:inline ml-2">{row.modelId}</span>
-											</Label>
-										</div>
+											</div>
+										</label>
 									</Table.Cell>
 								</Table.Row>
 							{/each}
