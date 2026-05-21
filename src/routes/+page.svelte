@@ -304,7 +304,7 @@
 							<div class="space-y-1.5 group/select">
 								<div class="flex items-center gap-1.5">
 									<Cpu class="size-3.5 text-muted-foreground/70" />
-									<Label for={worker.id} class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Worker Model {index + 1}</Label>
+									<Label for={worker.id} class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Worker Model {index + 1}{index > 1 ? ' (OPTIONAL)' : ''}</Label>
 								</div>
 								
 								<Select.Root type="single" bind:value={worker.value} disabled={running}>
