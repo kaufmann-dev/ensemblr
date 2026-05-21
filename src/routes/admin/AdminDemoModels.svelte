@@ -295,7 +295,7 @@
 			<div 
 				bind:this={scrollViewport} 
 				class={cn(
-					"overflow-y-auto max-h-[35rem] w-full custom-scrollbar",
+					"overflow-y-auto max-h-[35rem] w-full",
 					filteredModels.length === 0 && "hidden"
 				)}
 			>
@@ -313,7 +313,7 @@
 									<!-- Provider Column -->
 									<Table.Cell class="py-3">
 										<div class="flex items-center gap-3">
-											<div class="flex size-9 items-center justify-center rounded-full bg-background border border-border overflow-hidden shrink-0">
+											<div class="flex size-9 items-center justify-center rounded bg-background border border-border overflow-hidden shrink-0">
 												<img class="size-4 object-contain filter grayscale dark:invert" src={row.providerLogoUrl} alt="" />
 											</div>
 											<div class="flex flex-col min-w-0">
@@ -334,7 +334,7 @@
 										<div class={cn(
 											"flex min-w-0 items-center gap-3 rounded border px-3 py-2 transition-colors duration-150",
 											allowedSet.has(row.value)
-												? "bg-foreground/8 border-foreground/15"
+												? "bg-foreground/10 border-foreground/20"
 												: "bg-muted/40 border-border/40 hover:bg-muted/60"
 										)}>
 											<Checkbox
@@ -363,23 +363,3 @@
 	{/if}
 </div>
 
-<style>
-	.custom-scrollbar::-webkit-scrollbar {
-		width: 6px;
-		height: 6px;
-	}
-	.custom-scrollbar::-webkit-scrollbar-track {
-		background: transparent;
-	}
-	.custom-scrollbar::-webkit-scrollbar-thumb {
-		background: hsl(var(--muted-foreground) / 0.2);
-		border-radius: 3px;
-	}
-	.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-		background: hsl(var(--muted-foreground) / 0.4);
-	}
-	.custom-scrollbar {
-		scrollbar-width: thin;
-		scrollbar-color: hsl(var(--muted-foreground) / 0.2) transparent;
-	}
-</style>

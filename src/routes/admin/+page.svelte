@@ -108,10 +108,10 @@
 						<div class="space-y-2">
 							<div class="flex items-center gap-1.5">
 								<Sliders class="size-3.5 text-foreground/75" />
-								<Label class="text-[10px] font-mono font-bold uppercase tracking-wider text-foreground">Intermediate Synthesis Layer Template</Label>
+								<Label class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Intermediate Synthesis Layer Template</Label>
 							</div>
 							<Textarea
-								class="min-h-48 font-mono text-xs leading-relaxed border border-border focus-visible:ring-1 focus-visible:ring-foreground rounded"
+								class="min-h-48 font-mono text-xs leading-relaxed border border-border focus-visible:ring-1 focus-visible:ring-foreground/20 rounded"
 								name="intermediateTemplate"
 								value={data.settings.intermediateTemplate}
 								placeholder="Enter system prompt for intermediate workers..."
@@ -125,10 +125,10 @@
 						<div class="space-y-2 pt-3">
 							<div class="flex items-center gap-1.5">
 								<Shield class="size-3.5 text-foreground/75" />
-								<Label class="text-[10px] font-mono font-bold uppercase tracking-wider text-foreground">Final Judge Synthesis Template</Label>
+								<Label class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Final Judge Synthesis Template</Label>
 							</div>
 							<Textarea
-								class="min-h-48 font-mono text-xs leading-relaxed border border-border focus-visible:ring-1 focus-visible:ring-foreground rounded"
+								class="min-h-48 font-mono text-xs leading-relaxed border border-border focus-visible:ring-1 focus-visible:ring-foreground/20 rounded"
 								name="judgeTemplate"
 								value={data.settings.judgeTemplate}
 								placeholder="Enter system prompt for the final judge model..."
@@ -160,16 +160,16 @@
 		</div>
 
 		<!-- Admin Form Actions Bar -->
-		<div class="flex flex-col gap-4 sm:flex-row sm:items-center border-t border-border/20 pt-4">
-			<Button class="w-full sm:w-auto h-10 px-5 font-mono text-xs uppercase tracking-wider font-bold rounded bg-foreground text-background hover:bg-foreground/90 transition-all gap-2" type="submit">
+		<div class="flex flex-col gap-4 sm:flex-row sm:items-center border-t border-border pt-4">
+			<Button class="w-full sm:w-auto h-8.5 px-5 font-mono text-xs uppercase tracking-wider font-bold rounded shadow-none gap-2" type="submit">
 				<Save class="size-3.5" />
 				Save admin configurations
 			</Button>
 			
 			{#if form?.message}
-				<div class="rounded border border-destructive/20 bg-destructive/5 px-4 py-2 flex items-center gap-2">
-					<AlertCircle class="size-3.5 text-destructive shrink-0" />
-					<p class="text-xs font-mono text-destructive break-words">{form.message}</p>
+				<div class="rounded border border-destructive/20 bg-destructive/5 p-3 flex items-start gap-2.5">
+					<AlertCircle class="size-4 text-destructive shrink-0 mt-0.5" />
+					<p class="text-[11px] font-mono text-destructive break-words">{form.message}</p>
 				</div>
 			{/if}
 		</div>
