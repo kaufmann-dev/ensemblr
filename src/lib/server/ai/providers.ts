@@ -10,6 +10,7 @@ import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { createPerplexity } from '@ai-sdk/perplexity';
 import { createTogetherAI } from '@ai-sdk/togetherai';
 import { createXai } from '@ai-sdk/xai';
+import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import type { LanguageModel } from 'ai';
 import type { CatalogProvider } from '$lib/server/models/catalog';
 
@@ -38,7 +39,9 @@ const factories: Record<string, ProviderFactory> = {
 			apiKey,
 			baseURL: provider.api
 		})(modelId);
-	}
+	},
+	'@openrouter/ai-sdk-provider': (apiKey, _provider, modelId) =>
+		createOpenRouter({ apiKey })(modelId)
 };
 
 export function createLanguageModel(provider: CatalogProvider, modelId: string, apiKey: string) {
