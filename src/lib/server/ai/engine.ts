@@ -12,35 +12,13 @@ import { decryptSecret } from '$lib/server/crypto';
 import { findCatalogModel } from '$lib/server/models/catalog';
 import { getSettings } from '$lib/server/settings';
 import { createLanguageModel } from './providers';
+import {
+	publishGenerationEvent,
+	sse,
+	startGeneration,
+	type RunEvent
+} from './generation-events';
 import type { GenerateRequest } from '$lib/validation';
-
-type RunEvent =
-	| { type: 'generation'; generationId: string }
-	| {
-			type: 'status';
-			outputId: string;
-			phase: 'worker' | 'judge';
-			round: number;
-			model: ModelSelection;
-			status: string;
-	  }
-	| {
-			type: 'text';
-			outputId: string;
-			phase: 'worker' | 'judge';
-			round: number;
-			model: ModelSelection;
-			text: string;
-	  }
-	| {
-			type: 'error';
-			outputId?: string;
-			phase: 'worker' | 'judge';
-			round: number;
-			model: ModelSelection;
-			error: string;
-	  }
-	| { type: 'final'; generationId: string; text: string };
 
 type SuccessfulAnswer = {
 	model: ModelSelection;
@@ -58,10 +36,6 @@ function renderTemplate(template: string, prompt: string, answers: SuccessfulAns
 				.map((answer) => `${answer.model.providerId}/${answer.model.modelId}:\n${answer.text}`)
 				.join('\n\n')
 		);
-}
-
-function sse(event: RunEvent) {
-	return `data: ${JSON.stringify(event)}\n\n`;
 }
 
 async function getApiKey(
@@ -148,6 +122,7 @@ async function runModel(
 
 export async function createGeneration(user: RunUser, sessionId: string, request: GenerateRequest) {
 	const generationId = crypto.randomUUID();
+	const now = new Date();
 	await db.insert(generation).values({
 		id: generationId,
 		userId: user.id,
@@ -155,6 +130,20 @@ export async function createGeneration(user: RunUser, sessionId: string, request
 		prompt: request.prompt,
 		config: request,
 		status: 'running'
+	});
+	startGeneration({
+		generation: {
+			id: generationId,
+			userId: user.id,
+			demoSessionId: user.role === 'demo' ? sessionId : null,
+			prompt: request.prompt,
+			status: 'running',
+			finalOutput: null,
+			error: null,
+			createdAt: now,
+			updatedAt: now
+		},
+		outputs: []
 	});
 	return generationId;
 }
@@ -164,7 +153,10 @@ export function streamMixture(user: RunUser, generationId: string, request: Gene
 
 	return new ReadableStream({
 		async start(controller) {
-			const emit = (event: RunEvent) => controller.enqueue(encoder.encode(sse(event)));
+			const emit = (event: RunEvent) => {
+				publishGenerationEvent(generationId, event);
+				controller.enqueue(encoder.encode(sse(event)));
+			};
 			emit({ type: 'generation', generationId });
 
 			try {

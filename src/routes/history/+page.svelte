@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import { invalidateAll } from '$app/navigation';
 	import { cn } from '$lib/utils.js';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { Badge } from '$lib/components/ui/badge';
@@ -9,6 +10,30 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	let hasRunningGenerations = $derived(data.generations.some((item) => item.status === 'running'));
+
+	function statusClass(status: 'running' | 'completed' | 'failed') {
+		return cn(
+			"text-[9px] font-mono font-medium uppercase px-1.5 py-0.5 rounded border tracking-wide",
+			status === 'completed'
+				? "border-border bg-foreground/5 text-foreground"
+				: status === 'failed'
+					? "border-destructive/30 bg-destructive/5 text-destructive"
+					: "border-border bg-muted text-muted-foreground animate-pulse"
+		);
+	}
+
+	$effect(() => {
+		if (!hasRunningGenerations) return;
+
+		const poll = setInterval(() => {
+			invalidateAll();
+		}, 1000);
+
+		return () => {
+			clearInterval(poll);
+		};
+	});
 </script>
 
 <svelte:head><title>History | ensemblr</title></svelte:head>
@@ -54,12 +79,7 @@
 
 						<div class="shrink-0 flex flex-wrap items-center gap-2">
 							<span 
-								class={cn(
-									"text-[9px] font-mono font-medium uppercase px-1.5 py-0.5 rounded border tracking-wide",
-									item.status === 'completed'
-										? "border-border bg-foreground/5 text-foreground"
-										: "border-destructive/30 bg-destructive/5 text-destructive"
-								)}
+								class={statusClass(item.status)}
 							>
 								{item.status}
 							</span>
