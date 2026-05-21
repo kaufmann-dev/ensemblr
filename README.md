@@ -61,7 +61,7 @@ pnpm db:migrate
 pnpm db:seed
 ```
 
-The seed script creates the admin account from your `.env` values and ensures the one-click demo account exists. It is idempotent — safe to run multiple times.
+The seed script creates the admin account from your `.env` values, ensures the one-click demo account exists, and creates initial app settings if they do not exist yet. It is idempotent — safe to run multiple times. Existing prompt templates and admin-selected demo models are preserved on later seed runs.
 
 ### 5. Start the development server
 
@@ -120,17 +120,17 @@ If you prefer to run migrations automatically on every deploy, use:
 
 Add the following environment variables in Coolify (or import them from a file):
 
-| Variable                    | Required | Description                                                                                                                      |
-| --------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `DATABASE_URL`              | **Yes**  | PostgreSQL connection string, e.g. `postgres://user:pass@host:5432/db`                                                           |
-| `ORIGIN`                    | **Yes**  | The public URL of your app, e.g. `https://ensemblr.yourdomain.com`                                                               |
-| `BETTER_AUTH_SECRET`        | **Yes**  | High-entropy secret for auth session signing. Generate with `openssl rand -base64 32`                                            |
-| `API_KEY_ENCRYPTION_SECRET` | **Yes**  | High-entropy secret for encrypting stored provider API keys. Generate with `openssl rand -base64 32`                             |
-| `ADMIN_EMAIL`               | **Yes**  | Email address for the initial admin account                                                                                      |
-| `ADMIN_PASSWORD`            | **Yes**  | Password for the initial admin account. Must be at least 8 characters                                                            |
-| `ADMIN_NAME`                | No       | Display name for the admin account (default: `Admin`)                                                                            |
-| `DEMO_NAME`                 | No       | Display name for the demo account (default: `Demo`)                                                                              |
-| `DEMO_ALLOWED_MODELS`       | No       | Comma-separated list of `provider/model` IDs allowed for demo users, e.g. `openai/gpt-4o-mini,anthropic/claude-3-5-haiku-latest` |
+| Variable                    | Required | Description                                                                                                        |
+| --------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------ |
+| `DATABASE_URL`              | **Yes**  | PostgreSQL connection string, e.g. `postgres://user:pass@host:5432/db`                                             |
+| `ORIGIN`                    | **Yes**  | The public URL of your app, e.g. `https://ensemblr.yourdomain.com`                                                 |
+| `BETTER_AUTH_SECRET`        | **Yes**  | High-entropy secret for auth session signing. Generate with `openssl rand -base64 32`                              |
+| `API_KEY_ENCRYPTION_SECRET` | **Yes**  | High-entropy secret for encrypting stored provider API keys. Generate with `openssl rand -base64 32`               |
+| `ADMIN_EMAIL`               | **Yes**  | Email address for the initial admin account                                                                        |
+| `ADMIN_PASSWORD`            | **Yes**  | Password for the initial admin account. Must be at least 8 characters                                              |
+| `ADMIN_NAME`                | No       | Display name for the admin account (default: `Admin`)                                                              |
+| `DEMO_NAME`                 | No       | Display name for the demo account (default: `Demo`)                                                                |
+| `DEMO_ALLOWED_MODELS`       | No       | Initial comma-separated `provider/model` IDs for demo users. Used only when the app settings row is first created. |
 
 ### 5. Deploy
 

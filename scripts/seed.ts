@@ -132,13 +132,7 @@ await db
 		judgeTemplate: DEFAULT_JUDGE_TEMPLATE,
 		demoAllowedModels: parseModels(process.env.DEMO_ALLOWED_MODELS)
 	})
-	.onConflictDoUpdate({
-		target: appSetting.id,
-		set: {
-			demoAllowedModels: parseModels(process.env.DEMO_ALLOWED_MODELS),
-			updatedAt: new Date()
-		}
-	});
+	.onConflictDoNothing();
 
 console.log('Seed complete');
 
