@@ -11,6 +11,7 @@
 		CardHeader,
 		CardTitle
 	} from '$lib/components/ui/card';
+	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import * as Select from '$lib/components/ui/select';
@@ -286,7 +287,7 @@
 					</div>
 					<Textarea
 						id="prompt"
-						class="min-h-32 resize-y font-mono text-xs rounded border border-border focus-visible:ring-1 focus-visible:ring-foreground/20 p-3"
+						class="min-h-32 resize-y font-mono text-xs p-3"
 						placeholder="What would you like the Mixture-of-Agents to synthesize? Enter a complex task, coding query, or reasoning prompt..."
 						bind:value={prompt}
 						disabled={running}
@@ -305,12 +306,12 @@
 								</div>
 								
 								<Select.Root type="single" bind:value={worker.value} disabled={running}>
-									<Select.Trigger id={worker.id} class="h-8.5 rounded border border-border bg-card text-xs font-mono font-medium focus:ring-0 focus:ring-offset-0 focus-visible:ring-1 focus-visible:ring-foreground/20 focus-visible:ring-offset-0">
+									<Select.Trigger id={worker.id} class="text-xs font-mono font-medium">
 										<span class="truncate">
 											{modelTriggerLabel(worker.value, `Select worker ${index + 1}`)}
 										</span>
 									</Select.Trigger>
-									<Select.Content class="max-h-80 border border-border bg-popover rounded p-1 shadow-md">
+									<Select.Content class="p-1">
 										{#each data.catalog as provider (provider.id)}
 											<Select.Group>
 												<Select.Label class="text-[9px] uppercase font-mono font-black text-muted-foreground px-2.5 py-1.5 tracking-widest">{provider.name}</Select.Label>
@@ -338,12 +339,12 @@
 							</div>
 							
 							<Select.Root type="single" bind:value={judgeId} disabled={running}>
-								<Select.Trigger id="judge-model" class="w-full h-8.5 rounded border border-border bg-card hover:border-foreground/30 text-xs font-mono font-medium focus:ring-0 focus-visible:ring-1 focus-visible:ring-foreground/20">
-									<span class="truncate font-bold">
+								<Select.Trigger id="judge-model" class="text-xs font-mono font-medium">
+									<span class="truncate">
 										{modelTriggerLabel(judgeId, 'Select judge model')}
 									</span>
 								</Select.Trigger>
-								<Select.Content class="max-h-80 border border-border bg-popover rounded p-1 shadow-md">
+								<Select.Content class="p-1">
 									{#each data.catalog as provider (provider.id)}
 										<Select.Group>
 											<Select.Label class="text-[9px] uppercase font-mono font-black text-muted-foreground px-2.5 py-1.5 tracking-widest">{provider.name}</Select.Label>
@@ -351,7 +352,7 @@
 												<Select.Item
 													value={`${provider.id}/${model.id}`}
 													label={`${provider.name}: ${model.name ?? model.id}`}
-													class="rounded-sm mx-0.5 text-xs font-mono focus:bg-muted focus:text-foreground"
+													class="rounded-sm mx-0.5 text-xs font-mono px-2 py-1.5 cursor-pointer"
 												>
 													<span class="truncate font-medium">{model.name ?? model.id}</span>
 												</Select.Item>
@@ -369,9 +370,9 @@
 								<Label for="rounds" class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Rounds of mixture</Label>
 							</div>
 							<div class="relative flex items-center">
-								<input
+								<Input
 									id="rounds"
-									class="h-8.5 w-full rounded border border-border bg-card px-3 text-xs font-mono focus-visible:ring-1 focus-visible:ring-foreground/20 outline-none"
+									class="text-xs font-mono pr-14"
 									type="number"
 									min="1"
 									max="3"
@@ -389,7 +390,7 @@
 							<div class="flex items-center justify-between gap-3">
 								<div class="flex items-center gap-1.5">
 									<Thermometer class="size-3.5 text-foreground/80" />
-									<Label for="temperature" class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Generation Temperature</Label>
+									<Label class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Generation Temperature</Label>
 								</div>
 								<span class="text-[10px] font-mono font-bold bg-foreground/10 px-2 py-0.5 rounded text-foreground tabular-nums">
 									{temperature.toFixed(1)}
