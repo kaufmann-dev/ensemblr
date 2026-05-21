@@ -313,7 +313,7 @@
 									<!-- Provider Column -->
 									<Table.Cell class="py-3">
 										<div class="flex items-center gap-3">
-											<div class="flex size-8 items-center justify-center rounded-full bg-muted/40 border border-border/80 overflow-hidden shrink-0">
+											<div class="flex size-9 items-center justify-center rounded-full bg-background border border-border overflow-hidden shrink-0">
 												<img class="size-4 object-contain filter grayscale dark:invert" src={row.providerLogoUrl} alt="" />
 											</div>
 											<div class="flex flex-col min-w-0">
@@ -332,10 +332,10 @@
 									<!-- Model Column -->
 									<Table.Cell class="py-3">
 										<div class={cn(
-											"flex min-w-0 items-center gap-3 rounded px-3 py-2 transition-colors duration-150",
+											"flex min-w-0 items-center gap-3 rounded border px-3 py-2 transition-colors duration-150",
 											allowedSet.has(row.value)
-												? "bg-foreground/8"
-												: "bg-muted/40 hover:bg-muted/60"
+												? "bg-foreground/8 border-foreground/15"
+												: "bg-muted/40 border-border/40 hover:bg-muted/60"
 										)}>
 											<Checkbox
 												id={row.id}
