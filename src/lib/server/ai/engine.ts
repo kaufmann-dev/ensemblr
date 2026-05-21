@@ -118,6 +118,8 @@ async function runModel(
 			emit({ type: 'text', phase, round, model, text: delta });
 		}
 
+		if (text.trim().length === 0) throw new Error('Model returned an empty response');
+
 		await db
 			.update(generationOutput)
 			.set({ status: 'completed', output: text })
