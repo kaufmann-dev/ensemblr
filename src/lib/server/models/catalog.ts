@@ -52,7 +52,8 @@ const IMPLEMENTED_PACKAGES = new Set([
 	'@ai-sdk/togetherai',
 	'@ai-sdk/deepinfra',
 	'@ai-sdk/cerebras',
-	'@ai-sdk/openai-compatible'
+	'@ai-sdk/openai-compatible',
+	'@openrouter/ai-sdk-provider'
 ]);
 
 export async function getCatalog() {

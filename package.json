@@ -75,6 +75,7 @@
 		"@ai-sdk/perplexity": "^3.0.33",
 		"@ai-sdk/togetherai": "^2.0.51",
 		"@ai-sdk/xai": "^3.0.91",
+		"@openrouter/ai-sdk-provider": "^2.9.0",
 		"ai": "^6.0.184",
 		"mode-watcher": "^1.1.0",
 		"zod": "^4.4.3"
