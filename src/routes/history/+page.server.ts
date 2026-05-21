@@ -1,6 +1,7 @@
-import { desc, eq } from 'drizzle-orm';
+import { desc } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { generation } from '$lib/server/db/schema';
+import { visibleGenerationsFor } from '$lib/server/generation-access';
 import { requireUser } from '$lib/server/authz';
 
 export async function load({ locals }) {
@@ -9,7 +10,7 @@ export async function load({ locals }) {
 		generations: await db
 			.select()
 			.from(generation)
-			.where(eq(generation.userId, user.id))
+			.where(visibleGenerationsFor(user, locals.session!.id))
 			.orderBy(desc(generation.createdAt))
 			.limit(50)
 	};

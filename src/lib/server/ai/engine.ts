@@ -135,11 +135,12 @@ async function runModel(
 	}
 }
 
-export async function createGeneration(userId: string, request: GenerateRequest) {
+export async function createGeneration(user: RunUser, sessionId: string, request: GenerateRequest) {
 	const generationId = crypto.randomUUID();
 	await db.insert(generation).values({
 		id: generationId,
-		userId,
+		userId: user.id,
+		demoSessionId: user.role === 'demo' ? sessionId : null,
 		prompt: request.prompt,
 		config: request,
 		status: 'running'
