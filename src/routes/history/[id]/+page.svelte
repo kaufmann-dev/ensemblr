@@ -8,13 +8,10 @@
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import * as Accordion from '$lib/components/ui/accordion';
 	import { 
-		ArrowLeft, 
-		Activity, 
 		Copy, 
 		Check, 
 		Layers, 
 		FileText, 
-		Cpu,
 		ShieldCheck,
 		Trash2
 	} from '@lucide/svelte';

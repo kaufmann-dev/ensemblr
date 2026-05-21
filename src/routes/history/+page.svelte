@@ -3,10 +3,8 @@
 	import { invalidateAll } from '$app/navigation';
 	import { cn } from '$lib/utils.js';
 	import PageHeader from '$lib/components/PageHeader.svelte';
-	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
-	import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '$lib/components/ui/card';
-	import { History, Activity, Calendar, Sparkles, ExternalLink, Trash2 } from '@lucide/svelte';
+	import { History, Calendar, ExternalLink, Trash2 } from '@lucide/svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
