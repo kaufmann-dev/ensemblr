@@ -341,7 +341,7 @@
 												id={row.id}
 												checked={allowedSet.has(row.value)}
 												disabled={!row.modelEnabled}
-												onclick={() => toggleAllowed(row.value)}
+												onCheckedChange={() => toggleAllowed(row.value)}
 												class="rounded border-border/60 data-[state=checked]:bg-foreground data-[state=checked]:text-background data-[state=checked]:border-foreground focus-visible:ring-1 focus-visible:ring-foreground"
 											/>
 											<Label class="min-w-0 flex-1 text-[11px] font-mono font-bold text-foreground/85 flex items-center justify-between gap-1.5 cursor-pointer select-none" for={row.id}>
