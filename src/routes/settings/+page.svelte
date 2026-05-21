@@ -108,8 +108,9 @@
 				{/if}
 			{/if}
 
-			<!-- Saved Credentials Section -->
-			<div class="space-y-3">
+			{#if data.role !== 'demo'}
+				<!-- Saved Credentials Section -->
+				<div class="space-y-3">
 				<h3 class="text-xs font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Configured Providers ({savedProviders.length})</h3>
 				<div class="grid gap-2">
 					{#each savedProviders as provider (provider.id)}
@@ -127,20 +128,18 @@
 								</div>
 							</div>
 							
-							{#if data.role !== 'demo'}
-								<form method="POST" action="?/delete" class="shrink-0">
-									<input type="hidden" name="providerId" value={provider.id} />
-									<Button 
-										class="w-full sm:w-auto h-7.5 rounded text-[10px] font-mono border-border hover:bg-destructive/5 hover:text-destructive hover:border-destructive/20 transition-all" 
-										type="submit" 
-										variant="outline" 
-										size="sm"
-									>
-										<Trash2 class="size-3.5 mr-1" />
-										Delete
-									</Button>
-								</form>
-							{/if}
+							<form method="POST" action="?/delete" class="shrink-0">
+								<input type="hidden" name="providerId" value={provider.id} />
+								<Button 
+									class="w-full sm:w-auto h-7.5 rounded text-[10px] font-mono border-border hover:bg-destructive/5 hover:text-destructive hover:border-destructive/20 transition-all" 
+									type="submit" 
+									variant="outline" 
+									size="sm"
+								>
+									<Trash2 class="size-3.5 mr-1" />
+									Delete
+								</Button>
+							</form>
 						</div>
 					{:else}
 						<div class="flex flex-col items-center justify-center py-12 text-center border border-dashed border-border rounded bg-muted/10">
@@ -149,6 +148,7 @@
 						</div>
 					{/each}
 				</div>
-			</div>
+				</div>
+			{/if}
 		</div>
 	</main>

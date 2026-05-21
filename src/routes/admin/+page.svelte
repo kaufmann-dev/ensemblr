@@ -39,6 +39,7 @@
 	let catalogError = $state('');
 	let catalogLoaded = $state(false);
 	let demoModelsComponent = $state<Promise<typeof import('./AdminDemoModels.svelte')>>();
+	let demoKeysComponent = $state<Promise<typeof import('./AdminDemoKeys.svelte')>>();
 
 	async function loadCatalog() {
 		if (catalogLoading || catalogLoaded) return;
@@ -66,6 +67,9 @@
 	$effect(() => {
 		if (activeTab === 'demo') {
 			demoModelsComponent ??= import('./AdminDemoModels.svelte');
+			void loadCatalog();
+		} else if (activeTab === 'demo-keys') {
+			demoKeysComponent ??= import('./AdminDemoKeys.svelte');
 			void loadCatalog();
 		}
 	});
@@ -100,6 +104,12 @@
 						class="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-1 pb-3 pt-1 font-mono text-xs uppercase tracking-wider font-bold text-muted-foreground data-[state=active]:text-foreground"
 					>
 						Demo models
+					</Tabs.Trigger>
+					<Tabs.Trigger 
+						value="demo-keys" 
+						class="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-1 pb-3 pt-1 font-mono text-xs uppercase tracking-wider font-bold text-muted-foreground data-[state=active]:text-foreground"
+					>
+						Demo API Keys
 					</Tabs.Trigger>
 				</Tabs.List>
 			</Tabs.Root>
@@ -197,6 +207,58 @@
 						{/if}
 					</div>
 				</form>
+			{:else if activeTab === 'demo-keys'}
+				<div class="space-y-6">
+					{#if !data.demoUserExists}
+						<div class="flex items-start gap-3 rounded border border-destructive/20 bg-destructive/5 p-4 mt-3">
+							<AlertCircle class="size-4.5 text-destructive shrink-0 mt-0.5" />
+							<div class="space-y-1">
+								<h4 class="text-xs font-mono font-bold text-destructive">Demo Account Not Found</h4>
+								<p class="text-[10px] font-mono text-destructive/90 mt-0.5 leading-relaxed">
+									The demo account has not been configured in the database yet. Please ensure the database is properly seeded before adding API keys.
+								</p>
+							</div>
+						</div>
+					{:else}
+						{#if demoKeysComponent}
+							{#await demoKeysComponent}
+								<div class="flex flex-col items-center justify-center py-20 text-center">
+									<Loader2 class="size-6 text-foreground/75 animate-spin inline-block mb-3 stroke-[1.5]" />
+									<p class="text-xs font-mono text-muted-foreground">Loading demo keys controls...</p>
+								</div>
+							{:then { default: AdminDemoKeys }}
+								{#if catalogLoading}
+									<div class="flex flex-col items-center justify-center py-20 text-center">
+										<Loader2 class="size-6 text-foreground/75 animate-spin inline-block mb-3 stroke-[1.5]" />
+										<p class="text-xs font-mono text-muted-foreground">Loading catalog...</p>
+									</div>
+								{:else if catalogError}
+									<div class="flex flex-col items-center justify-center py-12 text-center border border-dashed border-destructive/30 rounded bg-destructive/5 gap-3">
+										<AlertCircle class="size-6 text-destructive stroke-[1.5]" />
+										<div class="space-y-1 max-w-sm">
+											<p class="text-xs font-mono font-bold text-destructive">Catalog Error</p>
+											<p class="text-[10px] font-mono text-destructive/80">{catalogError}</p>
+										</div>
+										<Button 
+											variant="outline" 
+											size="sm" 
+											class="h-7 text-[10px] font-mono mt-2" 
+											onclick={retryCatalog}
+										>
+											Retry
+										</Button>
+									</div>
+								{:else}
+									<AdminDemoKeys
+										{catalog}
+										demoKeys={data.demoKeys}
+										{form}
+									/>
+								{/if}
+							{/await}
+						{/if}
+					{/if}
+				</div>
 			{/if}
 		</div>
 	</div>
