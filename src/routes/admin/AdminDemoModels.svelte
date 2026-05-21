@@ -6,7 +6,6 @@
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import * as Table from '$lib/components/ui/table';
 	import { Loader2, AlertTriangle, RefreshCw, Cpu, Search, X } from '@lucide/svelte';
 
@@ -130,14 +129,17 @@
 			: [...allowed, value];
 	}
 
-	// Reset rendering limit when search queries update
+	// Reset rendering limit and scroll position when search queries update
 	$effect(() => {
 		providerSearch;
 		modelSearch;
 		limit = 50;
+		if (scrollViewport) {
+			scrollViewport.scrollTop = 0;
+		}
 	});
 
-	// Infinite Scroll view port bindings with passive listener & guard protection
+	// Setup scroll listener once on the element
 	$effect(() => {
 		const el = scrollViewport;
 		if (!el) return;
@@ -157,14 +159,32 @@
 		}
 
 		el.addEventListener('scroll', handleScroll, { passive: true });
-
-		untrack(() => {
-			handleScroll();
-		});
-
 		return () => {
 			el.removeEventListener('scroll', handleScroll);
 		};
+	});
+
+	// Auto-expand limit if there's no scrollbar but still more items to show
+	$effect(() => {
+		const count = filteredModels.length;
+		const currentLimit = limit;
+		const el = scrollViewport;
+		if (!el) return;
+
+		// Re-run this check when the DOM updates (which is when the effect runs)
+		untrack(() => {
+			if (!el) return;
+			const threshold = 300;
+			const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
+			if (isNearBottom && currentLimit < count) {
+				if (loadingMore) return;
+				loadingMore = true;
+				limit = Math.min(currentLimit + 50, count);
+				setTimeout(() => {
+					loadingMore = false;
+				}, 100);
+			}
+		});
 	});
 </script>
 
@@ -254,23 +274,31 @@
 					Retry load
 				</Button>
 			</div>
-		{:else if filteredModels.length === 0}
-			<div class="flex flex-col items-center justify-center py-16 text-center border border-dashed border-border rounded bg-muted/10">
-				<Cpu class="size-7 text-muted-foreground/30 mb-2 stroke-[1.5]" />
-				<p class="text-xs font-mono text-muted-foreground">No matching models or providers found.</p>
-				<Button 
-					variant="ghost" 
-					class="mt-2 h-7 rounded text-[10px] font-mono hover:bg-muted text-muted-foreground hover:text-foreground"
-					onclick={() => {
-						handleProviderInput('');
-						handleModelInput('');
-					}}
-				>
-					Clear search filters
-				</Button>
-			</div>
 		{:else}
-			<ScrollArea class="max-h-[35rem] w-full" bind:viewportRef={scrollViewport}>
+			{#if filteredModels.length === 0}
+				<div class="flex flex-col items-center justify-center py-16 text-center border border-dashed border-border rounded bg-muted/10">
+					<Cpu class="size-7 text-muted-foreground/30 mb-2 stroke-[1.5]" />
+					<p class="text-xs font-mono text-muted-foreground">No matching models or providers found.</p>
+					<Button 
+						variant="ghost" 
+						class="mt-2 h-7 rounded text-[10px] font-mono hover:bg-muted text-muted-foreground hover:text-foreground"
+						onclick={() => {
+							handleProviderInput('');
+							handleModelInput('');
+						}}
+					>
+						Clear search filters
+					</Button>
+				</div>
+			{/if}
+
+			<div 
+				bind:this={scrollViewport} 
+				class={cn(
+					"overflow-y-auto max-h-[35rem] w-full border border-border rounded bg-card custom-scrollbar",
+					filteredModels.length === 0 && "hidden"
+				)}
+			>
 				<div class="pr-5 py-1">
 					<Table.Root>
 						<Table.Header class="hover:bg-transparent">
@@ -330,7 +358,28 @@
 						</Table.Body>
 					</Table.Root>
 				</div>
-			</ScrollArea>
+			</div>
 		{/if}
 	{/if}
 </div>
+
+<style>
+	.custom-scrollbar::-webkit-scrollbar {
+		width: 6px;
+		height: 6px;
+	}
+	.custom-scrollbar::-webkit-scrollbar-track {
+		background: transparent;
+	}
+	.custom-scrollbar::-webkit-scrollbar-thumb {
+		background: hsl(var(--muted-foreground) / 0.2);
+		border-radius: 3px;
+	}
+	.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+		background: hsl(var(--muted-foreground) / 0.4);
+	}
+	.custom-scrollbar {
+		scrollbar-width: thin;
+		scrollbar-color: hsl(var(--muted-foreground) / 0.2) transparent;
+	}
+</style>
