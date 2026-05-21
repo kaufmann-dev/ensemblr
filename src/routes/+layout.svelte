@@ -83,8 +83,8 @@
 						aria-label="Toggle dark mode"
 						class="rounded size-8 text-muted-foreground hover:text-foreground active:scale-95 transition-all duration-150"
 					>
-						<Sun class="size-4 transition-all dark:hidden" />
-						<Moon class="hidden size-4 transition-all dark:block" />
+						<Moon class="size-4 transition-all dark:hidden" />
+						<Sun class="hidden size-4 transition-all dark:block" />
 					</Button>
 
 					<!-- Sign Out -->
@@ -110,8 +110,8 @@
 						aria-label="Toggle dark mode"
 						class="rounded size-8 text-muted-foreground hover:text-foreground active:scale-95 transition-all"
 					>
-						<Sun class="size-4 transition-all dark:hidden" />
-						<Moon class="hidden size-4 transition-all dark:block" />
+						<Moon class="size-4 transition-all dark:hidden" />
+						<Sun class="hidden size-4 transition-all dark:block" />
 					</Button>
 					
 					<Sheet.Root bind:open={mobileMenuOpen}>
