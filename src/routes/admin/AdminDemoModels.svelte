@@ -303,26 +303,26 @@
 					<Table.Root>
 						<Table.Header class="hover:bg-transparent">
 							<Table.Row class="hover:bg-transparent border-border">
-								<Table.Head class="text-xs font-mono font-bold uppercase tracking-tight text-foreground py-3 w-[35%]">Provider</Table.Head>
-								<Table.Head class="text-xs font-mono font-bold uppercase tracking-tight text-foreground py-3 w-[65%]">Model</Table.Head>
+								<Table.Head class="text-xs font-mono font-bold uppercase tracking-tight text-foreground py-3 w-[35%]">PROVIDER</Table.Head>
+								<Table.Head class="text-xs font-mono font-bold uppercase tracking-tight text-foreground py-3 w-[65%]">MODEL</Table.Head>
 							</Table.Row>
 						</Table.Header>
 						<Table.Body>
 							{#each visibleModels as row (row.value)}
-								<Table.Row class="hover:bg-muted/10 border-border">
+								<Table.Row class="hover:bg-transparent border-border">
 									<!-- Provider Column -->
-									<Table.Cell class="py-2.5">
+									<Table.Cell class="py-3">
 										<div class="flex items-center gap-3">
-											<div class="flex size-7 items-center justify-center rounded bg-card border border-border overflow-hidden shrink-0">
+											<div class="flex size-8 items-center justify-center rounded-full bg-muted/40 border border-border/80 overflow-hidden shrink-0">
 												<img class="size-4 object-contain filter grayscale dark:invert" src={row.providerLogoUrl} alt="" />
 											</div>
 											<div class="flex flex-col min-w-0">
 												<strong class="truncate text-xs font-bold font-mono uppercase tracking-tight text-foreground">{row.providerName}</strong>
-												<span class="text-[9px] font-mono mt-0.5">
+												<span class="text-[9px] font-bold font-mono mt-0.5 tracking-wider uppercase">
 													{#if row.providerEnabled}
-														<span class="text-emerald-500 font-bold uppercase tracking-wider">Active</span>
+														<span class="text-emerald-500">ACTIVE</span>
 													{:else}
-														<span class="text-muted-foreground/75 font-medium uppercase tracking-wider">Catalog only</span>
+														<span class="text-muted-foreground/75">CATALOG ONLY</span>
 													{/if}
 												</span>
 											</div>
@@ -330,12 +330,12 @@
 									</Table.Cell>
 
 									<!-- Model Column -->
-									<Table.Cell class="py-2.5">
+									<Table.Cell class="py-3">
 										<div class={cn(
 											"flex min-w-0 items-center gap-3 rounded border p-2.5 transition-all duration-150",
 											allowedSet.has(row.value)
 												? "bg-foreground/5 border-foreground/30 shadow-none"
-												: "bg-muted/20 border-border hover:bg-muted/50 hover:border-foreground/20"
+												: "bg-muted/5 border-border/60 hover:bg-muted/15 hover:border-border/80"
 										)}>
 											<Checkbox
 												id={row.id}
@@ -344,7 +344,7 @@
 												onclick={() => toggleAllowed(row.value)}
 												class="rounded border-border/60 data-[state=checked]:bg-foreground data-[state=checked]:text-background data-[state=checked]:border-foreground focus-visible:ring-1 focus-visible:ring-foreground"
 											/>
-											<Label class="min-w-0 flex-1 text-[11px] font-mono font-semibold text-foreground/85 flex items-center justify-between gap-1.5 cursor-pointer select-none" for={row.id}>
+											<Label class="min-w-0 flex-1 text-[11px] font-mono font-bold text-foreground/85 flex items-center justify-between gap-1.5 cursor-pointer select-none" for={row.id}>
 												<div class="flex items-center gap-1.5 min-w-0">
 													<Cpu class={cn("size-3.5 shrink-0 transition-colors", allowedSet.has(row.value) ? "text-foreground" : "text-muted-foreground/60")} />
 													<span class="truncate">{row.modelName}</span>
