@@ -5,6 +5,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { Shield, Sliders, AlertCircle, Save, Loader2 } from '@lucide/svelte';
+	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
 
 	type CatalogModel = {
@@ -28,6 +29,11 @@
 	$effect(() => {
 		allowed = data.settings.demoAllowedModels.map((model) => `${model.providerId}/${model.modelId}`);
 	});
+
+	$effect(() => {
+		activeTab = data.tab;
+	});
+
 	let catalog = $state.raw<CatalogProvider[]>([]);
 	let catalogLoading = $state(false);
 	let catalogError = $state('');
@@ -55,11 +61,14 @@
 
 	function setActiveTab(value: string) {
 		activeTab = value;
-		if (value !== 'demo') return;
-
-		demoModelsComponent ??= import('./AdminDemoModels.svelte');
-		void loadCatalog();
 	}
+
+	$effect(() => {
+		if (activeTab === 'demo') {
+			demoModelsComponent ??= import('./AdminDemoModels.svelte');
+			void loadCatalog();
+		}
+	});
 
 	function retryCatalog() {
 		catalogLoaded = false;
@@ -70,39 +79,35 @@
 <svelte:head><title>Admin | Ensemblr</title></svelte:head>
 
 <main class="relative flex-1 flex flex-col justify-start max-w-6xl mx-auto w-full px-4 py-8 space-y-6 bg-background">
-	<form method="POST" class="space-y-6">
-		{#each allowed as model (model)}
-			<input type="hidden" name="demoAllowedModels" value={model} />
-		{/each}
+	<PageHeader
+		title="Admin console"
+		description="Manage global Mixture-of-Agents system prompts and enabled catalog models"
+		icon={Shield}
+	/>
 
-		<PageHeader
-			title="Admin console"
-			description="Manage global Mixture-of-Agents system prompts and enabled catalog models"
-			icon={Shield}
-		/>
-
-		<div class="space-y-6">
-			<div class="border-b border-border pb-px">
-				<Tabs.Root value={activeTab} onValueChange={setActiveTab} class="w-full">
-					<Tabs.List class="w-full justify-start bg-transparent border-b-0 p-0 rounded-none gap-6 flex">
-						<Tabs.Trigger 
-							value="prompts" 
-							class="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-1 pb-3 pt-1 font-mono text-xs uppercase tracking-wider font-bold text-muted-foreground data-[state=active]:text-foreground"
-						>
-							Prompt templates
-						</Tabs.Trigger>
-						<Tabs.Trigger 
-							value="demo" 
-							class="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-1 pb-3 pt-1 font-mono text-xs uppercase tracking-wider font-bold text-muted-foreground data-[state=active]:text-foreground"
-						>
-							Demo models
-						</Tabs.Trigger>
-					</Tabs.List>
-				</Tabs.Root>
-			</div>
-			
-			<div class="pt-2">
-				{#if activeTab === 'prompts'}
+	<div class="space-y-6">
+		<div class="border-b border-border pb-px">
+			<Tabs.Root value={activeTab} onValueChange={setActiveTab} class="w-full">
+				<Tabs.List class="w-full justify-start bg-transparent border-b-0 p-0 rounded-none gap-6 flex">
+					<Tabs.Trigger 
+						value="prompts" 
+						class="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-1 pb-3 pt-1 font-mono text-xs uppercase tracking-wider font-bold text-muted-foreground data-[state=active]:text-foreground"
+					>
+						Prompt templates
+					</Tabs.Trigger>
+					<Tabs.Trigger 
+						value="demo" 
+						class="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-1 pb-3 pt-1 font-mono text-xs uppercase tracking-wider font-bold text-muted-foreground data-[state=active]:text-foreground"
+					>
+						Demo models
+					</Tabs.Trigger>
+				</Tabs.List>
+			</Tabs.Root>
+		</div>
+		
+		<div class="pt-2">
+			{#if activeTab === 'prompts'}
+				<form method="POST" action="?/savePrompts" use:enhance class="space-y-6">
 					<div class="space-y-5">
 						<!-- Intermediate Prompt Template -->
 						<div class="space-y-2">
@@ -138,7 +143,28 @@
 							</p>
 						</div>
 					</div>
-				{:else if activeTab === 'demo'}
+
+					<!-- Admin Form Actions Bar -->
+					<div class="flex flex-col gap-4 sm:flex-row sm:items-center border-t border-border pt-4">
+						<Button class="w-full sm:w-auto h-8.5 px-5 font-mono text-xs uppercase tracking-wider font-bold rounded shadow-none gap-2" type="submit">
+							<Save class="size-3.5" />
+							Save prompt templates
+						</Button>
+						
+						{#if form?.message && form?.action === 'savePrompts'}
+							<div class="rounded border border-destructive/20 bg-destructive/5 p-3 flex items-start gap-2.5">
+								<AlertCircle class="size-4 text-destructive shrink-0 mt-0.5" />
+								<p class="text-[11px] font-mono text-destructive break-words">{form.message}</p>
+							</div>
+						{/if}
+					</div>
+				</form>
+			{:else if activeTab === 'demo'}
+				<form method="POST" action="?/saveDemoModels" use:enhance class="space-y-6">
+					{#each allowed as model (model)}
+						<input type="hidden" name="demoAllowedModels" value={model} />
+					{/each}
+
 					{#if demoModelsComponent}
 						{#await demoModelsComponent}
 							<div class="flex flex-col items-center justify-center py-20 text-center">
@@ -155,23 +181,24 @@
 							/>
 						{/await}
 					{/if}
-				{/if}
-			</div>
-		</div>
 
-		<!-- Admin Form Actions Bar -->
-		<div class="flex flex-col gap-4 sm:flex-row sm:items-center border-t border-border pt-4">
-			<Button class="w-full sm:w-auto h-8.5 px-5 font-mono text-xs uppercase tracking-wider font-bold rounded shadow-none gap-2" type="submit">
-				<Save class="size-3.5" />
-				Save admin configurations
-			</Button>
-			
-			{#if form?.message}
-				<div class="rounded border border-destructive/20 bg-destructive/5 p-3 flex items-start gap-2.5">
-					<AlertCircle class="size-4 text-destructive shrink-0 mt-0.5" />
-					<p class="text-[11px] font-mono text-destructive break-words">{form.message}</p>
-				</div>
+					<!-- Admin Form Actions Bar -->
+					<div class="flex flex-col gap-4 sm:flex-row sm:items-center border-t border-border pt-4">
+						<Button class="w-full sm:w-auto h-8.5 px-5 font-mono text-xs uppercase tracking-wider font-bold rounded shadow-none gap-2" type="submit">
+							<Save class="size-3.5" />
+							Save demo models
+						</Button>
+						
+						{#if form?.message && form?.action === 'saveDemoModels'}
+							<div class="rounded border border-destructive/20 bg-destructive/5 p-3 flex items-start gap-2.5">
+								<AlertCircle class="size-4 text-destructive shrink-0 mt-0.5" />
+								<p class="text-[11px] font-mono text-destructive break-words">{form.message}</p>
+							</div>
+						{/if}
+					</div>
+				</form>
 			{/if}
 		</div>
-	</form>
+	</div>
 </main>
+
