@@ -23,9 +23,11 @@
 
 	let { data, form }: PageProps = $props();
 	let activeTab = $state('prompts');
-	let allowed = $derived(
-		data.settings.demoAllowedModels.map((model) => `${model.providerId}/${model.modelId}`)
-	);
+	let allowed = $state<string[]>([]);
+	
+	$effect(() => {
+		allowed = data.settings.demoAllowedModels.map((model) => `${model.providerId}/${model.modelId}`);
+	});
 	let catalog = $state.raw<CatalogProvider[]>([]);
 	let catalogLoading = $state(false);
 	let catalogError = $state('');
@@ -140,7 +142,7 @@
 					{#if demoModelsComponent}
 						{#await demoModelsComponent}
 							<div class="flex flex-col items-center justify-center py-20 text-center">
-								<Loader2 class="size-6 text-foreground/75 animate-spin mb-3 stroke-[1.5]" />
+								<Loader2 class="size-6 text-foreground/75 animate-spin inline-block mb-3 stroke-[1.5]" />
 								<p class="text-xs font-mono text-muted-foreground">Loading demo model controls...</p>
 							</div>
 						{:then { default: AdminDemoModels }}

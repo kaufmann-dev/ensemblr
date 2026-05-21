@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { cn } from '$lib/utils.js';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
@@ -6,6 +7,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
+	import * as Table from '$lib/components/ui/table';
 	import { Loader2, AlertTriangle, RefreshCw, Cpu, Search, X } from '@lucide/svelte';
 
 	type CatalogModel = {
@@ -36,76 +38,129 @@
 		retry: () => void;
 	} = $props();
 
-	let searchQuery = $state('');
-	let visibleCount = $state(8);
-	let scrollViewport = $state<HTMLElement | null>(null);
+	// Flatten catalog structures into a single flat array of model entries
+	type FlatModelRow = {
+		providerId: string;
+		providerName: string;
+		providerLogoUrl: string;
+		providerEnabled: boolean;
+		modelId: string;
+		modelName: string;
+		modelEnabled: boolean;
+		value: string; // providerId/modelId
+		id: string; // demo-providerId-modelId
+	};
 
-	// Derived filtered list of providers and models
-	let filteredCatalog = $derived.by(() => {
-		const query = searchQuery.trim().toLowerCase();
-		if (!query) return catalog;
-
-		return catalog
-			.map((provider) => {
-				const matchesProvider =
-					provider.name.toLowerCase().includes(query) || provider.id.toLowerCase().includes(query);
-
-				// If provider matches, keep all its models. Otherwise, filter models.
-				const matchedModels = matchesProvider
-					? provider.models
-					: provider.models.filter(
-							(model) =>
-								(model.name && model.name.toLowerCase().includes(query)) ||
-								model.id.toLowerCase().includes(query)
-						);
-
-				if (matchedModels.length > 0) {
-					return {
-						...provider,
-						models: matchedModels
-					};
-				}
-				return null;
-			})
-			.filter((provider): provider is CatalogProvider => provider !== null);
+	let flatModels = $derived.by(() => {
+		const rows: FlatModelRow[] = [];
+		if (!catalog) return rows;
+		for (const provider of catalog) {
+			for (const model of provider.models) {
+				rows.push({
+					providerId: provider.id,
+					providerName: provider.name,
+					providerLogoUrl: provider.logoUrl,
+					providerEnabled: provider.enabled,
+					modelId: model.id,
+					modelName: model.name ?? model.id,
+					modelEnabled: model.enabled,
+					value: `${provider.id}/${model.id}`,
+					id: `demo-${provider.id}-${model.id}`
+				});
+			}
+		}
+		return rows;
 	});
 
-	// Get total count of currently filtered models
-	let filteredModelsCount = $derived(
-		filteredCatalog.reduce((acc, provider) => acc + provider.models.length, 0)
-	);
+	// Input and debounced search state
+	let providerInput = $state('');
+	let providerSearch = $state('');
+	let providerDebounce: ReturnType<typeof setTimeout>;
 
-	// Slice catalog to only render the visibleCount amount of providers
-	let visibleCatalog = $derived(filteredCatalog.slice(0, visibleCount));
+	function handleProviderInput(val: string) {
+		providerInput = val;
+		clearTimeout(providerDebounce);
+		providerDebounce = setTimeout(() => {
+			providerSearch = val;
+		}, 150);
+	}
+
+	let modelInput = $state('');
+	let modelSearch = $state('');
+	let modelDebounce: ReturnType<typeof setTimeout>;
+
+	function handleModelInput(val: string) {
+		modelInput = val;
+		clearTimeout(modelDebounce);
+		modelDebounce = setTimeout(() => {
+			modelSearch = val;
+		}, 150);
+	}
+
+	// Filtered list using both queries independently
+	let filteredModels = $derived.by(() => {
+		const pQuery = providerSearch.trim().toLowerCase();
+		const mQuery = modelSearch.trim().toLowerCase();
+		return flatModels.filter((item) => {
+			const matchProvider =
+				!pQuery ||
+				item.providerName.toLowerCase().includes(pQuery) ||
+				item.providerId.toLowerCase().includes(pQuery);
+			const matchModel =
+				!mQuery ||
+				item.modelName.toLowerCase().includes(mQuery) ||
+				item.modelId.toLowerCase().includes(mQuery);
+			return matchProvider && matchModel;
+		});
+	});
+
+	let limit = $state(50);
+	let loadingMore = $state(false);
+	let scrollViewport = $state<HTMLElement | null>(null);
+
+	// Slice current list for rendering
+	let visibleModels = $derived(filteredModels.slice(0, limit));
+
+	// Derived Set for O(1) allowed checkups
+	let allowedSet = $derived(new Set(allowed));
 
 	function toggleAllowed(value: string) {
-		allowed = allowed.includes(value)
+		allowed = allowedSet.has(value)
 			? allowed.filter((item) => item !== value)
 			: [...allowed, value];
 	}
 
+	// Reset rendering limit when search queries update
 	$effect(() => {
-		// Reset visible count when searchQuery changes
-		searchQuery;
-		visibleCount = 8;
+		providerSearch;
+		modelSearch;
+		limit = 50;
 	});
 
+	// Infinite Scroll view port bindings with passive listener & guard protection
 	$effect(() => {
 		const el = scrollViewport;
 		if (!el) return;
 
 		function handleScroll() {
 			if (!el) return;
-			const threshold = 250; // trigger loading a bit early for smooth scrolling
+			const threshold = 300;
 			const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
-			if (isNearBottom && visibleCount < filteredCatalog.length) {
-				visibleCount = Math.min(visibleCount + 8, filteredCatalog.length);
+			if (isNearBottom && limit < filteredModels.length) {
+				if (loadingMore) return;
+				loadingMore = true;
+				limit = Math.min(limit + 50, filteredModels.length);
+				setTimeout(() => {
+					loadingMore = false;
+				}, 100);
 			}
 		}
 
 		el.addEventListener('scroll', handleScroll, { passive: true });
-		// Initial check in case it's already near the bottom on render
-		handleScroll();
+
+		untrack(() => {
+			handleScroll();
+		});
 
 		return () => {
 			el.removeEventListener('scroll', handleScroll);
@@ -121,124 +176,159 @@
 
 	{#if loading}
 		<div class="flex flex-col items-center justify-center py-20 text-center">
-			<Loader2 class="size-6 text-foreground/75 animate-spin mb-3 stroke-[1.5]" />
+			<Loader2 class="size-6 text-foreground/75 animate-spin inline-block mb-3 stroke-[1.5]" />
 			<p class="text-xs font-mono text-muted-foreground">Synchronizing provider model catalogs...</p>
-		</div>
-	{:else if error}
-		<div class="flex flex-col items-center justify-center py-16 text-center border border-destructive/20 bg-destructive/5 rounded p-6 space-y-4">
-			<AlertTriangle class="size-6 text-destructive stroke-[1.5]" />
-			<div class="space-y-1">
-				<h4 class="text-xs font-bold font-mono text-destructive uppercase tracking-tight">Catalog loading failed</h4>
-				<p class="text-xs font-mono text-muted-foreground/85 max-w-sm leading-relaxed">{error}</p>
-			</div>
-			<Button class="rounded border border-border bg-card px-4 h-9 font-mono text-xs uppercase tracking-wider font-bold text-foreground hover:bg-muted gap-2 shadow-none" type="button" onclick={retry}>
-				<RefreshCw class="size-3.5" />
-				Retry load
-			</Button>
 		</div>
 	{:else}
 		<!-- Search & Stats Bar -->
 		<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-1">
-			<div class="relative w-full sm:max-w-xs">
-				<Search class="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground/70" />
-				<Input
-					type="text"
-					placeholder="Search providers or models..."
-					bind:value={searchQuery}
-					class="h-8.5 pl-8 pr-8 text-xs rounded border border-border focus-visible:ring-1 focus-visible:ring-foreground/20 font-mono w-full"
-				/>
-				{#if searchQuery}
-					<Button
-						type="button"
-						variant="ghost"
-						size="icon"
-						class="absolute right-1.5 top-1/2 size-5 -translate-y-1/2 rounded text-muted-foreground/60 hover:text-foreground active:scale-95 transition-all"
-						onclick={() => searchQuery = ''}
-						aria-label="Clear search"
-					>
-						<X class="size-3" />
-					</Button>
-				{/if}
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full sm:max-w-xl">
+				<!-- Provider Search -->
+				<div class="relative w-full">
+					<Search class="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground/70" />
+					<Input
+						type="text"
+						placeholder="Search providers..."
+						value={providerInput}
+						oninput={(e) => handleProviderInput(e.currentTarget.value)}
+						class="h-8.5 pl-8 pr-8 text-xs rounded border border-border focus-visible:ring-1 focus-visible:ring-foreground/20 font-mono w-full"
+					/>
+					{#if providerInput}
+						<Button
+							type="button"
+							variant="ghost"
+							size="icon"
+							class="absolute right-1.5 top-1/2 size-5 -translate-y-1/2 rounded text-muted-foreground/60 hover:text-foreground active:scale-95 transition-all"
+							onclick={() => handleProviderInput('')}
+							aria-label="Clear provider search"
+						>
+							<X class="size-3" />
+						</Button>
+					{/if}
+				</div>
+
+				<!-- Model Search -->
+				<div class="relative w-full">
+					<Search class="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground/70" />
+					<Input
+						type="text"
+						placeholder="Search models..."
+						value={modelInput}
+						oninput={(e) => handleModelInput(e.currentTarget.value)}
+						class="h-8.5 pl-8 pr-8 text-xs rounded border border-border focus-visible:ring-1 focus-visible:ring-foreground/20 font-mono w-full"
+					/>
+					{#if modelInput}
+						<Button
+							type="button"
+							variant="ghost"
+							size="icon"
+							class="absolute right-1.5 top-1/2 size-5 -translate-y-1/2 rounded text-muted-foreground/60 hover:text-foreground active:scale-95 transition-all"
+							onclick={() => handleModelInput('')}
+							aria-label="Clear model search"
+						>
+							<X class="size-3" />
+						</Button>
+					{/if}
+				</div>
 			</div>
 
 			<!-- Dynamic stats badge -->
-			<div class="text-[10px] font-mono text-muted-foreground self-start sm:self-center">
-				{#if searchQuery}
-					Found <span class="font-bold text-foreground">{filteredModelsCount}</span> models across <span class="font-bold text-foreground">{filteredCatalog.length}</span> providers
+			<div class="text-[10px] font-mono text-muted-foreground shrink-0 self-start sm:self-center">
+				{#if providerSearch || modelSearch}
+					Found <span class="font-bold text-foreground">{filteredModels.length}</span> matching models
 				{:else}
-					Catalog: <span class="font-bold text-foreground">{filteredModelsCount}</span> models across <span class="font-bold text-foreground">{filteredCatalog.length}</span> providers
+					Catalog: <span class="font-bold text-foreground">{flatModels.length}</span> models
 				{/if}
 			</div>
 		</div>
 
-		{#if filteredCatalog.length === 0}
+		{#if error}
+			<div class="flex flex-col items-center justify-center py-16 text-center border border-destructive/20 bg-destructive/5 rounded p-6 space-y-4">
+				<AlertTriangle class="size-6 text-destructive stroke-[1.5]" />
+				<div class="space-y-1">
+					<h4 class="text-xs font-bold font-mono text-destructive uppercase tracking-tight">Catalog loading failed</h4>
+					<p class="text-xs font-mono text-muted-foreground/85 max-w-sm leading-relaxed">{error}</p>
+				</div>
+				<Button class="rounded border border-border bg-card px-4 h-9 font-mono text-xs uppercase tracking-wider font-bold text-foreground hover:bg-muted gap-2 shadow-none" type="button" onclick={retry}>
+					<RefreshCw class="size-3.5" />
+					Retry load
+				</Button>
+			</div>
+		{:else if filteredModels.length === 0}
 			<div class="flex flex-col items-center justify-center py-16 text-center border border-dashed border-border rounded bg-muted/10">
 				<Cpu class="size-7 text-muted-foreground/30 mb-2 stroke-[1.5]" />
 				<p class="text-xs font-mono text-muted-foreground">No matching models or providers found.</p>
 				<Button 
 					variant="ghost" 
 					class="mt-2 h-7 rounded text-[10px] font-mono hover:bg-muted text-muted-foreground hover:text-foreground"
-					onclick={() => searchQuery = ''}
+					onclick={() => {
+						handleProviderInput('');
+						handleModelInput('');
+					}}
 				>
-					Clear search filter
+					Clear search filters
 				</Button>
 			</div>
 		{:else}
 			<ScrollArea class="max-h-[35rem] w-full" bind:viewportRef={scrollViewport}>
-				<div class="grid gap-4 pr-3 py-1">
-					{#each visibleCatalog as provider (provider.id)}
-						<div class="rounded border border-border bg-muted/20 p-4 space-y-4 hover:border-foreground/30">
-							<!-- Provider Header -->
-							<div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-border">
-								<div class="flex min-w-0 items-center gap-3">
-									<div class="flex size-7 items-center justify-center rounded bg-card border border-border overflow-hidden shrink-0">
-										<img class="size-4 object-contain filter grayscale dark:invert" src={provider.logoUrl} alt="" />
-									</div>
-									<strong class="truncate text-xs font-bold font-mono uppercase tracking-tight text-foreground">{provider.name}</strong>
-								</div>
-								
-								<Badge 
-									variant="outline" 
-									class={cn(
-										"text-[9px] uppercase font-bold font-mono px-2 py-0.5 rounded border shadow-none tracking-wider",
-										provider.enabled
-											? "border-border bg-foreground/5 text-foreground"
-											: "border-border/60 bg-muted/10 text-muted-foreground"
-									)}
-								>
-									{provider.enabled ? 'Enabled' : 'Catalog only'}
-								</Badge>
-							</div>
+				<div class="pr-5 py-1">
+					<Table.Root>
+						<Table.Header class="hover:bg-transparent">
+							<Table.Row class="hover:bg-transparent border-border">
+								<Table.Head class="text-xs font-mono font-bold uppercase tracking-tight text-foreground py-3 w-[35%]">Provider</Table.Head>
+								<Table.Head class="text-xs font-mono font-bold uppercase tracking-tight text-foreground py-3 w-[65%]">Model</Table.Head>
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
+							{#each visibleModels as row (row.value)}
+								<Table.Row class="hover:bg-muted/10 border-border">
+									<!-- Provider Column -->
+									<Table.Cell class="py-2.5">
+										<div class="flex items-center gap-3">
+											<div class="flex size-7 items-center justify-center rounded bg-card border border-border overflow-hidden shrink-0">
+												<img class="size-4 object-contain filter grayscale dark:invert" src={row.providerLogoUrl} alt="" />
+											</div>
+											<div class="flex flex-col min-w-0">
+												<strong class="truncate text-xs font-bold font-mono uppercase tracking-tight text-foreground">{row.providerName}</strong>
+												<span class="text-[9px] font-mono mt-0.5">
+													{#if row.providerEnabled}
+														<span class="text-emerald-500 font-bold uppercase tracking-wider">Active</span>
+													{:else}
+														<span class="text-muted-foreground/75 font-medium uppercase tracking-wider">Catalog only</span>
+													{/if}
+												</span>
+											</div>
+										</div>
+									</Table.Cell>
 
-							<!-- Models Selection Grid -->
-							<div class="grid gap-2.5 sm:grid-cols-2">
-								{#each provider.models as model (model.id)}
-									{@const value = `${provider.id}/${model.id}`}
-									{@const id = `demo-${provider.id}-${model.id}`}
-									<div class={cn(
-										"flex min-w-0 items-center gap-3 rounded border p-2.5",
-										allowed.includes(value)
-											? "bg-foreground/5 border-foreground/30 shadow-none"
-											: "bg-muted/20 border-border hover:bg-muted/50 hover:border-foreground/20"
-									)}>
-										<Checkbox
-											{id}
-											checked={allowed.includes(value)}
-											disabled={!model.enabled}
-											onclick={() => toggleAllowed(value)}
-											class="rounded border-border/60 data-[state=checked]:bg-foreground data-[state=checked]:text-background data-[state=checked]:border-foreground focus-visible:ring-1 focus-visible:ring-foreground"
-										/>
-										<Label class="min-w-0 flex-1 text-[11px] font-mono font-semibold text-foreground/85 flex items-center gap-1.5 cursor-pointer select-none" for={id}>
-											<Cpu class={cn("size-3.5 shrink-0 transition-colors", allowed.includes(value) ? "text-foreground" : "text-muted-foreground/60")} />
-											<span class="truncate">{model.name ?? model.id}</span>
-										</Label>
-									</div>
-								{:else}
-									<p class="text-xs font-mono text-muted-foreground/60 p-2 col-span-2">No models available in this catalog.</p>
-								{/each}
-							</div>
-						</div>
-					{/each}
+									<!-- Model Column -->
+									<Table.Cell class="py-2.5">
+										<div class={cn(
+											"flex min-w-0 items-center gap-3 rounded border p-2.5 transition-all duration-150",
+											allowedSet.has(row.value)
+												? "bg-foreground/5 border-foreground/30 shadow-none"
+												: "bg-muted/20 border-border hover:bg-muted/50 hover:border-foreground/20"
+										)}>
+											<Checkbox
+												id={row.id}
+												checked={allowedSet.has(row.value)}
+												disabled={!row.modelEnabled}
+												onclick={() => toggleAllowed(row.value)}
+												class="rounded border-border/60 data-[state=checked]:bg-foreground data-[state=checked]:text-background data-[state=checked]:border-foreground focus-visible:ring-1 focus-visible:ring-foreground"
+											/>
+											<Label class="min-w-0 flex-1 text-[11px] font-mono font-semibold text-foreground/85 flex items-center justify-between gap-1.5 cursor-pointer select-none" for={row.id}>
+												<div class="flex items-center gap-1.5 min-w-0">
+													<Cpu class={cn("size-3.5 shrink-0 transition-colors", allowedSet.has(row.value) ? "text-foreground" : "text-muted-foreground/60")} />
+													<span class="truncate">{row.modelName}</span>
+												</div>
+												<span class="text-[9px] font-mono text-muted-foreground/60 shrink-0 hidden sm:inline ml-2">{row.modelId}</span>
+											</Label>
+										</div>
+									</Table.Cell>
+								</Table.Row>
+							{/each}
+						</Table.Body>
+					</Table.Root>
 				</div>
 			</ScrollArea>
 		{/if}
