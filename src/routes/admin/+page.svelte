@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { browser } from '$app/environment';
 	import { Button } from '$lib/components/ui/button';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { Textarea } from '$lib/components/ui/textarea';
@@ -23,16 +26,9 @@
 	};
 
 	let { data, form }: PageProps = $props();
-	let activeTab = $state('prompts');
-	let allowed = $state<string[]>([]);
-	
-	$effect(() => {
-		allowed = data.settings.demoAllowedModels.map((model) => `${model.providerId}/${model.modelId}`);
-	});
 
-	$effect(() => {
-		activeTab = data.tab;
-	});
+	let allowedOverrides = $state<string[] | null>(null);
+	let activeTab = $derived(data.tab);
 
 	let catalog = $state.raw<CatalogProvider[]>([]);
 	let catalogLoading = $state(false);
@@ -60,19 +56,24 @@
 		}
 	}
 
-	function setActiveTab(value: string) {
-		activeTab = value;
-	}
-
-	$effect(() => {
-		if (activeTab === 'demo') {
+	function checkAndLoadTab(tab: string) {
+		if (tab === 'demo') {
 			demoModelsComponent ??= import('./AdminDemoModels.svelte');
 			void loadCatalog();
-		} else if (activeTab === 'demo-keys') {
+		} else if (tab === 'demo-keys') {
 			demoKeysComponent ??= import('./AdminDemoKeys.svelte');
 			void loadCatalog();
 		}
-	});
+	}
+
+	function setActiveTab(value: string) {
+		goto(`?tab=${value}`, { noScroll: true, keepFocus: true });
+		checkAndLoadTab(value);
+	}
+
+	if (browser) {
+		checkAndLoadTab(untrack(() => data.tab));
+	}
 
 	function retryCatalog() {
 		catalogLoaded = false;
@@ -170,7 +171,13 @@
 					</div>
 				</form>
 			{:else if activeTab === 'demo'}
-				<form method="POST" action="?/saveDemoModels" use:enhance class="space-y-6">
+				<form method="POST" action="?/saveDemoModels" use:enhance={() => {
+					return ({ result }) => {
+						if (result.type === 'success' || result.type === 'redirect') {
+							allowedOverrides = null;
+						}
+					};
+				}} class="space-y-6">
 					{#if demoModelsComponent}
 						{#await demoModelsComponent}
 							<div class="flex flex-col items-center justify-center py-20 text-center">
@@ -179,7 +186,10 @@
 							</div>
 						{:then { default: AdminDemoModels }}
 							<AdminDemoModels
-								bind:allowed
+								bind:allowed={
+									() => allowedOverrides ?? data.settings.demoAllowedModels.map((model) => `${model.providerId}/${model.modelId}`),
+									(v) => { allowedOverrides = v; }
+								}
 								{catalog}
 								loading={catalogLoading}
 								error={catalogError}

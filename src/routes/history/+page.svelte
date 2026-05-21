@@ -10,7 +10,12 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
-	let hasRunningGenerations = $derived(data.generations.some((item) => item.status === 'running'));
+
+	let runningIds = $derived(
+		data.generations
+			.filter((item) => item.status === 'running')
+			.map((item) => item.id)
+	);
 
 	function statusClass(status: 'running' | 'completed' | 'failed') {
 		return cn(
@@ -24,14 +29,24 @@
 	}
 
 	$effect(() => {
-		if (!hasRunningGenerations) return;
+		const sources = new Map<string, EventSource>();
 
-		const poll = setInterval(() => {
-			invalidateAll();
-		}, 1000);
+		for (const id of runningIds) {
+			const source = new EventSource(resolve(`/api/generations/${id}/events`));
+			sources.set(id, source);
+
+			source.onmessage = (message) => {
+				const event = JSON.parse(message.data);
+				if (event.type === 'final' || (event.type === 'error' && !event.outputId)) {
+					invalidateAll();
+				}
+			};
+		}
 
 		return () => {
-			clearInterval(poll);
+			for (const source of sources.values()) {
+				source.close();
+			}
 		};
 	});
 </script>
