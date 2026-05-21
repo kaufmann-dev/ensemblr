@@ -2,7 +2,6 @@
 	import { browser } from '$app/environment';
 	import { cn } from '$lib/utils.js';
 	import PageHeader from '$lib/components/PageHeader.svelte';
-	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '$lib/components/ui/card';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
