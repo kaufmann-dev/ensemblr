@@ -117,7 +117,7 @@
 						<div class="flex flex-col gap-4 rounded border border-border bg-muted/20 p-3 sm:flex-row sm:items-center sm:justify-between hover:border-foreground/30">
 							<div class="flex min-w-0 items-center gap-3.5">
 								<div class="flex size-8 items-center justify-center rounded bg-card border border-border overflow-hidden shrink-0">
-									<img class="size-5 object-contain" src={provider.logoUrl} alt="" />
+									<img class="size-5 object-contain filter grayscale dark:invert" src={provider.logoUrl} alt="" />
 								</div>
 								<div class="min-w-0">
 									<span class="truncate font-mono text-xs font-bold text-foreground">{provider.name}</span>
