@@ -2,13 +2,11 @@ import { fail, redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { appSetting, type ModelSelection } from '$lib/server/db/schema';
 import { requireAdmin } from '$lib/server/authz';
-import { getCatalog } from '$lib/server/models/catalog';
 import { getSettings } from '$lib/server/settings';
 
 export async function load({ locals }) {
 	requireAdmin(locals);
-	const [catalog, settings] = await Promise.all([getCatalog(), getSettings()]);
-	return { catalog, settings };
+	return { settings: await getSettings() };
 }
 
 export const actions = {
