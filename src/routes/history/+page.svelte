@@ -3,8 +3,9 @@
 	import { cn } from '$lib/utils.js';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { Badge } from '$lib/components/ui/badge';
+	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '$lib/components/ui/card';
-	import { History, Activity, Calendar, Sparkles } from '@lucide/svelte';
+	import { History, Activity, Calendar, Sparkles, ExternalLink, Trash2 } from '@lucide/svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -19,14 +20,24 @@
 		icon={History}
 	/>
 
+	{#if data.generations.length > 0}
+		<div class="flex justify-end px-1">
+			<form method="POST" action="?/clear">
+				<Button type="submit" variant="destructive" size="sm" class="h-7.5 rounded text-[10px]">
+					<Trash2 class="size-3.5 mr-1" />
+					Clear history
+				</Button>
+			</form>
+		</div>
+	{/if}
+
 	<div class="space-y-2 px-1">
 			{#each data.generations as item (item.id)}
-				<a
+				<article
 					class="group block relative rounded border border-border bg-muted/20 p-4 hover:bg-muted/50 hover:border-foreground/30 min-w-0"
-					href={resolve(`/history/${item.id}`)}
 				>
 					<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-						<div class="space-y-2 min-w-0 flex-1">
+						<a href={resolve(`/history/${item.id}`)} class="space-y-2 min-w-0 flex-1">
 							<p class="line-clamp-2 font-mono text-xs text-foreground/80 group-hover:text-foreground break-words leading-relaxed">
 								{item.prompt}
 							</p>
@@ -39,9 +50,9 @@
 									id: {item.id.slice(0, 8)}...
 								</span>
 							</div>
-						</div>
+						</a>
 
-						<div class="shrink-0 flex items-center">
+						<div class="shrink-0 flex flex-wrap items-center gap-2">
 							<span 
 								class={cn(
 									"text-[9px] font-mono font-medium uppercase px-1.5 py-0.5 rounded border tracking-wide",
@@ -52,9 +63,20 @@
 							>
 								{item.status}
 							</span>
+							<Button href={resolve(`/history/${item.id}`)} variant="outline" size="xs" class="rounded text-[10px]">
+								<ExternalLink class="size-3 mr-1" />
+								Open
+							</Button>
+							<form method="POST" action="?/delete">
+								<input type="hidden" name="id" value={item.id} />
+								<Button type="submit" variant="destructive" size="xs" class="rounded text-[10px]">
+									<Trash2 class="size-3 mr-1" />
+									Delete
+								</Button>
+							</form>
 						</div>
 					</div>
-				</a>
+				</article>
 			{:else}
 				<div class="flex flex-col items-center justify-center py-20 text-center">
 					<History class="size-7 text-muted-foreground/30 mb-2 stroke-[1.5]" />
