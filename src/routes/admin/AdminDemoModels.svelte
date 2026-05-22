@@ -223,7 +223,7 @@
 	{:else}
 		<!-- Search & Stats Bar -->
 		<div class="flex flex-col gap-3 pb-1">
-			<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full sm:max-w-xl">
+			<div class="grid grid-cols-1 gap-2.5 w-full lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-center">
 				<!-- Provider Search -->
 				<div class="relative w-full">
 					<Search class="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground/70" />
@@ -271,18 +271,16 @@
 						</Button>
 					{/if}
 				</div>
-			</div>
 
-			<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-				<div class="inline-flex w-full rounded border border-border bg-muted/30 p-0.5 sm:w-auto">
+				<div class="flex w-full items-center justify-center gap-1 rounded-md border border-input bg-background p-1 lg:w-auto lg:justify-self-start lg:justify-start">
 					{#each activationOptions as option (option.value)}
 						<button
 							type="button"
 							class={cn(
-								"min-h-7 flex-1 rounded px-2.5 text-[10px] font-bold font-mono uppercase tracking-tight transition-colors sm:flex-none",
+								"flex h-8 flex-1 items-center justify-center rounded-sm px-3 text-[10px] font-bold font-mono uppercase tracking-tight transition-colors sm:flex-none",
 								activationFilter === option.value
-									? "bg-background text-foreground shadow-sm"
-									: "text-muted-foreground hover:text-foreground"
+									? "bg-muted text-foreground shadow-sm"
+									: "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
 							)}
 							aria-pressed={activationFilter === option.value}
 							onclick={() => {
@@ -294,7 +292,9 @@
 						</button>
 					{/each}
 				</div>
+			</div>
 
+			<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 				<!-- Dynamic stats badge -->
 				<div class="text-[10px] font-mono text-muted-foreground shrink-0 self-start sm:self-center">
 					{#if providerSearch || modelSearch || activationFilter !== 'all'}
