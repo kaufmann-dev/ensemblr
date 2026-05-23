@@ -516,7 +516,7 @@
 				{/if}
 			</CardHeader>
 			<CardContent class="p-0 flex-1 flex flex-col bg-muted/5 border-t border-border">
-				<ScrollArea class="h-80 lg:h-[26rem] w-full flex-1">
+				<ScrollArea class="h-80 lg:h-[26rem] w-full">
 					{#if final}
 						<pre class="code-area p-5 text-foreground/90 whitespace-pre-wrap selection:bg-foreground/10 break-words select-text outline-none">{final}</pre>
 					{:else if running}
@@ -571,7 +571,7 @@
 								</span>
 							</Accordion.Trigger>
 							<Accordion.Content class="p-0 border-t border-border bg-muted/5">
-								<div class="max-h-96 w-full overflow-y-auto">
+								<div class="max-h-96 w-full overflow-y-auto" tabindex="-1">
 									<pre class="code-area p-4 text-foreground/85 whitespace-pre-wrap break-words bg-muted/10 selection:bg-foreground/10 outline-none">{output.error ?? output.text}</pre>
 								</div>
 							</Accordion.Content>
