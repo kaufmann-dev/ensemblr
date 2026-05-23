@@ -127,7 +127,7 @@
 								<Label class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Intermediate Synthesis Layer Template</Label>
 							</div>
 							<Textarea
-								class="min-h-48 font-mono text-xs leading-relaxed"
+								class="min-h-32 max-h-80 resize-none overflow-y-auto font-mono text-xs leading-relaxed"
 								name="intermediateTemplate"
 								value={data.settings.intermediateTemplate}
 								placeholder="Enter system prompt for intermediate workers..."
@@ -144,7 +144,7 @@
 								<Label class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Final Judge Synthesis Template</Label>
 							</div>
 							<Textarea
-								class="min-h-48 font-mono text-xs leading-relaxed"
+								class="min-h-32 max-h-80 resize-none overflow-y-auto font-mono text-xs leading-relaxed"
 								name="judgeTemplate"
 								value={data.settings.judgeTemplate}
 								placeholder="Enter system prompt for the final judge model..."

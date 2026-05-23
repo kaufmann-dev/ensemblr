@@ -9,6 +9,24 @@
 		'data-slot': dataSlot = 'textarea',
 		...restProps
 	}: WithoutChildren<WithElementRef<HTMLTextareaAttributes>> = $props();
+
+	// Clean Svelte action to handle auto-expansion on mount and value changes
+	function autoExpand(node: HTMLTextAreaElement, currentVal: any) {
+		const updateHeight = () => {
+			node.style.height = 'auto';
+			node.style.height = `${node.scrollHeight}px`;
+		};
+
+		// Run initially on mount to fit pre-populated templates
+		updateHeight();
+
+		return {
+			update() {
+				// Automatically called by Svelte whenever the bound parameter value changes
+				updateHeight();
+			}
+		};
+	}
 </script>
 
 <textarea
@@ -19,5 +37,6 @@
 		className
 	)}
 	bind:value
+	use:autoExpand={value}
 	{...restProps}
 ></textarea>

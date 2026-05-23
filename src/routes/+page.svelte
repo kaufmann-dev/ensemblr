@@ -334,7 +334,7 @@
 					</div>
 					<Textarea
 						id="prompt"
-						class="min-h-32 resize-y font-mono text-xs p-3"
+						class="min-h-24 max-h-64 resize-none overflow-y-auto font-mono text-xs p-3"
 						placeholder="What would you like the Mixture-of-Agents to synthesize? Enter a complex task, coding query, or reasoning prompt..."
 						bind:value={prompt}
 						disabled={running}
