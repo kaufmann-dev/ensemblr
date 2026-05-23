@@ -26,27 +26,53 @@
 		);
 	}
 
-	$effect(() => {
+	// Svelte action to manage browser EventSource connections dynamically and cleanly without $effect
+	function syncEvents(node: HTMLElement, currentIds: string[]) {
 		const sources = new Map<string, EventSource>();
 
-		for (const id of runningIds) {
-			const source = new EventSource(resolve(`/api/generations/${id}/events`));
-			sources.set(id, source);
-
-			source.onmessage = (message) => {
-				const event = JSON.parse(message.data);
-				if (event.type === 'final' || (event.type === 'error' && !event.outputId)) {
-					invalidateAll();
+		const sync = (ids: string[]) => {
+			// 1. Close and remove any connections that are no longer running
+			for (const [id, source] of sources.entries()) {
+				if (!ids.includes(id)) {
+					source.close();
+					sources.delete(id);
 				}
-			};
-		}
+			}
+			// 2. Open new connections for newly running IDs
+			for (const id of ids) {
+				if (!sources.has(id)) {
+					const source = new EventSource(resolve(`/api/generations/${id}/events`));
+					sources.set(id, source);
 
-		return () => {
-			for (const source of sources.values()) {
-				source.close();
+					source.onmessage = (message) => {
+						const event = JSON.parse(message.data);
+						if (event.type === 'final' || (event.type === 'error' && !event.outputId)) {
+							source.close();
+							sources.delete(id);
+							invalidateAll();
+						}
+					};
+				}
 			}
 		};
-	});
+
+		// Run initially on mount
+		sync(currentIds);
+
+		return {
+			update(newIds: string[]) {
+				// Svelte calls this hook automatically when the runningIds array updates
+				sync(newIds);
+			},
+			destroy() {
+				// Clean up all active connections when the component is unmounted
+				for (const source of sources.values()) {
+					source.close();
+				}
+				sources.clear();
+			}
+		};
+	}
 </script>
 
 <svelte:head><title>History | ensemblr</title></svelte:head>
@@ -69,7 +95,7 @@
 		</div>
 	{/if}
 
-	<div class="space-y-2 px-1">
+	<div class="space-y-2 px-1" use:syncEvents={runningIds}>
 			{#each data.generations as item (item.id)}
 				<article
 					class="group relative rounded border border-border bg-muted/20 p-4 hover:bg-muted/50 hover:border-foreground/30 min-w-0"
