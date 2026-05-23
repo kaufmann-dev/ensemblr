@@ -4,7 +4,6 @@
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '$lib/components/ui/card';
-	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import * as Accordion from '$lib/components/ui/accordion';
 	import { 
 		Copy, 
@@ -243,9 +242,9 @@
 			</div>
 		</CardHeader>
 		<CardContent class="p-0 bg-muted/5">
-			<ScrollArea class="max-h-52 w-full">
+			<div class="max-h-52 w-full overflow-y-auto">
 				<pre class="code-area p-5 text-foreground/80 break-words whitespace-pre-wrap select-text outline-none">{generation.prompt}</pre>
-			</ScrollArea>
+			</div>
 		</CardContent>
 	</Card>
 
@@ -276,9 +275,9 @@
 			{/if}
 		</CardHeader>
 		<CardContent class="p-0 bg-muted/5">
-			<ScrollArea class="max-h-[30rem] w-full">
+			<div class="max-h-[30rem] w-full overflow-y-auto">
 				<pre class="code-area p-5 text-foreground whitespace-pre-wrap selection:bg-foreground/10 break-words select-text outline-none">{generation.finalOutput ?? generation.error ?? 'No final output saved.'}</pre>
-			</ScrollArea>
+			</div>
 		</CardContent>
 	</Card>
 
@@ -309,9 +308,9 @@
 						</span>
 					</Accordion.Trigger>
 					<Accordion.Content class="p-0 border-t border-border bg-muted/5">
-						<ScrollArea class="max-h-96 w-full">
+						<div class="max-h-96 w-full overflow-y-auto">
 							<pre class="code-area p-4 text-foreground/85 whitespace-pre-wrap break-words bg-muted/10 selection:bg-foreground/10 outline-none">{output.error ?? output.output}</pre>
-						</ScrollArea>
+						</div>
 					</Accordion.Content>
 				</Accordion.Item>
 			{:else}

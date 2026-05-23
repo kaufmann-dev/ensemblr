@@ -571,9 +571,9 @@
 								</span>
 							</Accordion.Trigger>
 							<Accordion.Content class="p-0 border-t border-border bg-muted/5">
-								<ScrollArea class="max-h-96 w-full">
+								<div class="max-h-96 w-full overflow-y-auto">
 									<pre class="code-area p-4 text-foreground/85 whitespace-pre-wrap break-words bg-muted/10 selection:bg-foreground/10 outline-none">{output.error ?? output.text}</pre>
-								</ScrollArea>
+								</div>
 							</Accordion.Content>
 						</Accordion.Item>
 					{/each}
