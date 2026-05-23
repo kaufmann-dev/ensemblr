@@ -333,8 +333,6 @@
 					bind:value={prompt}
 					disabled={running}
 					showCharCount={true}
-					minHeightClass="min-h-24"
-					maxHeightClass="max-h-64"
 				/>
 
 				{#if hasModelOptions}

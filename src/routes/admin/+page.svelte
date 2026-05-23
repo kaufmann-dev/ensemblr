@@ -132,8 +132,8 @@
 								name="intermediateTemplate"
 								bind:value={data.settings.intermediateTemplate}
 								placeholder="Enter system prompt for intermediate workers..."
-								minHeightClass="min-h-32"
-								maxHeightClass="max-h-80"
+								minHeight="128px"
+								maxHeight="320px"
 							/>
 							<p class="text-[10px] font-mono text-muted-foreground leading-relaxed">
 								Configures how intermediate rounds synthesize context from previous worker results before final consolidation.
@@ -151,8 +151,8 @@
 								name="judgeTemplate"
 								bind:value={data.settings.judgeTemplate}
 								placeholder="Enter system prompt for the final judge model..."
-								minHeightClass="min-h-32"
-								maxHeightClass="max-h-80"
+								minHeight="128px"
+								maxHeight="320px"
 							/>
 							<p class="text-[10px] font-mono text-muted-foreground leading-relaxed">
 								Instructs the final judge model on how to compare, evaluate, and consolidate the worker responses into a single high-quality response.
