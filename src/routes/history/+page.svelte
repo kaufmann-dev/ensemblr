@@ -75,7 +75,7 @@
 					class="group block relative rounded border border-border bg-muted/20 p-4 hover:bg-muted/50 hover:border-foreground/30 min-w-0"
 				>
 					<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-						<a href={resolve(`/history/${item.id}`)} class="space-y-2 min-w-0 flex-1">
+						<a href={resolve(`/history/${item.id}`)} class="space-y-2 min-w-0 flex-1 rounded p-1 -m-1">
 							<p class="line-clamp-2 font-mono text-xs text-foreground/80 group-hover:text-foreground break-words leading-relaxed">
 								{item.prompt}
 							</p>

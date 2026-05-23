@@ -109,7 +109,8 @@
 		@apply border-border;
 	}
 	*:focus-visible {
-		@apply !outline-2 !outline-foreground !outline-offset-2;
+		outline: none !important;
+		box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--foreground) !important;
 	}
 	body {
 		@apply bg-background text-foreground antialiased selection:bg-primary/10;
