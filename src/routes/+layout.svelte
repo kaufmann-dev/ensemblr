@@ -45,7 +45,7 @@
 				<!-- Brand Logo -->
 				<a 
 					href={resolve('/')} 
-					class="shrink-0 flex items-center gap-3.5 group focus-visible:outline-none"
+					class="shrink-0 flex items-center gap-3.5 group"
 				>
 					<span class="font-mono tracking-tighter text-[16px] font-bold text-foreground transition-all">
 						ensemblr
@@ -60,7 +60,7 @@
 					{#each navItems as item (item.href)}
 						<a
 							class={cn(
-								'rounded px-3 py-1.5 text-xs font-medium font-mono transition-all duration-150 focus-visible:outline-none',
+								'rounded px-3 py-1.5 text-xs font-medium font-mono transition-all duration-150',
 								isActive(item.href) 
 									? 'bg-muted text-foreground border border-border shadow-xs' 
 									: 'text-muted-foreground hover:bg-muted/50 hover:text-foreground border border-transparent'
