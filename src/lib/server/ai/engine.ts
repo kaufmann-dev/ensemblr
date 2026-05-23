@@ -152,9 +152,15 @@ export function streamMixture(user: RunUser, generationId: string, request: Gene
 
 	return new ReadableStream({
 		async start(controller) {
+			let closed = false;
 			const emit = (event: RunEvent) => {
 				publishGenerationEvent(generationId, event);
-				controller.enqueue(encoder.encode(sse(event)));
+				if (closed) return;
+				try {
+					controller.enqueue(encoder.encode(sse(event)));
+				} catch {
+					closed = true;
+				}
 			};
 			emit({ type: 'generation', generationId });
 
@@ -178,6 +184,7 @@ export function streamMixture(user: RunUser, generationId: string, request: Gene
 				).filter((answer): answer is SuccessfulAnswer => Boolean(answer));
 
 				for (let round = 1; round <= request.rounds && answers.length > 0; round += 1) {
+					if (closed) break; // Stop executing further rounds if browser connection dropped
 					const roundPrompt = renderTemplate(
 						settings.intermediateTemplate,
 						request.prompt,
@@ -201,6 +208,7 @@ export function streamMixture(user: RunUser, generationId: string, request: Gene
 					).filter((answer): answer is SuccessfulAnswer => Boolean(answer));
 				}
 
+				if (closed) return; // Stop executing final judge if browser connection dropped
 				if (answers.length === 0) throw new Error('All worker models failed');
 
 				const judgePrompt = renderTemplate(settings.judgeTemplate, request.prompt, answers);
@@ -236,7 +244,14 @@ export function streamMixture(user: RunUser, generationId: string, request: Gene
 					error: message
 				});
 			} finally {
-				controller.close();
+				if (!closed) {
+					closed = true;
+					try {
+						controller.close();
+					} catch {
+						// Stream is already closed by SvelteKit or the browser, completely safe to ignore
+					}
+				}
 			}
 		}
 	});

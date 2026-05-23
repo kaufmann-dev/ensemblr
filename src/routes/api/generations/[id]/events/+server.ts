@@ -60,12 +60,21 @@ export async function GET({ locals, params, request }) {
 					closed = true;
 					unsubscribe();
 					if (poll) clearInterval(poll);
-					controller.close();
+					try {
+						controller.close();
+					} catch {
+						// Stream is already closed by SvelteKit or the browser, completely safe to ignore
+					}
 				};
 
 				const send = (event: GenerationStreamEvent) => {
 					if (closed) return;
-					controller.enqueue(encoder.encode(sse(event)));
+					try {
+						controller.enqueue(encoder.encode(sse(event)));
+					} catch {
+						close();
+						return;
+					}
 					if (
 						event.type === 'final' ||
 						(event.type === 'error' && !event.outputId) ||
