@@ -96,19 +96,19 @@
 				<Tabs.List class="w-full justify-start bg-transparent border-b-0 p-1 rounded-none gap-6 flex overflow-x-auto scrollbar-none">
 					<Tabs.Trigger 
 						value="prompts" 
-						class="shrink-0 rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-1 pb-3 pt-1 font-mono text-xs uppercase tracking-wider font-bold text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent! dark:data-[state=active]:bg-transparent!"
+						class="shrink-0 rounded border-b-2 border-transparent data-[state=active]:border-foreground px-1 pb-3 pt-1 font-mono text-xs uppercase tracking-wider font-bold text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent! dark:data-[state=active]:bg-transparent!"
 					>
 						Prompt templates
 					</Tabs.Trigger>
 					<Tabs.Trigger 
 						value="demo" 
-						class="shrink-0 rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-1 pb-3 pt-1 font-mono text-xs uppercase tracking-wider font-bold text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent! dark:data-[state=active]:bg-transparent!"
+						class="shrink-0 rounded border-b-2 border-transparent data-[state=active]:border-foreground px-1 pb-3 pt-1 font-mono text-xs uppercase tracking-wider font-bold text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent! dark:data-[state=active]:bg-transparent!"
 					>
 						Demo models
 					</Tabs.Trigger>
 					<Tabs.Trigger 
 						value="demo-keys" 
-						class="shrink-0 rounded-none border-b-2 border-transparent data-[state=active]:border-foreground px-1 pb-3 pt-1 font-mono text-xs uppercase tracking-wider font-bold text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent! dark:data-[state=active]:bg-transparent!"
+						class="shrink-0 rounded border-b-2 border-transparent data-[state=active]:border-foreground px-1 pb-3 pt-1 font-mono text-xs uppercase tracking-wider font-bold text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent! dark:data-[state=active]:bg-transparent!"
 					>
 						Demo API Keys
 					</Tabs.Trigger>

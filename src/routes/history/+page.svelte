@@ -72,10 +72,17 @@
 	<div class="space-y-2 px-1">
 			{#each data.generations as item (item.id)}
 				<article
-					class="group block relative rounded border border-border bg-muted/20 p-4 hover:bg-muted/50 hover:border-foreground/30 min-w-0"
+					class="group relative rounded border border-border bg-muted/20 p-4 hover:bg-muted/50 hover:border-foreground/30 min-w-0"
 				>
-					<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-						<a href={resolve(`/history/${item.id}`)} class="space-y-2 min-w-0 flex-1 rounded p-1 -m-1">
+					<!-- Stretched overlay link covering the entire card -->
+					<a 
+						href={resolve(`/history/${item.id}`)} 
+						class="absolute inset-0 rounded z-0"
+						aria-label="Open details for prompt: {item.prompt}"
+					></a>
+
+					<div class="relative z-10 pointer-events-none flex flex-col sm:flex-row sm:items-start justify-between gap-3 w-full">
+						<div class="space-y-2 min-w-0 flex-1">
 							<p class="line-clamp-2 font-mono text-xs text-foreground/80 group-hover:text-foreground break-words leading-relaxed">
 								{item.prompt}
 							</p>
@@ -88,9 +95,9 @@
 									id: {item.id.slice(0, 8)}...
 								</span>
 							</div>
-						</a>
+						</div>
 
-						<div class="shrink-0 flex flex-wrap items-center gap-2">
+						<div class="shrink-0 flex flex-wrap items-center gap-2 pointer-events-auto relative z-20">
 							<span 
 								class={statusClass(item.status)}
 							>
