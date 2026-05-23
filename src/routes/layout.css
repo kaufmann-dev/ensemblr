@@ -112,6 +112,15 @@
 		outline: none !important;
 		box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--foreground) !important;
 	}
+	/* Focus whole accordion item card when trigger is focused to prevent focus ring clipping */
+	[data-slot="accordion-item"]:has([data-slot="accordion-trigger"]:focus-visible) {
+		outline: none !important;
+		box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--foreground) !important;
+	}
+	[data-slot="accordion-item"] [data-slot="accordion-trigger"]:focus-visible {
+		outline: none !important;
+		box-shadow: none !important;
+	}
 	body {
 		@apply bg-background text-foreground antialiased selection:bg-primary/10;
 	}

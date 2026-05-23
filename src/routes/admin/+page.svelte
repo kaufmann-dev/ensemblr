@@ -6,6 +6,7 @@
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { Label } from '$lib/components/ui/label';
+	import PromptInput from '$lib/components/PromptInput.svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { Shield, Sliders, AlertCircle, Save, Loader2 } from '@lucide/svelte';
 	import { enhance } from '$app/forms';
@@ -126,11 +127,13 @@
 								<Sliders class="size-3.5 text-foreground/75" />
 								<Label class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Intermediate Synthesis Layer Template</Label>
 							</div>
-							<Textarea
-								class="min-h-32 max-h-80 resize-none overflow-y-auto font-mono text-xs leading-relaxed"
+							<PromptInput
+								id="intermediateTemplate"
 								name="intermediateTemplate"
-								value={data.settings.intermediateTemplate}
+								bind:value={data.settings.intermediateTemplate}
 								placeholder="Enter system prompt for intermediate workers..."
+								minHeightClass="min-h-32"
+								maxHeightClass="max-h-80"
 							/>
 							<p class="text-[10px] font-mono text-muted-foreground leading-relaxed">
 								Configures how intermediate rounds synthesize context from previous worker results before final consolidation.
@@ -143,11 +146,13 @@
 								<Shield class="size-3.5 text-foreground/75" />
 								<Label class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Final Judge Synthesis Template</Label>
 							</div>
-							<Textarea
-								class="min-h-32 max-h-80 resize-none overflow-y-auto font-mono text-xs leading-relaxed"
+							<PromptInput
+								id="judgeTemplate"
 								name="judgeTemplate"
-								value={data.settings.judgeTemplate}
+								bind:value={data.settings.judgeTemplate}
 								placeholder="Enter system prompt for the final judge model..."
+								minHeightClass="min-h-32"
+								maxHeightClass="max-h-80"
 							/>
 							<p class="text-[10px] font-mono text-muted-foreground leading-relaxed">
 								Instructs the final judge model on how to compare, evaluate, and consolidate the worker responses into a single high-quality response.
