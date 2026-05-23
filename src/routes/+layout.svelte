@@ -45,7 +45,7 @@
 				<!-- Brand Logo -->
 				<a 
 					href={resolve('/')} 
-					class="shrink-0 flex items-center gap-3.5 group"
+					class="shrink-0 flex items-center gap-3.5 group rounded px-1 py-0.5 -mx-1 -my-0.5"
 				>
 					<span class="font-mono tracking-tighter text-[16px] font-bold text-foreground transition-all">
 						ensemblr
