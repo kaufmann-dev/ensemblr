@@ -9,8 +9,8 @@
 		value = $bindable(''),
 		placeholder = '',
 		disabled = false,
-		minHeightClass = 'min-h-24',
-		maxHeightClass = 'max-h-64',
+		minHeight = '96px', // Standard height (96px = min-h-24)
+		maxHeight = '256px', // Standard cutoff (256px = max-h-64)
 		showCharCount = false,
 		class: className = ''
 	} = $props();
@@ -33,7 +33,8 @@
 	<Textarea
 		{id}
 		{name}
-		class="resize-none overflow-y-auto font-mono text-xs p-3 {minHeightClass} !{maxHeightClass}"
+		class="resize-none overflow-y-auto font-mono text-xs p-3"
+		style="min-height: {minHeight} !important; max-height: {maxHeight} !important;"
 		{placeholder}
 		{disabled}
 		bind:value
