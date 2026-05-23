@@ -91,7 +91,6 @@ async function runModel(
 		const result = streamText({
 			model: languageModel,
 			prompt,
-			temperature: options?.temperature,
 			maxOutputTokens: options?.maxOutputTokens
 		});
 

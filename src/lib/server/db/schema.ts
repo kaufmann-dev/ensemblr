@@ -117,7 +117,6 @@ export type GenerationConfig = {
 	judge: ModelSelection;
 	rounds: number;
 	options?: {
-		temperature?: number;
 		maxOutputTokens?: number;
 	};
 };
