@@ -106,7 +106,10 @@
 
 @layer base {
 	* {
-		@apply border-border outline-ring/30;
+		@apply border-border;
+	}
+	*:focus-visible {
+		@apply outline-2 outline-foreground outline-offset-2 !important;
 	}
 	body {
 		@apply bg-background text-foreground antialiased selection:bg-primary/10;
