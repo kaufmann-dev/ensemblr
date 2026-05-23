@@ -28,6 +28,7 @@
 
 	// Svelte action to manage browser EventSource connections dynamically and cleanly without $effect
 	function syncEvents(node: HTMLElement, currentIds: string[]) {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const sources = new Map<string, EventSource>();
 
 		const sync = (ids: string[]) => {
