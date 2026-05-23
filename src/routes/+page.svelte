@@ -15,7 +15,6 @@
 	import { Label } from '$lib/components/ui/label';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import * as Select from '$lib/components/ui/select';
-	import { Slider } from '$lib/components/ui/slider';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import * as Accordion from '$lib/components/ui/accordion';
 	import { 
@@ -28,7 +27,6 @@
 		Check, 
 		Cpu, 
 		Layers,
-		Thermometer,
 		Loader2,
 		AlertCircle
 	} from '@lucide/svelte';
@@ -64,7 +62,6 @@
 	]);
 	let judgeId = $state('');
 	let rounds = $state(1);
-	let temperature = $state(0.7);
 	let final = $state('');
 	let running = $state(false);
 	let error = $state('');
@@ -201,8 +198,7 @@
 					prompt,
 					workers: selectedWorkers.map((worker) => parseSelection(worker.value)),
 					judge: parseSelection(judgeId),
-					rounds,
-					options: { temperature }
+					rounds
 				})
 			});
 
@@ -436,32 +432,6 @@
 							</div>
 						</div>
 
-						<!-- Config Slider: Temperature -->
-						<div class="grid gap-3 rounded border border-border bg-muted/30 p-3 md:col-span-2">
-							<div class="flex items-center justify-between gap-3">
-								<div class="flex items-center gap-1.5">
-									<Thermometer class="size-3.5 text-foreground/80" />
-									<Label class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Generation Temperature</Label>
-								</div>
-								<span class="text-[10px] font-mono font-bold bg-foreground/10 px-2 py-0.5 rounded text-foreground tabular-nums">
-									{temperature.toFixed(1)}
-								</span>
-							</div>
-							<div class="flex items-center gap-3 pt-1">
-								<span class="text-[9px] font-mono font-medium text-muted-foreground uppercase tracking-widest">Precise</span>
-								<Slider
-									id="temperature"
-									type="single"
-									bind:value={temperature}
-									min={0}
-									max={2}
-									step={0.1}
-									disabled={running}
-									class="flex-1"
-								/>
-								<span class="text-[9px] font-mono font-medium text-muted-foreground uppercase tracking-widest">Creative</span>
-							</div>
-						</div>
 					</div>
 				{:else}
 					<!-- Key Setup Callout -->
