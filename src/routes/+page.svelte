@@ -16,6 +16,7 @@
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import * as Select from '$lib/components/ui/select';
 	import { Textarea } from '$lib/components/ui/textarea';
+	import PromptInput from '$lib/components/PromptInput.svelte';
 	import * as Accordion from '$lib/components/ui/accordion';
 	import { 
 		Key, 
@@ -325,21 +326,16 @@
 
 		<div class="space-y-4.5 px-1 pb-2">
 				<!-- Prompt Area -->
-				<div class="space-y-2">
-					<div class="flex justify-between items-center">
-						<Label for="prompt" class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">System prompt input</Label>
-						<span class="text-[9px] font-mono text-muted-foreground/60 tabular-nums">
-							{prompt.length} chars
-						</span>
-					</div>
-					<Textarea
-						id="prompt"
-						class="min-h-24 max-h-64 resize-none overflow-y-auto font-mono text-xs p-3"
-						placeholder="What would you like the Mixture-of-Agents to synthesize? Enter a complex task, coding query, or reasoning prompt..."
-						bind:value={prompt}
-						disabled={running}
-					/>
-				</div>
+				<PromptInput
+					id="prompt"
+					label="System prompt input"
+					placeholder="What would you like the Mixture-of-Agents to synthesize? Enter a complex task, coding query, or reasoning prompt..."
+					bind:value={prompt}
+					disabled={running}
+					showCharCount={true}
+					minHeightClass="min-h-24"
+					maxHeightClass="max-h-64"
+				/>
 
 				{#if hasModelOptions}
 					<!-- Workers and Judge Select Grid -->
