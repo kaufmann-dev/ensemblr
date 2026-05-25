@@ -293,7 +293,7 @@
 			</div>
 			<div class="py-2.5 flex-1 overflow-hidden">
 				<ScrollArea class="h-[25rem] lg:h-[calc(100vh-17rem)]">
-					<div class="space-y-1.5 p-1 pr-2">
+					<div class="space-y-1.5 p-1">
 						{#each recentRuns as item (item.id)}
 							<a
 								class="group/item block rounded border border-border bg-muted/20 p-2.5 hover:bg-muted/65 hover:border-foreground/30"
