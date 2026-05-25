@@ -10,22 +10,19 @@
 		...restProps
 	}: WithoutChildren<WithElementRef<HTMLTextareaAttributes>> = $props();
 
-	function autoExpand(node: HTMLTextAreaElement) {
-		const updateHeight = () => {
-			node.style.height = 'auto';
-			node.style.height = `${node.scrollHeight}px`;
-		};
+	function autoExpand(_value: typeof value) {
+		return (node: HTMLTextAreaElement) => {
+			const updateHeight = () => {
+				node.style.height = 'auto';
+				node.style.height = `${node.scrollHeight}px`;
+			};
 
-		$effect(() => {
-			value;
-			node.style.height = 'auto';
-			node.style.height = `${node.scrollHeight}px`;
-		});
+			updateHeight();
+			node.addEventListener('input', updateHeight);
 
-		node.addEventListener('input', updateHeight);
-
-		return () => {
-			node.removeEventListener('input', updateHeight);
+			return () => {
+				node.removeEventListener('input', updateHeight);
+			};
 		};
 	}
 </script>
@@ -38,6 +35,6 @@
 		className
 	)}
 	bind:value
-	{@attach autoExpand}
+	{@attach autoExpand(value)}
 	{...restProps}
 ></textarea>
