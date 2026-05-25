@@ -15,6 +15,20 @@
       "when": 1779372847594,
       "tag": "0001_solid_toad_men",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779737591024,
+      "tag": "0002_high_black_widow",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1779737904476,
+      "tag": "0003_melodic_hardball",
+      "breakpoints": true
     }
   ]
 }

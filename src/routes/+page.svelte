@@ -66,6 +66,8 @@
 	let final = $state('');
 	let running = $state(false);
 	let error = $state('');
+	let errorTitle = $state('');
+	let errorDetail = $state('');
 	let generationId = $state('');
 	let outputs = $state<Output[]>([]);
 	let optimisticRecentRuns = $state<RecentRun[]>([]);
@@ -186,6 +188,8 @@
 		if (!canRun) return;
 
 		error = '';
+		errorTitle = '';
+		errorDetail = '';
 		final = '';
 		generationId = '';
 		outputs = [];
@@ -205,6 +209,19 @@
 
 			if (!response.ok || !response.body) {
 				error = await response.text();
+				if (response.status === 429) {
+					const retryAfterSeconds = Number(response.headers.get('retry-after'));
+					const retryAfterMinutes = Number.isFinite(retryAfterSeconds)
+						? Math.max(1, Math.ceil(retryAfterSeconds / 60))
+						: null;
+
+					errorTitle = 'Demo rate limit reached';
+					errorDetail = retryAfterMinutes
+						? `No provider API call was started. Try again in about ${retryAfterMinutes} minute${retryAfterMinutes === 1 ? '' : 's'}.`
+						: 'No provider API call was started. Try again after the current rate-limit window resets.';
+				} else {
+					errorTitle = 'Generation could not start';
+				}
 				return;
 			}
 
@@ -240,6 +257,7 @@
 				}
 			}
 		} catch {
+			errorTitle = 'Generation could not start';
 			error = 'Generation could not be started. Try again.';
 		} finally {
 			running = false;
@@ -478,7 +496,15 @@
 				{#if error}
 					<div class="rounded border border-destructive/20 bg-destructive/5 p-3 flex items-start gap-2.5">
 						<AlertCircle class="size-4 text-destructive shrink-0 mt-0.5" />
-						<p class="text-[11px] font-mono text-destructive break-words">{error}</p>
+						<div class="min-w-0 space-y-1">
+							<p class="text-[11px] font-mono font-bold text-destructive break-words">
+								{errorTitle || 'Generation could not start'}
+							</p>
+							<p class="text-[11px] font-mono text-destructive break-words">{error}</p>
+							{#if errorDetail}
+								<p class="text-[10px] font-mono text-destructive/80 break-words">{errorDetail}</p>
+							{/if}
+						</div>
 					</div>
 				{/if}
 		</div>

@@ -131,6 +131,8 @@ Add the following environment variables in Coolify (or import them from a file):
 | `ADMIN_NAME`                | No       | Display name for the admin account (default: `Admin`)                                                              |
 | `DEMO_NAME`                 | No       | Display name for the demo account (default: `Demo`)                                                                |
 | `DEMO_ALLOWED_MODELS`       | No       | Initial comma-separated `provider/model` IDs for demo users. Used only when the app settings row is first created. |
+| `ADDRESS_HEADER`            | No       | Trusted proxy header for client IP detection, e.g. `X-Forwarded-For`                                               |
+| `XFF_DEPTH`                 | No       | Number of trusted proxies when `ADDRESS_HEADER=X-Forwarded-For`                                                    |
 
 ### 5. Deploy
 
@@ -164,8 +166,9 @@ Or by temporarily updating the **Build Command** to include `pnpm db:migrate` an
 - **Workspace**: `/` — create and run mixture-of-agents generations
 - **History**: `/history` — view, delete, or clear past generation runs
 - **Settings**: `/settings` — manage provider API keys (encrypted at rest)
-- **Admin**: `/admin` — configure prompt templates and demo model access (admin only)
+- **Admin**: `/admin` — configure prompt templates, demo model access, demo API keys, and demo rate limits (admin only)
 
 Model and provider options are fetched live from `https://models.dev/api.json`. Workspace selectors show only models from providers the current user has configured with an API key; demo users see only the admin-approved demo model list.
 For demo users, generation uses admin-managed provider credentials from the environment variables advertised by the selected provider in the live catalog, such as `OPENAI_API_KEY` for OpenAI.
 Demo generation history is scoped to the current login session, so visitors using the shared demo account do not see Recent runs or history entries from other demo sessions.
+Demo generation is rate-limited before provider API calls are started. Defaults are 5 generations per IP and 25 total demo generations per 60-minute window; admins can change these values in the Admin console. In production behind a reverse proxy, configure SvelteKit's trusted client-address settings (`ADDRESS_HEADER` and, for `X-Forwarded-For`, `XFF_DEPTH`) so per-IP limits use visitor IPs instead of the proxy address.
