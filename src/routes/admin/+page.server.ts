@@ -1,11 +1,18 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
+import { z } from 'zod';
 import { db } from '$lib/server/db';
 import { appSetting, type ModelSelection, user, providerApiKey } from '$lib/server/db/schema';
 import { requireAdmin } from '$lib/server/authz';
 import { getSettings } from '$lib/server/settings';
 import { encryptSecret } from '$lib/server/crypto';
 import { getRunnableModelKeys } from '$lib/server/models/catalog';
+
+const rateLimitFormSchema = z.object({
+	demoRateLimitWindowMinutes: z.coerce.number().int().min(1).max(10080),
+	demoRateLimitPerIp: z.coerce.number().int().min(1).max(100000),
+	demoRateLimitGlobal: z.coerce.number().int().min(1).max(100000)
+});
 
 export async function load({ locals, url }) {
 	requireAdmin(locals);
@@ -92,6 +99,36 @@ export const actions = {
 			});
 
 		redirect(303, '/admin?tab=demo');
+	},
+
+	saveRateLimits: async ({ request, locals }) => {
+		requireAdmin(locals);
+		const form = await request.formData();
+		const parsed = rateLimitFormSchema.safeParse({
+			demoRateLimitWindowMinutes: form.get('demoRateLimitWindowMinutes'),
+			demoRateLimitPerIp: form.get('demoRateLimitPerIp'),
+			demoRateLimitGlobal: form.get('demoRateLimitGlobal')
+		});
+
+		if (!parsed.success) {
+			return fail(400, {
+				message: 'Rate limits must be positive whole numbers',
+				action: 'saveRateLimits'
+			});
+		}
+
+		await db
+			.insert(appSetting)
+			.values({
+				id: 'global',
+				...parsed.data
+			})
+			.onConflictDoUpdate({
+				target: appSetting.id,
+				set: { ...parsed.data, updatedAt: new Date() }
+			});
+
+		redirect(303, '/admin?tab=rate-limits');
 	},
 
 	saveDemoKey: async ({ request, locals }) => {
