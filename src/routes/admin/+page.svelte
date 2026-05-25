@@ -4,7 +4,6 @@
 	import { browser } from '$app/environment';
 	import { Button } from '$lib/components/ui/button';
 	import PageHeader from '$lib/components/PageHeader.svelte';
-	import { Textarea } from '$lib/components/ui/textarea';
 	import { Label } from '$lib/components/ui/label';
 	import PromptInput from '$lib/components/PromptInput.svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
@@ -29,6 +28,8 @@
 	let { data, form }: PageProps = $props();
 
 	let allowedOverrides = $state<string[] | null>(null);
+	let intermediateTemplate = $state(untrack(() => data.settings.intermediateTemplate));
+	let judgeTemplate = $state(untrack(() => data.settings.judgeTemplate));
 	let activeTab = $derived(data.tab);
 
 	let catalog = $state.raw<CatalogProvider[]>([]);
@@ -130,7 +131,7 @@
 							<PromptInput
 								id="intermediateTemplate"
 								name="intermediateTemplate"
-								bind:value={data.settings.intermediateTemplate}
+								bind:value={intermediateTemplate}
 								placeholder="Enter system prompt for intermediate workers..."
 								minHeight="128px"
 								maxHeight="320px"
@@ -149,7 +150,7 @@
 							<PromptInput
 								id="judgeTemplate"
 								name="judgeTemplate"
-								bind:value={data.settings.judgeTemplate}
+								bind:value={judgeTemplate}
 								placeholder="Enter system prompt for the final judge model..."
 								minHeight="128px"
 								maxHeight="320px"

@@ -272,14 +272,14 @@
 					{/if}
 				</div>
 
-				<div class="inline-flex w-full rounded-md border border-input bg-background p-0.5 md:w-auto md:justify-self-start">
+				<div class="inline-flex h-8.5 w-full rounded border border-border bg-card p-0.5 md:w-auto md:justify-self-start">
 					{#each activationOptions as option (option.value)}
 						<button
 							type="button"
 							class={cn(
-								"flex-1 md:flex-initial h-8 rounded-sm px-3.5 text-xs font-mono transition-colors",
+								"flex-1 md:flex-initial h-7 rounded-sm px-3.5 text-xs font-mono transition-colors",
 								activationFilter === option.value
-									? "bg-muted text-foreground"
+									? "bg-foreground/15 text-foreground"
 									: "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
 							)}
 							aria-pressed={activationFilter === option.value}
