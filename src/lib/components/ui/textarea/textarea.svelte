@@ -10,21 +10,22 @@
 		...restProps
 	}: WithoutChildren<WithElementRef<HTMLTextareaAttributes>> = $props();
 
-	// Clean Svelte action to handle auto-expansion on mount and value changes
-	function autoExpand(node: HTMLTextAreaElement, currentVal: any) {
+	function autoExpand(node: HTMLTextAreaElement) {
 		const updateHeight = () => {
 			node.style.height = 'auto';
 			node.style.height = `${node.scrollHeight}px`;
 		};
 
-		// Run initially on mount to fit pre-populated templates
-		updateHeight();
+		$effect(() => {
+			value;
+			node.style.height = 'auto';
+			node.style.height = `${node.scrollHeight}px`;
+		});
 
-		return {
-			update() {
-				// Automatically called by Svelte whenever the bound parameter value changes
-				updateHeight();
-			}
+		node.addEventListener('input', updateHeight);
+
+		return () => {
+			node.removeEventListener('input', updateHeight);
 		};
 	}
 </script>
@@ -37,6 +38,6 @@
 		className
 	)}
 	bind:value
-	use:autoExpand={value}
+	{@attach autoExpand}
 	{...restProps}
 ></textarea>
