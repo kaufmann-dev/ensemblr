@@ -91,11 +91,32 @@ export const appSetting = pgTable('app_setting', {
 			sql`'Original prompt:\n{{original_prompt}}\n\nCandidate answers:\n{{previous_answers}}\n\nSynthesize the best final answer.'`
 		),
 	demoAllowedModels: jsonb('demo_allowed_models').$type<ModelSelection[]>().notNull().default([]),
+	demoRateLimitWindowMinutes: integer('demo_rate_limit_window_minutes').notNull().default(60),
+	demoRateLimitPerIp: integer('demo_rate_limit_per_ip').notNull().default(5),
+	demoRateLimitGlobal: integer('demo_rate_limit_global').notNull().default(25),
 	updatedAt: timestamp('updated_at')
 		.defaultNow()
 		.$onUpdate(() => new Date())
 		.notNull()
 });
+
+export const demoGenerationRateLimit = pgTable(
+	'demo_generation_rate_limit',
+	{
+		scope: text('scope', { enum: ['ip', 'global'] }).notNull(),
+		identifier: text('identifier').notNull(),
+		windowStart: timestamp('window_start').notNull(),
+		count: integer('count').notNull().default(0),
+		updatedAt: timestamp('updated_at')
+			.defaultNow()
+			.$onUpdate(() => new Date())
+			.notNull()
+	},
+	(table) => [
+		primaryKey({ columns: [table.scope, table.identifier, table.windowStart] }),
+		index('demo_generation_rate_limit_window_idx').on(table.windowStart)
+	]
+);
 
 export const userRelations = relations(user, ({ many }) => ({
 	apiKeys: many(providerApiKey),

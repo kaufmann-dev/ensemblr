@@ -4,10 +4,11 @@
 	import { browser } from '$app/environment';
 	import { Button } from '$lib/components/ui/button';
 	import PageHeader from '$lib/components/PageHeader.svelte';
+	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import PromptInput from '$lib/components/PromptInput.svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
-	import { Shield, Sliders, AlertCircle, Save, Loader2 } from '@lucide/svelte';
+	import { Shield, Sliders, AlertCircle, Save, Loader2, Gauge, Clock, Network, Globe2 } from '@lucide/svelte';
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
 
@@ -30,6 +31,9 @@
 	let allowedOverrides = $state<string[] | null>(null);
 	let intermediateTemplate = $state(untrack(() => data.settings.intermediateTemplate));
 	let judgeTemplate = $state(untrack(() => data.settings.judgeTemplate));
+	let demoRateLimitWindowMinutes = $state(untrack(() => data.settings.demoRateLimitWindowMinutes));
+	let demoRateLimitPerIp = $state(untrack(() => data.settings.demoRateLimitPerIp));
+	let demoRateLimitGlobal = $state(untrack(() => data.settings.demoRateLimitGlobal));
 	let activeTab = $derived(data.tab);
 
 	let catalog = $state.raw<CatalogProvider[]>([]);
@@ -113,6 +117,12 @@
 						class="shrink-0 rounded border-b-2 border-transparent data-[state=active]:border-foreground px-1 pb-3 pt-1 font-mono text-xs uppercase tracking-wider font-bold text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent! dark:data-[state=active]:bg-transparent!"
 					>
 						Demo API Keys
+					</Tabs.Trigger>
+					<Tabs.Trigger 
+						value="rate-limits" 
+						class="shrink-0 rounded border-b-2 border-transparent data-[state=active]:border-foreground px-1 pb-3 pt-1 font-mono text-xs uppercase tracking-wider font-bold text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent! dark:data-[state=active]:bg-transparent!"
+					>
+						Rate limits
 					</Tabs.Trigger>
 				</Tabs.List>
 			</Tabs.Root>
@@ -212,6 +222,97 @@
 						</Button>
 						
 						{#if form?.message && form?.action === 'saveDemoModels'}
+							<div class="rounded border border-destructive/20 bg-destructive/5 p-3 flex items-start gap-2.5">
+								<AlertCircle class="size-4 text-destructive shrink-0 mt-0.5" />
+								<p class="text-[11px] font-mono text-destructive break-words">{form.message}</p>
+							</div>
+						{/if}
+					</div>
+				</form>
+			{:else if activeTab === 'rate-limits'}
+				<form method="POST" action="?/saveRateLimits" use:enhance class="space-y-6">
+					<div class="space-y-5">
+						<div>
+							<div class="flex items-center gap-1.5">
+								<Gauge class="size-3.5 text-foreground/75" />
+								<h3 class="text-xs font-bold font-mono text-foreground uppercase tracking-tight">Demo generation rate limits</h3>
+							</div>
+							<p class="text-xs font-mono text-muted-foreground/80 mt-0.5">Control how often demo users can start paid API generations</p>
+						</div>
+
+						<div class="grid gap-4 md:grid-cols-3">
+							<div class="space-y-2">
+								<div class="flex items-center gap-1.5">
+									<Clock class="size-3.5 text-foreground/75" />
+									<Label for="demoRateLimitWindowMinutes" class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Window minutes</Label>
+								</div>
+								<Input
+									id="demoRateLimitWindowMinutes"
+									name="demoRateLimitWindowMinutes"
+									type="number"
+									min="1"
+									step="1"
+									bind:value={demoRateLimitWindowMinutes}
+									class="text-xs font-mono"
+								/>
+								<p class="text-[10px] font-mono text-muted-foreground leading-relaxed">
+									Length of each shared quota window.
+								</p>
+							</div>
+
+							<div class="space-y-2">
+								<div class="flex items-center gap-1.5">
+									<Network class="size-3.5 text-foreground/75" />
+									<Label for="demoRateLimitPerIp" class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Per IP limit</Label>
+								</div>
+								<Input
+									id="demoRateLimitPerIp"
+									name="demoRateLimitPerIp"
+									type="number"
+									min="1"
+									step="1"
+									bind:value={demoRateLimitPerIp}
+									class="text-xs font-mono"
+								/>
+								<p class="text-[10px] font-mono text-muted-foreground leading-relaxed">
+									Maximum demo generations per client address.
+								</p>
+							</div>
+
+							<div class="space-y-2">
+								<div class="flex items-center gap-1.5">
+									<Globe2 class="size-3.5 text-foreground/75" />
+									<Label for="demoRateLimitGlobal" class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Global limit</Label>
+								</div>
+								<Input
+									id="demoRateLimitGlobal"
+									name="demoRateLimitGlobal"
+									type="number"
+									min="1"
+									step="1"
+									bind:value={demoRateLimitGlobal}
+									class="text-xs font-mono"
+								/>
+								<p class="text-[10px] font-mono text-muted-foreground leading-relaxed">
+									Maximum total demo generations across all visitors.
+								</p>
+							</div>
+						</div>
+
+						<div class="rounded border border-border bg-muted/20 p-3">
+							<p class="text-[10px] font-mono leading-relaxed text-muted-foreground">
+								Current policy: <span class="font-bold text-foreground">{demoRateLimitPerIp}</span> per IP and <span class="font-bold text-foreground">{demoRateLimitGlobal}</span> total every <span class="font-bold text-foreground">{demoRateLimitWindowMinutes}</span> minutes.
+							</p>
+						</div>
+					</div>
+
+					<div class="flex flex-col gap-4 sm:flex-row sm:items-center border-t border-border pt-4">
+						<Button class="w-full sm:w-auto h-8.5 px-5 font-mono text-xs uppercase tracking-wider font-bold rounded shadow-none gap-2" type="submit">
+							<Save class="size-3.5" />
+							Save rate limits
+						</Button>
+						
+						{#if form?.message && form?.action === 'saveRateLimits'}
 							<div class="rounded border border-destructive/20 bg-destructive/5 p-3 flex items-start gap-2.5">
 								<AlertCircle class="size-4 text-destructive shrink-0 mt-0.5" />
 								<p class="text-[11px] font-mono text-destructive break-words">{form.message}</p>

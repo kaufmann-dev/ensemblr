@@ -6,13 +6,14 @@ import { requireUser } from '$lib/server/authz';
 import { createGeneration, streamMixture } from '$lib/server/ai/engine';
 import { getSettings } from '$lib/server/settings';
 import { getRunnableModelKeys } from '$lib/server/models/catalog';
+import { checkDemoGenerationRateLimit } from '$lib/server/demo-rate-limit';
 import { generateRequestSchema } from '$lib/validation';
 
 function key(model: { providerId: string; modelId: string }) {
 	return `${model.providerId}/${model.modelId}`;
 }
 
-export async function POST({ request, locals }) {
+export async function POST({ request, locals, getClientAddress }) {
 	const user = requireUser(locals);
 	const parsed = generateRequestSchema.safeParse(await request.json());
 	if (!parsed.success) error(400, 'Invalid generation request');
@@ -23,6 +24,14 @@ export async function POST({ request, locals }) {
 		const allowed = new Set(settings.demoAllowedModels.map(key));
 		if (selected.some((model) => !allowed.has(key(model)) || !runnableModels.has(key(model)))) {
 			error(403, 'Demo users can only use active admin-approved models');
+		}
+
+		const rateLimit = await checkDemoGenerationRateLimit(getClientAddress());
+		if (!rateLimit.allowed) {
+			return new Response(rateLimit.message, {
+				status: 429,
+				headers: { 'retry-after': rateLimit.retryAfterSeconds.toString() }
+			});
 		}
 	} else {
 		const keys = await db
