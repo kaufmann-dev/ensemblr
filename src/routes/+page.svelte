@@ -33,6 +33,8 @@
 	} from '@lucide/svelte';
 	import type { PageProps } from './$types';
 
+	const RECENT_RUNS_LIMIT = 5;
+
 	let { data }: PageProps = $props();
 
 	type Selection = { providerId: string; modelId: string };
@@ -108,8 +110,10 @@
 		return [
 			...optimisticRecentRuns,
 			...data.history.filter((item) => !optimisticIds.has(item.id))
-		].slice(0, 8);
+		];
 	});
+	let visibleRecentRuns = $derived(recentRuns.slice(0, RECENT_RUNS_LIMIT));
+	let hasMoreRecentRuns = $derived(recentRuns.length > RECENT_RUNS_LIMIT);
 
 	function parseSelection(value: string): Selection {
 		const [providerId, ...model] = value.split('/');
@@ -170,7 +174,7 @@
 				createdAt: new Date()
 			},
 			...optimisticRecentRuns.filter((item) => item.id !== id)
-		].slice(0, 8);
+		].slice(0, RECENT_RUNS_LIMIT + 1);
 	}
 
 	function statusClass(status: RecentRun['status']) {
@@ -291,36 +295,47 @@
 					<p class="text-[9px] font-mono text-muted-foreground mt-0.5">Saved mixture history</p>
 				</div>
 			</div>
-			<div class="py-2.5 flex-1 overflow-hidden">
-				<ScrollArea class="h-[25rem] lg:h-[calc(100vh-17rem)]">
-					<div class="space-y-1.5">
-						{#each recentRuns as item (item.id)}
-							<a
-								class="group/item block rounded border border-border bg-muted/20 p-2.5 hover:bg-muted/65 hover:border-foreground/30"
-								href={resolve(`/history/${item.id}`)}
-							>
-								<div class="line-clamp-2 font-mono text-[11px] leading-relaxed text-foreground/80 group-hover/item:text-foreground break-words">
-									{item.prompt}
-								</div>
-								<div class="mt-2.5 flex items-center justify-between gap-2">
-									<span class="text-[9px] font-mono text-muted-foreground/75 tabular-nums">
-										{new Date(item.createdAt).toLocaleDateString()}
-									</span>
-									<span 
-										class={statusClass(item.status)}
-									>
-										{item.status}
-									</span>
-								</div>
-							</a>
-						{:else}
-							<div class="flex flex-col items-center justify-center py-12 text-center">
-								<History class="size-7 text-muted-foreground/35 mb-2 stroke-[1.5]" />
-								<p class="text-[11px] font-mono text-muted-foreground/75">No generations saved yet.</p>
+			<div class="py-2.5">
+				<div class="space-y-1.5">
+					{#each visibleRecentRuns as item (item.id)}
+						<a
+							class="group/item block rounded border border-border bg-muted/20 p-2.5 hover:bg-muted/65 hover:border-foreground/30"
+							href={resolve(`/history/${item.id}`)}
+						>
+							<div class="line-clamp-2 font-mono text-[11px] leading-relaxed text-foreground/80 group-hover/item:text-foreground break-words">
+								{item.prompt}
 							</div>
-						{/each}
-					</div>
-				</ScrollArea>
+							<div class="mt-2.5 flex items-center justify-between gap-2">
+								<span class="text-[9px] font-mono text-muted-foreground/75 tabular-nums">
+									{new Date(item.createdAt).toLocaleDateString()}
+								</span>
+								<span 
+									class={statusClass(item.status)}
+								>
+									{item.status}
+								</span>
+							</div>
+						</a>
+					{:else}
+						<div class="flex flex-col items-center justify-center py-12 text-center">
+							<History class="size-7 text-muted-foreground/35 mb-2 stroke-[1.5]" />
+							<p class="text-[11px] font-mono text-muted-foreground/75">No generations saved yet.</p>
+						</div>
+					{/each}
+					{#if hasMoreRecentRuns}
+						<a
+							class="group/more block rounded border border-dashed border-border bg-muted/10 p-2.5 hover:bg-muted/55 hover:border-foreground/30"
+							href={resolve('/history')}
+						>
+							<div class="font-mono text-[11px] font-medium leading-relaxed text-foreground/80 group-hover/more:text-foreground">
+								More recent runs available
+							</div>
+							<div class="mt-1 text-[9px] font-mono uppercase tracking-wide text-muted-foreground/75">
+								Open full history
+							</div>
+						</a>
+					{/if}
+				</div>
 			</div>
 		</div>
 	</aside>
