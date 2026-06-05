@@ -134,5 +134,9 @@
 				</form>
 			</CardContent>
 		</Card>
+
+		<div class="mt-5 text-center font-mono text-[10px] text-muted-foreground/70">
+			Better Auth session active · SSL secure
+		</div>
 	</div>
 </main>
