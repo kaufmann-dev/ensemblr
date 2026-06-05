@@ -7,6 +7,8 @@ import { getCatalog } from '$lib/server/models/catalog';
 import type { CatalogProvider } from '$lib/server/models/catalog';
 import { getSettings } from '$lib/server/settings';
 
+const RECENT_RUNS_LIMIT = 5;
+
 export async function load({ locals }) {
 	const user = requireUser(locals);
 	const [keys, history] = await Promise.all([
@@ -19,7 +21,7 @@ export async function load({ locals }) {
 			.from(generation)
 			.where(visibleGenerationsFor(user, locals.session!.id))
 			.orderBy(desc(generation.createdAt))
-			.limit(8)
+			.limit(RECENT_RUNS_LIMIT + 1)
 	]);
 	const keyProviders = keys.map((key) => key.providerId);
 	const configuredProviders = new Set(keyProviders);
