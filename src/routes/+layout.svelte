@@ -171,6 +171,26 @@
 	<div class="flex-1 flex flex-col min-h-0 w-full">
 		{@render children()}
 	</div>
+
+	<footer class="px-4 pb-5 pt-2 text-center font-mono text-[10px] text-muted-foreground/70">
+		<nav class="inline-flex items-center gap-3" aria-label="Legal links">
+			<a
+				class="rounded px-1 py-0.5 underline-offset-4 transition-colors hover:text-foreground hover:underline"
+				href="https://legal.kaufmann.dev/privacy?site=ensemblr.kaufmann.dev"
+				rel="noreferrer"
+			>
+				Privacy
+			</a>
+			<span aria-hidden="true" class="text-muted-foreground/40">/</span>
+			<a
+				class="rounded px-1 py-0.5 underline-offset-4 transition-colors hover:text-foreground hover:underline"
+				href="https://legal.kaufmann.dev/imprint?site=ensemblr.kaufmann.dev"
+				rel="noreferrer"
+			>
+				Imprint
+			</a>
+		</nav>
+	</footer>
 </div>
 
 <div style="display:none">

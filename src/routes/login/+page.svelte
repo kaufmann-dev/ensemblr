@@ -39,7 +39,7 @@
 
 <svelte:head><title>Login | ensemblr</title></svelte:head>
 
-<main class="relative grid min-h-screen place-items-center px-4 py-12 bg-background">
+<main class="relative grid flex-1 place-items-center bg-background px-4 py-12">
 	<div class="relative w-full max-w-[380px] px-1 py-4 sm:px-2">
 		<!-- Dynamic Logo Branding above Card -->
 		<div class="mb-6 text-center">
@@ -134,10 +134,5 @@
 				</form>
 			</CardContent>
 		</Card>
-
-		<!-- Footer Help -->
-		<div class="mt-6 text-center text-[10px] font-mono text-muted-foreground/70">
-			Better Auth session active · SSL secure
-		</div>
 	</div>
 </main>
