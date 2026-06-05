@@ -4,7 +4,7 @@
 	import { cn } from '$lib/utils.js';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { Button } from '$lib/components/ui/button';
-	import { History, Calendar, ExternalLink, Trash2 } from '@lucide/svelte';
+	import { History, Calendar, Trash2 } from '@lucide/svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -130,10 +130,6 @@
 							>
 								{item.status}
 							</span>
-							<Button href={resolve(`/history/${item.id}`)} variant="outline" size="xs" class="rounded text-[10px]">
-								<ExternalLink class="size-3 mr-1" />
-								Open
-							</Button>
 							<form method="POST" action="?/delete">
 								<input type="hidden" name="id" value={item.id} />
 								<Button type="submit" variant="destructive" size="xs" class="rounded text-[10px]">
