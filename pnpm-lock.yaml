@@ -44,6 +44,9 @@ importers:
       '@ai-sdk/xai':
         specifier: ^3.0.91
         version: 3.0.91(zod@4.4.3)
+      '@fontsource-variable/recursive':
+        specifier: ^5.2.8
+        version: 5.2.8
       '@openrouter/ai-sdk-provider':
         specifier: ^2.9.0
         version: 2.9.0(ai@6.0.184(zod@4.4.3))(zod@4.4.3)
@@ -66,12 +69,6 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.4.0(jiti@2.7.0))
-      '@fontsource-variable/inter':
-        specifier: ^5.2.8
-        version: 5.2.8
-      '@fontsource/fira-code':
-        specifier: ^5.2.7
-        version: 5.2.7
       '@iconify/tailwind4':
         specifier: ^1.2.3
         version: 1.2.3(tailwindcss@4.3.0)
@@ -1006,11 +1003,8 @@ packages:
   '@floating-ui/utils@0.2.11':
     resolution: {integrity: sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg==}
 
-  '@fontsource-variable/inter@5.2.8':
-    resolution: {integrity: sha512-kOfP2D+ykbcX/P3IFnokOhVRNoTozo5/JxhAIVYLpea/UBmCQ/YWPBfWIDuBImXX/15KH+eKh4xpEUyS2sQQGQ==}
-
-  '@fontsource/fira-code@5.2.7':
-    resolution: {integrity: sha512-tnB9NNund9TwIym8/7DMJe573nlPEQb+fKUV5GL8TBYXjIhDvL0D7mgmNVNQUPhXp+R7RylQeiBdkA4EbOHPGQ==}
+  '@fontsource-variable/recursive@5.2.8':
+    resolution: {integrity: sha512-LEq6XtuWtjmNTRFQEctx+RUPiQegsjOaCF++ASVoMoGEW4gNjbaKZJJo/NiR12eWxT4LaTKonTgrmEci0oVcSw==}
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -4131,9 +4125,7 @@ snapshots:
 
   '@floating-ui/utils@0.2.11': {}
 
-  '@fontsource-variable/inter@5.2.8': {}
-
-  '@fontsource/fira-code@5.2.7': {}
+  '@fontsource-variable/recursive@5.2.8': {}
 
   '@humanfs/core@0.19.2':
     dependencies:
