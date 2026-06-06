@@ -31,13 +31,15 @@
 		catalog,
 		loading,
 		error,
-		retry
+		retry,
+		onSelectionChange
 	}: {
 		allowed: string[];
 		catalog: CatalogProvider[];
 		loading: boolean;
 		error: string;
 		retry: () => void;
+		onSelectionChange: (allowed: string[]) => void;
 	} = $props();
 	let activationFilter = $state<ActivationFilter>('all');
 
@@ -145,9 +147,11 @@
 	let visibleModels = $derived(filteredModels.slice(0, limit));
 
 	function toggleAllowed(value: string) {
-		allowed = allowedSet.has(value)
+		const nextAllowed = allowedSet.has(value)
 			? allowed.filter((item) => item !== value)
 			: [...allowed, value];
+		allowed = nextAllowed;
+		onSelectionChange(nextAllowed.filter((item) => enabledCatalogValueSet.has(item)));
 	}
 
 	function resetLimitAndScroll() {
@@ -209,35 +213,45 @@
 	{/each}
 
 	<div>
-		<h3 class="text-xs font-bold font-mono text-foreground uppercase tracking-tight">Demo allowed models</h3>
-		<p class="text-xs font-mono text-muted-foreground/80 mt-0.5">Select which catalog models are accessible to demo role users</p>
+		<h3 class="font-mono text-xs font-bold tracking-tight text-foreground uppercase">
+			Demo allowed models
+		</h3>
+		<p class="mt-0.5 font-mono text-xs text-muted-foreground/80">
+			Select which catalog models are accessible to demo role users
+		</p>
 	</div>
 
 	{#if loading}
 		<div class="flex flex-col items-center justify-center py-20 text-center">
-			<Loader2 class="size-6 text-foreground/75 animate-spin inline-block mb-3 stroke-[1.5]" />
-			<p class="text-xs font-mono text-muted-foreground">Synchronizing provider model catalogs...</p>
+			<Loader2 class="mb-3 inline-block size-6 animate-spin stroke-[1.5] text-foreground/75" />
+			<p class="font-mono text-xs text-muted-foreground">
+				Synchronizing provider model catalogs...
+			</p>
 		</div>
 	{:else}
 		<!-- Search & Stats Bar -->
 		<div class="flex flex-col gap-3 pb-1">
-			<div class="grid grid-cols-1 gap-2.5 w-full md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] md:items-center">
+			<div
+				class="grid w-full grid-cols-1 gap-2.5 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] md:items-center"
+			>
 				<!-- Provider Search -->
 				<div class="relative w-full">
-					<Search class="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground/70" />
+					<Search
+						class="absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground/70"
+					/>
 					<Input
 						type="text"
 						placeholder="Search providers..."
 						value={providerInput}
 						oninput={(e) => handleProviderInput(e.currentTarget.value)}
-						class="pl-8 pr-8 text-xs font-mono w-full"
+						class="w-full pr-8 pl-8 font-mono text-xs"
 					/>
 					{#if providerInput}
 						<Button
 							type="button"
 							variant="ghost"
 							size="icon"
-							class="absolute right-1.5 top-1/2 size-5 -translate-y-1/2 rounded text-muted-foreground/60 hover:text-foreground active:scale-95 transition-all"
+							class="absolute top-1/2 right-1.5 size-5 -translate-y-1/2 rounded text-muted-foreground/60 transition-all hover:text-foreground active:scale-95"
 							onclick={() => handleProviderInput('')}
 							aria-label="Clear provider search"
 						>
@@ -248,20 +262,22 @@
 
 				<!-- Model Search -->
 				<div class="relative w-full">
-					<Search class="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground/70" />
+					<Search
+						class="absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground/70"
+					/>
 					<Input
 						type="text"
 						placeholder="Search models..."
 						value={modelInput}
 						oninput={(e) => handleModelInput(e.currentTarget.value)}
-						class="pl-8 pr-8 text-xs font-mono w-full"
+						class="w-full pr-8 pl-8 font-mono text-xs"
 					/>
 					{#if modelInput}
 						<Button
 							type="button"
 							variant="ghost"
 							size="icon"
-							class="absolute right-1.5 top-1/2 size-5 -translate-y-1/2 rounded text-muted-foreground/60 hover:text-foreground active:scale-95 transition-all"
+							class="absolute top-1/2 right-1.5 size-5 -translate-y-1/2 rounded text-muted-foreground/60 transition-all hover:text-foreground active:scale-95"
 							onclick={() => handleModelInput('')}
 							aria-label="Clear model search"
 						>
@@ -270,15 +286,17 @@
 					{/if}
 				</div>
 
-				<div class="inline-flex h-8.5 w-full rounded border border-border bg-card p-0.5 md:w-auto md:justify-self-start">
+				<div
+					class="inline-flex h-8.5 w-full rounded border border-border bg-card p-0.5 md:w-auto md:justify-self-start"
+				>
 					{#each activationOptions as option (option.value)}
 						<button
 							type="button"
 							class={cn(
-								"flex-1 md:flex-initial h-7 rounded-sm px-3.5 text-xs font-mono transition-colors",
+								'h-7 flex-1 rounded-sm px-3.5 font-mono text-xs transition-colors md:flex-initial',
 								activationFilter === option.value
-									? "bg-foreground/15 text-foreground"
-									: "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+									? 'bg-foreground/15 text-foreground'
+									: 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
 							)}
 							aria-pressed={activationFilter === option.value}
 							onclick={() => {
@@ -294,7 +312,7 @@
 
 			<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 				<!-- Dynamic stats badge -->
-				<div class="text-[10px] font-mono text-muted-foreground shrink-0 self-start sm:self-center">
+				<div class="shrink-0 self-start font-mono text-[10px] text-muted-foreground sm:self-center">
 					{#if providerSearch || modelSearch || activationFilter !== 'all'}
 						Found <span class="font-bold text-foreground">{filteredModels.length}</span> matching models
 					{:else}
@@ -305,13 +323,21 @@
 		</div>
 
 		{#if error}
-			<div class="flex flex-col items-center justify-center py-16 text-center border border-destructive/20 bg-destructive/5 rounded p-6 space-y-4">
-				<AlertTriangle class="size-6 text-destructive stroke-[1.5]" />
+			<div
+				class="flex flex-col items-center justify-center space-y-4 rounded border border-destructive/20 bg-destructive/5 p-6 py-16 text-center"
+			>
+				<AlertTriangle class="size-6 stroke-[1.5] text-destructive" />
 				<div class="space-y-1">
-					<h4 class="text-xs font-bold font-mono text-destructive uppercase tracking-tight">Catalog loading failed</h4>
-					<p class="text-xs font-mono text-muted-foreground/85 max-w-sm leading-relaxed">{error}</p>
+					<h4 class="font-mono text-xs font-bold tracking-tight text-destructive uppercase">
+						Catalog loading failed
+					</h4>
+					<p class="max-w-sm font-mono text-xs leading-relaxed text-muted-foreground/85">{error}</p>
 				</div>
-				<Button class="rounded border border-border bg-card px-4 h-9 font-mono text-xs uppercase tracking-wider font-bold text-foreground hover:bg-muted gap-2 shadow-none" type="button" onclick={retry}>
+				<Button
+					class="h-9 gap-2 rounded border border-border bg-card px-4 font-mono text-xs font-bold tracking-wider text-foreground uppercase shadow-none hover:bg-muted"
+					type="button"
+					onclick={retry}
+				>
 					<RefreshCw class="size-3.5" />
 					Retry load
 				</Button>
@@ -320,20 +346,31 @@
 			{#if staleAllowed.length > 0 || unavailableAllowed.length > 0}
 				<div class="rounded border border-destructive/20 bg-destructive/5 p-3">
 					<div class="flex items-start gap-2.5">
-						<AlertTriangle class="size-4 text-destructive shrink-0 mt-0.5" />
+						<AlertTriangle class="mt-0.5 size-4 shrink-0 text-destructive" />
 						<div class="min-w-0 space-y-1">
-							<h4 class="text-xs font-bold font-mono text-destructive uppercase tracking-tight">Unavailable demo selections</h4>
-							<p class="text-[10px] font-mono text-destructive/85 leading-relaxed">
-								{staleAllowed.length + unavailableAllowed.length} saved selection{staleAllowed.length + unavailableAllowed.length === 1 ? '' : 's'} no longer resolve to runnable catalog models and will be removed on save.
+							<h4 class="font-mono text-xs font-bold tracking-tight text-destructive uppercase">
+								Unavailable demo selections
+							</h4>
+							<p class="font-mono text-[10px] leading-relaxed text-destructive/85">
+								{staleAllowed.length + unavailableAllowed.length} saved selection{staleAllowed.length +
+									unavailableAllowed.length ===
+								1
+									? ''
+									: 's'} no longer resolve to runnable catalog models and will be removed with the next
+								selection change.
 							</p>
 							<div class="flex flex-wrap gap-1.5 pt-1">
 								{#each staleAllowed as model (model)}
-									<span class="rounded border border-destructive/20 bg-background px-1.5 py-0.5 text-[9px] font-mono text-destructive">
+									<span
+										class="rounded border border-destructive/20 bg-background px-1.5 py-0.5 font-mono text-[9px] text-destructive"
+									>
 										{model}
 									</span>
 								{/each}
 								{#each unavailableAllowed as model (model.value)}
-									<span class="rounded border border-destructive/20 bg-background px-1.5 py-0.5 text-[9px] font-mono text-destructive">
+									<span
+										class="rounded border border-destructive/20 bg-background px-1.5 py-0.5 font-mono text-[9px] text-destructive"
+									>
 										{model.providerId}/{model.modelId}
 									</span>
 								{/each}
@@ -344,12 +381,16 @@
 			{/if}
 
 			{#if filteredModels.length === 0}
-				<div class="flex flex-col items-center justify-center py-16 text-center border border-dashed border-border rounded bg-muted/10">
-					<Cpu class="size-7 text-muted-foreground/30 mb-2 stroke-[1.5]" />
-					<p class="text-xs font-mono text-muted-foreground">No matching models or providers found.</p>
-					<Button 
-						variant="ghost" 
-						class="mt-2 h-7 rounded text-[10px] font-mono hover:bg-muted text-muted-foreground hover:text-foreground"
+				<div
+					class="flex flex-col items-center justify-center rounded border border-dashed border-border bg-muted/10 py-16 text-center"
+				>
+					<Cpu class="mb-2 size-7 stroke-[1.5] text-muted-foreground/30" />
+					<p class="font-mono text-xs text-muted-foreground">
+						No matching models or providers found.
+					</p>
+					<Button
+						variant="ghost"
+						class="mt-2 h-7 rounded font-mono text-[10px] text-muted-foreground hover:bg-muted hover:text-foreground"
 						onclick={() => {
 							handleProviderInput('');
 							handleModelInput('');
@@ -361,35 +402,49 @@
 				</div>
 			{/if}
 
-			<div 
-				bind:this={scrollViewport} 
+			<div
+				bind:this={scrollViewport}
 				onscroll={handleScroll}
 				use:infiniteScroll={loadMore}
-				class={cn(
-					"overflow-y-auto max-h-[35rem] w-full",
-					filteredModels.length === 0 && "hidden"
-				)}
+				class={cn('max-h-[35rem] w-full overflow-y-auto', filteredModels.length === 0 && 'hidden')}
 			>
 				<div class="pr-2">
 					<Table.Root>
 						<Table.Header class="hover:bg-transparent">
-							<Table.Row class="hover:bg-transparent border-border">
-								<Table.Head class="text-xs font-mono font-bold uppercase tracking-tight text-foreground py-3 w-[35%]">PROVIDER</Table.Head>
-								<Table.Head class="text-xs font-mono font-bold uppercase tracking-tight text-foreground py-3 w-[65%]">MODEL</Table.Head>
+							<Table.Row class="border-border hover:bg-transparent">
+								<Table.Head
+									class="w-[35%] py-3 font-mono text-xs font-bold tracking-tight text-foreground uppercase"
+									>PROVIDER</Table.Head
+								>
+								<Table.Head
+									class="w-[65%] py-3 font-mono text-xs font-bold tracking-tight text-foreground uppercase"
+									>MODEL</Table.Head
+								>
 							</Table.Row>
 						</Table.Header>
 						<Table.Body>
 							{#each visibleModels as row (row.value)}
-								<Table.Row class="hover:bg-transparent border-border">
+								<Table.Row class="border-border hover:bg-transparent">
 									<!-- Provider Column -->
 									<Table.Cell class="py-3">
 										<div class="flex items-center gap-3">
-											<div class="flex size-9 items-center justify-center rounded bg-background border border-border overflow-hidden shrink-0">
-												<img class="size-4 object-contain filter grayscale dark:invert" src={row.providerLogoUrl} alt="" />
+											<div
+												class="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded border border-border bg-background"
+											>
+												<img
+													class="size-4 object-contain grayscale filter dark:invert"
+													src={row.providerLogoUrl}
+													alt=""
+												/>
 											</div>
-											<div class="flex flex-col min-w-0">
-												<strong class="truncate text-xs font-bold font-mono uppercase tracking-tight text-foreground">{row.providerName}</strong>
-												<span class="text-[9px] font-bold font-mono mt-0.5 tracking-wider uppercase">
+											<div class="flex min-w-0 flex-col">
+												<strong
+													class="truncate font-mono text-xs font-bold tracking-tight text-foreground uppercase"
+													>{row.providerName}</strong
+												>
+												<span
+													class="mt-0.5 font-mono text-[9px] font-bold tracking-wider uppercase"
+												>
 													{#if row.providerEnabled}
 														<span class="text-emerald-500">ACTIVE</span>
 													{:else}
@@ -402,25 +457,40 @@
 
 									<!-- Model Column -->
 									<Table.Cell class="py-3">
-										<label for={row.id} class={cn(
-											"flex min-w-0 items-center gap-3 rounded border px-3 py-2 transition-colors duration-150 cursor-pointer",
-											allowedSet.has(row.value)
-												? "bg-foreground/10 border-foreground/20"
-												: "bg-muted/40 border-border/40 hover:bg-muted/60"
-										)}>
+										<label
+											for={row.id}
+											class={cn(
+												'flex min-w-0 cursor-pointer items-center gap-3 rounded border px-3 py-2 transition-colors duration-150',
+												allowedSet.has(row.value)
+													? 'border-foreground/20 bg-foreground/10'
+													: 'border-border/40 bg-muted/40 hover:bg-muted/60'
+											)}
+										>
 											<Checkbox
 												id={row.id}
 												checked={allowedSet.has(row.value)}
 												disabled={!row.modelEnabled}
 												onCheckedChange={() => toggleAllowed(row.value)}
-												class="rounded border-border/60 data-[state=checked]:bg-foreground data-[state=checked]:text-background data-[state=checked]:border-foreground"
+												class="rounded border-border/60 data-[state=checked]:border-foreground data-[state=checked]:bg-foreground data-[state=checked]:text-background"
 											/>
-											<div class="min-w-0 flex-1 text-[11px] font-mono font-bold text-foreground/85 flex items-center justify-between gap-1.5 cursor-pointer select-none">
-												<div class="flex items-center gap-1.5 min-w-0">
-													<Cpu class={cn("size-3.5 shrink-0 transition-colors", allowedSet.has(row.value) ? "text-foreground" : "text-muted-foreground/60")} />
+											<div
+												class="flex min-w-0 flex-1 cursor-pointer items-center justify-between gap-1.5 font-mono text-[11px] font-bold text-foreground/85 select-none"
+											>
+												<div class="flex min-w-0 items-center gap-1.5">
+													<Cpu
+														class={cn(
+															'size-3.5 shrink-0 transition-colors',
+															allowedSet.has(row.value)
+																? 'text-foreground'
+																: 'text-muted-foreground/60'
+														)}
+													/>
 													<span class="truncate">{row.modelName}</span>
 												</div>
-												<span class="text-[9px] font-mono text-muted-foreground/60 shrink-0 hidden sm:inline ml-2">{row.modelId}</span>
+												<span
+													class="ml-2 hidden shrink-0 font-mono text-[9px] text-muted-foreground/60 sm:inline"
+													>{row.modelId}</span
+												>
 											</div>
 										</label>
 									</Table.Cell>

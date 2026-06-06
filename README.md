@@ -166,7 +166,7 @@ Or by temporarily updating the **Build Command** to include `pnpm db:migrate` an
 - **Workspace**: `/` — create and run mixture-of-agents generations
 - **History**: `/history` — view, delete, or clear past generation runs
 - **Settings**: `/settings` — manage provider API keys (encrypted at rest)
-- **Admin**: `/admin` — configure prompt templates, demo model access, demo API keys, and demo rate limits (admin only)
+- **Admin**: `/admin` — configure prompt templates, demo model access, demo API keys, and demo rate limits (admin only). Prompt templates, demo model selections, and rate limits autosave; demo API credential creation and deletion remain explicit actions.
 
 Model and provider options are fetched live from `https://models.dev/api.json`. Workspace selectors show only models from providers the current user has configured with an API key; demo users see only the admin-approved demo model list.
 For demo users, generation uses admin-managed provider credentials from the environment variables advertised by the selected provider in the live catalog, such as `OPENAI_API_KEY` for OpenAI.

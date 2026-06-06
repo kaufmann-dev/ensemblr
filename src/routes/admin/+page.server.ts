@@ -17,17 +17,24 @@ const rateLimitFormSchema = z.object({
 export async function load({ locals, url }) {
 	requireAdmin(locals);
 	const tab = url.searchParams.get('tab') ?? 'prompts';
-	
-	const [demoUser] = await db.select({ id: user.id }).from(user).where(eq(user.role, 'demo')).limit(1);
+
+	const [demoUser] = await db
+		.select({ id: user.id })
+		.from(user)
+		.where(eq(user.role, 'demo'))
+		.limit(1);
 	let demoKeys: string[] = [];
 	let demoUserExists = false;
-	
+
 	if (demoUser) {
 		demoUserExists = true;
-		const keys = await db.select({ providerId: providerApiKey.providerId }).from(providerApiKey).where(eq(providerApiKey.userId, demoUser.id));
+		const keys = await db
+			.select({ providerId: providerApiKey.providerId })
+			.from(providerApiKey)
+			.where(eq(providerApiKey.userId, demoUser.id));
 		demoKeys = keys.map((key) => key.providerId);
 	}
-	
+
 	return { settings: await getSettings(), tab, demoKeys, demoUserExists };
 }
 
@@ -39,9 +46,9 @@ export const actions = {
 		const judgeTemplate = String(form.get('judgeTemplate') ?? '');
 
 		if (!intermediateTemplate || !judgeTemplate) {
-			return fail(400, { 
-				message: 'Both prompt templates are required', 
-				action: 'savePrompts' 
+			return fail(400, {
+				message: 'Both prompt templates are required',
+				action: 'savePrompts'
 			});
 		}
 
@@ -57,7 +64,7 @@ export const actions = {
 				set: { intermediateTemplate, judgeTemplate, updatedAt: new Date() }
 			});
 
-		redirect(303, '/admin?tab=prompts');
+		return { success: true, action: 'savePrompts' };
 	},
 
 	saveDemoModels: async ({ request, locals }) => {
@@ -98,7 +105,7 @@ export const actions = {
 				set: { demoAllowedModels, updatedAt: new Date() }
 			});
 
-		redirect(303, '/admin?tab=demo');
+		return { success: true, action: 'saveDemoModels' };
 	},
 
 	saveRateLimits: async ({ request, locals }) => {
@@ -128,7 +135,7 @@ export const actions = {
 				set: { ...parsed.data, updatedAt: new Date() }
 			});
 
-		redirect(303, '/admin?tab=rate-limits');
+		return { success: true, action: 'saveRateLimits' };
 	},
 
 	saveDemoKey: async ({ request, locals }) => {
@@ -136,7 +143,8 @@ export const actions = {
 		const form = await request.formData();
 		const providerId = String(form.get('providerId') ?? '');
 		const apiKey = String(form.get('apiKey') ?? '');
-		if (!providerId || !apiKey) return fail(400, { message: 'Provider and API key are required', action: 'saveDemoKey' });
+		if (!providerId || !apiKey)
+			return fail(400, { message: 'Provider and API key are required', action: 'saveDemoKey' });
 
 		const [demoUser] = await db.select().from(user).where(eq(user.role, 'demo')).limit(1);
 		if (!demoUser) return fail(400, { message: 'Demo account not found', action: 'saveDemoKey' });
@@ -156,13 +164,15 @@ export const actions = {
 		requireAdmin(locals);
 		const form = await request.formData();
 		const providerId = String(form.get('providerId') ?? '');
-		
+
 		const [demoUser] = await db.select().from(user).where(eq(user.role, 'demo')).limit(1);
 		if (!demoUser) return fail(400, { message: 'Demo account not found', action: 'deleteDemoKey' });
 
 		await db
 			.delete(providerApiKey)
-			.where(and(eq(providerApiKey.userId, demoUser.id), eq(providerApiKey.providerId, providerId)));
+			.where(
+				and(eq(providerApiKey.userId, demoUser.id), eq(providerApiKey.providerId, providerId))
+			);
 
 		redirect(303, '/admin?tab=demo-keys');
 	}
