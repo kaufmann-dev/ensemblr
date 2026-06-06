@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { invalidateAll } from '$app/navigation';
-	import { cn } from '$lib/utils.js';
+	import GenerationStatus from '$lib/components/GenerationStatus.svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { History, Calendar, Trash2 } from '@lucide/svelte';
@@ -14,17 +14,6 @@
 			.filter((item) => item.status === 'running')
 			.map((item) => item.id)
 	);
-
-	function statusClass(status: 'running' | 'completed' | 'failed') {
-		return cn(
-			"text-[9px] font-mono font-medium uppercase px-1.5 py-0.5 rounded border tracking-wide",
-			status === 'completed'
-				? "border-border bg-foreground/5 text-foreground"
-				: status === 'failed'
-					? "border-destructive/30 bg-destructive/5 text-destructive"
-					: "border-border bg-muted text-muted-foreground animate-pulse"
-		);
-	}
 
 	// Svelte action to manage browser EventSource connections dynamically and cleanly without $effect
 	function syncEvents(node: HTMLElement, currentIds: string[]) {
@@ -125,11 +114,7 @@
 						</div>
 
 						<div class="shrink-0 flex flex-wrap items-center gap-2 pointer-events-auto relative z-20">
-							<span 
-								class={statusClass(item.status)}
-							>
-								{item.status}
-							</span>
+							<GenerationStatus status={item.status} />
 							<form method="POST" action="?/delete">
 								<input type="hidden" name="id" value={item.id} />
 								<Button type="submit" variant="destructive" size="xs" class="rounded text-[10px]">

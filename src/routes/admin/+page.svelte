@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { browser } from '$app/environment';
 	import { Button } from '$lib/components/ui/button';
 	import PageHeader from '$lib/components/PageHeader.svelte';
@@ -73,7 +74,7 @@
 	}
 
 	function setActiveTab(value: string) {
-		goto(`?tab=${value}`, { noScroll: true, keepFocus: true });
+		goto(resolve(`/admin?tab=${value}`), { noScroll: true, keepFocus: true });
 		checkAndLoadTab(value);
 	}
 
@@ -136,7 +137,7 @@
 						<div class="space-y-2">
 							<div class="flex items-center gap-1.5">
 								<Sliders class="size-3.5 text-foreground/75" />
-								<Label class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Intermediate Synthesis Layer Template</Label>
+								<Label>Intermediate Synthesis Layer Template</Label>
 							</div>
 							<PromptInput
 								id="intermediateTemplate"
@@ -155,7 +156,7 @@
 						<div class="space-y-2 pt-3">
 							<div class="flex items-center gap-1.5">
 								<Shield class="size-3.5 text-foreground/75" />
-								<Label class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Final Judge Synthesis Template</Label>
+								<Label>Final Judge Synthesis Template</Label>
 							</div>
 							<PromptInput
 								id="judgeTemplate"
@@ -244,7 +245,7 @@
 							<div class="space-y-2">
 								<div class="flex items-center gap-1.5">
 									<Clock class="size-3.5 text-foreground/75" />
-									<Label for="demoRateLimitWindowMinutes" class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Window minutes</Label>
+									<Label for="demoRateLimitWindowMinutes">Window minutes</Label>
 								</div>
 								<Input
 									id="demoRateLimitWindowMinutes"
@@ -263,7 +264,7 @@
 							<div class="space-y-2">
 								<div class="flex items-center gap-1.5">
 									<Network class="size-3.5 text-foreground/75" />
-									<Label for="demoRateLimitPerIp" class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Per IP limit</Label>
+									<Label for="demoRateLimitPerIp">Per IP limit</Label>
 								</div>
 								<Input
 									id="demoRateLimitPerIp"
@@ -282,7 +283,7 @@
 							<div class="space-y-2">
 								<div class="flex items-center gap-1.5">
 									<Globe2 class="size-3.5 text-foreground/75" />
-									<Label for="demoRateLimitGlobal" class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Global limit</Label>
+									<Label for="demoRateLimitGlobal">Global limit</Label>
 								</div>
 								<Input
 									id="demoRateLimitGlobal"

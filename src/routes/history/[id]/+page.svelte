@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { cn } from '$lib/utils.js';
+	import GenerationStatus from '$lib/components/GenerationStatus.svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '$lib/components/ui/card';
@@ -128,28 +128,6 @@
 		}
 	}
 
-	function statusClass(status: Generation['status']) {
-		return cn(
-			"text-[9px] font-mono font-medium uppercase px-1.5 py-0.5 rounded border tracking-wide ml-2.5",
-			status === 'completed'
-				? "border-border bg-foreground/5 text-foreground"
-				: status === 'failed'
-					? "border-destructive/30 bg-destructive/5 text-destructive"
-					: "border-border bg-muted text-muted-foreground animate-pulse"
-		);
-	}
-
-	function outputStatusClass(status: GenerationOutput['status']) {
-		return cn(
-			"text-[9px] uppercase px-1.5 py-0.5 rounded font-mono font-medium border shrink-0",
-			status === 'completed'
-				? "border-border bg-foreground/5 text-foreground"
-				: status === 'failed'
-					? "border-destructive/30 bg-destructive/5 text-destructive"
-					: "border-border bg-muted text-muted-foreground animate-pulse"
-		);
-	}
-
 	async function copyFinalOutput() {
 		const text = generation.finalOutput ?? generation.error;
 		if (!text) return;
@@ -215,11 +193,7 @@
 		backHref="/history"
 	>
 		{#snippet badge()}
-			<span 
-				class={statusClass(generation.status)}
-			>
-				{generation.status}
-			</span>
+			<GenerationStatus status={generation.status} class="ml-2.5" />
 		{/snippet}
 	</PageHeader>
 
@@ -301,11 +275,7 @@
 							</span>
 						</div>
 						
-						<span 
-							class={outputStatusClass(output.status)}
-						>
-							{output.status}
-						</span>
+						<GenerationStatus status={output.status} class="shrink-0" />
 					</Accordion.Trigger>
 					<Accordion.Content class="p-0 border-t border-border bg-muted/5">
 						<div class="max-h-96 w-full overflow-y-auto" tabindex="-1">

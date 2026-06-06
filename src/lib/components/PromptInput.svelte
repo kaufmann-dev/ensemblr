@@ -20,7 +20,7 @@
 	{#if label || showCharCount}
 		<div class="flex justify-between items-center">
 			{#if label}
-				<Label for={id} class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">{label}</Label>
+				<Label for={id}>{label}</Label>
 			{/if}
 			{#if showCharCount}
 				<span class="text-[9px] font-mono text-muted-foreground/60 tabular-nums">

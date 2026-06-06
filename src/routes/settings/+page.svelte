@@ -1,8 +1,6 @@
 <script lang="ts">
-	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
 	import PageHeader from '$lib/components/PageHeader.svelte';
-	import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import * as Select from '$lib/components/ui/select';
@@ -45,7 +43,7 @@
 					
 					<!-- Provider Selector -->
 					<div class="space-y-1.5">
-						<Label for="provider" class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">LLM Provider</Label>
+						<Label for="provider">LLM Provider</Label>
 						<Select.Root type="single" bind:value={providerId}>
 							<Select.Trigger id="provider" class="text-xs font-mono">
 								<span class="truncate">{selectedProviderName}</span>
@@ -67,7 +65,7 @@
 					
 					<!-- API Key Input -->
 					<div class="space-y-1.5">
-						<Label for="api-key" class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">API Credential Key</Label>
+						<Label for="api-key">API Credential Key</Label>
 						<div class="relative flex items-center">
 							<Input 
 								id="api-key" 

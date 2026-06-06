@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { cn } from '$lib/utils.js';
+	import GenerationStatus from '$lib/components/GenerationStatus.svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
-	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
 	import {
 		Card,
@@ -15,7 +14,6 @@
 	import { Label } from '$lib/components/ui/label';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
 	import * as Select from '$lib/components/ui/select';
-	import { Textarea } from '$lib/components/ui/textarea';
 	import PromptInput from '$lib/components/PromptInput.svelte';
 	import * as Accordion from '$lib/components/ui/accordion';
 	import { 
@@ -177,17 +175,6 @@
 		].slice(0, RECENT_RUNS_LIMIT + 1);
 	}
 
-	function statusClass(status: RecentRun['status']) {
-		return cn(
-			"text-[9px] font-mono font-medium uppercase px-1.5 py-0.5 rounded border tracking-wide",
-			status === 'completed'
-				? "border-border bg-foreground/5 text-foreground"
-				: status === 'failed'
-					? "border-destructive/20 bg-destructive/5 text-destructive"
-					: "border-border bg-muted text-muted-foreground animate-pulse"
-		);
-	}
-
 	async function run() {
 		if (!canRun) return;
 
@@ -309,11 +296,7 @@
 								<span class="text-[9px] font-mono text-muted-foreground/75 tabular-nums">
 									{new Date(item.createdAt).toLocaleDateString()}
 								</span>
-								<span 
-									class={statusClass(item.status)}
-								>
-									{item.status}
-								</span>
+								<GenerationStatus status={item.status} />
 							</div>
 						</a>
 					{:else}
@@ -376,7 +359,7 @@
 							<div class="space-y-1.5 group/select">
 								<div class="flex items-center gap-1.5">
 									<Cpu class="size-3.5 text-muted-foreground/70" />
-									<Label for={worker.id} class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Worker Model {index + 1}{index > 1 ? ' (OPTIONAL)' : ''}</Label>
+									<Label for={worker.id}>Worker Model {index + 1}{index > 1 ? ' (OPTIONAL)' : ''}</Label>
 								</div>
 								
 								<Select.Root type="single" bind:value={worker.value} disabled={running}>
@@ -409,7 +392,7 @@
 						<div class="space-y-1.5 group/select">
 							<div class="flex items-center gap-1.5">
 								<ShieldCheck class="size-3.5 text-muted-foreground" />
-								<Label for="judge-model" class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Synthesizing Judge Model</Label>
+								<Label for="judge-model">Synthesizing Judge Model</Label>
 							</div>
 							
 							<Select.Root type="single" bind:value={judgeId} disabled={running}>
@@ -441,7 +424,7 @@
 						<div class="space-y-1.5">
 							<div class="flex items-center gap-1.5">
 								<Layers class="size-3.5 text-muted-foreground/80" />
-								<Label for="rounds" class="text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Rounds of mixture</Label>
+								<Label for="rounds">Rounds of mixture</Label>
 							</div>
 							<div class="relative flex items-center">
 								<Input
@@ -592,18 +575,7 @@
 									</span>
 								</div>
 								
-								<span 
-									class={cn(
-										"text-[9px] uppercase px-1.5 py-0.5 rounded font-mono font-medium border shrink-0",
-										output.status === 'completed'
-											? "border-border bg-foreground/5 text-foreground"
-											: output.status === 'failed'
-												? "border-destructive/30 bg-destructive/5 text-destructive"
-												: "border-border bg-muted text-muted-foreground animate-pulse"
-									)}
-								>
-									{output.status}
-								</span>
+								<GenerationStatus status={output.status} class="shrink-0" />
 							</Accordion.Trigger>
 							<Accordion.Content class="p-0 border-t border-border bg-muted/5">
 								<div class="max-h-96 w-full overflow-y-auto" tabindex="-1">
