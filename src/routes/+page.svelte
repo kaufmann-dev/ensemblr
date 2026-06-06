@@ -276,7 +276,7 @@
 	<aside class="order-2 space-y-4 lg:order-1 lg:max-w-[18rem]">
 		<div class="h-full flex flex-col">
 			<div class="pb-3 pt-4 px-1 border-b border-border flex items-center gap-2">
-				<History class="size-4 text-foreground/80" />
+				<History class="size-4 text-foreground" />
 				<div>
 					<h3 class="text-xs font-bold font-mono tracking-tight text-foreground uppercase">Recent runs</h3>
 					<p class="text-[9px] font-mono text-muted-foreground mt-0.5">Saved mixture history</p>
@@ -301,7 +301,7 @@
 						</a>
 					{:else}
 						<div class="flex flex-col items-center justify-center py-12 text-center">
-							<History class="size-7 text-muted-foreground/35 mb-2 stroke-[1.5]" />
+							<History class="size-7 text-muted-foreground mb-2 stroke-[1.5]" />
 							<p class="text-[11px] font-mono text-muted-foreground/75">No generations saved yet.</p>
 						</div>
 					{/each}
@@ -358,7 +358,7 @@
 						{#each workers as worker, index (worker.id)}
 							<div class="space-y-1.5 group/select">
 								<div class="flex items-center gap-1.5">
-									<Cpu class="size-3.5 text-muted-foreground/70" />
+									<Cpu class="size-3.5 text-muted-foreground" />
 									<Label for={worker.id}>Worker Model {index + 1}{index > 1 ? ' (OPTIONAL)' : ''}</Label>
 								</div>
 								
@@ -423,7 +423,7 @@
 						<!-- Stepper Config: Rounds -->
 						<div class="space-y-1.5">
 							<div class="flex items-center gap-1.5">
-								<Layers class="size-3.5 text-muted-foreground/80" />
+								<Layers class="size-3.5 text-muted-foreground" />
 								<Label for="rounds">Rounds of mixture</Label>
 							</div>
 							<div class="relative flex items-center">
@@ -511,7 +511,7 @@
 		<Card class="border border-border bg-card rounded flex flex-col min-h-[350px] overflow-hidden">
 			<CardHeader class="pb-3 pt-4 px-5 flex flex-row items-center justify-between gap-4">
 				<div class="flex items-center gap-2">
-					<ShieldCheck class="size-4 text-foreground/80" />
+					<ShieldCheck class="size-4 text-foreground" />
 					<div>
 						<CardTitle class="text-sm font-bold font-mono tracking-tight">Synthesis Output</CardTitle>
 						<CardDescription class="text-[10px] font-mono text-muted-foreground mt-0.5">Real-time finalized MoA judge synthesis</CardDescription>
@@ -539,12 +539,12 @@
 						<pre class="code-area p-5 text-foreground/90 whitespace-pre-wrap selection:bg-foreground/10 break-words select-text outline-none">{final}</pre>
 					{:else if running}
 						<div class="flex flex-col items-center justify-center p-20 text-center h-full">
-							<Loader2 class="size-6 text-muted-foreground/60 animate-spin mb-3 stroke-[1.5]" />
+							<Loader2 class="size-6 text-muted-foreground animate-spin mb-3 stroke-[1.5]" />
 							<p class="text-xs font-mono text-muted-foreground/80 animate-pulse">Mixture-of-Agents is generating synthesis... Please wait.</p>
 						</div>
 					{:else}
 						<div class="flex flex-col items-center justify-center p-20 text-center text-muted-foreground/50 h-full">
-							<Cpu class="size-8 text-muted-foreground/35 mb-2 stroke-[1.2]" />
+							<Cpu class="size-8 text-muted-foreground mb-2 stroke-[1.2]" />
 							<p class="text-[11px] font-mono max-w-sm leading-relaxed text-muted-foreground/75">
 								Waiting for execution. Fill the system prompt and trigger the mixture synthesis.
 							</p>
@@ -558,7 +558,7 @@
 		{#if outputs.length > 0}
 			<div class="space-y-3 pt-2">
 				<div class="flex items-center gap-2 px-1">
-					<Layers class="size-4 text-foreground/80" />
+					<Layers class="size-4 text-foreground" />
 					<h3 class="text-xs font-mono font-bold uppercase tracking-widest text-muted-foreground/90">Mixture Steps ({outputs.length})</h3>
 				</div>
 				
