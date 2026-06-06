@@ -33,7 +33,7 @@
 	<Textarea
 		{id}
 		{name}
-		class="resize-none overflow-y-auto font-mono text-xs p-3"
+		class="resize-none font-mono text-xs p-3"
 		style="min-height: {minHeight} !important; max-height: {maxHeight} !important;"
 		{placeholder}
 		{disabled}
