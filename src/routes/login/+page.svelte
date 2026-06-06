@@ -64,7 +64,7 @@
 				<form class="space-y-3.5" onsubmit={submit}>
 					<!-- Email Field -->
 					<div class="space-y-1">
-						<Label for="email" class="text-[9px] font-mono font-bold text-muted-foreground/90 uppercase tracking-widest">Email</Label>
+						<Label for="email">Email</Label>
 						<Input 
 							id="email" 
 							type="email" 
@@ -78,7 +78,7 @@
 
 					<!-- Password Field -->
 					<div class="space-y-1">
-						<Label for="password" class="text-[9px] font-mono font-bold text-muted-foreground/90 uppercase tracking-widest">Password</Label>
+						<Label for="password">Password</Label>
 						<Input 
 							id="password" 
 							type="password" 
