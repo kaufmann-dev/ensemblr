@@ -26,12 +26,12 @@ export function isMixtureConfigurationValid(
 	return state.hasModels && state.selectedWorkerCount >= 2 && Boolean(state.judgeId);
 }
 
-export function isMixtureConfigurationCollapsed(valid: boolean, storedPreference: boolean) {
-	return valid && storedPreference;
+export function isMixtureConfigurationCollapsed(hasModels: boolean, storedPreference: boolean) {
+	return hasModels && storedPreference;
 }
 
 export function readMixtureCollapsedPreference(storedValue: string | null) {
-	return storedValue === 'true';
+	return storedValue === null ? true : storedValue === 'true';
 }
 
 export function getRunDisabledExplanation(state: MixtureState) {
