@@ -1,65 +1,22 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { invalidateAll } from '$app/navigation';
 	import GenerationStatus from '$lib/components/GenerationStatus.svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { Button } from '$lib/components/ui/button';
-	import { History, Calendar, Trash2 } from '@lucide/svelte';
-	import type { PageProps } from './$types';
+	import { getHistoryContext } from '$lib/history/history.svelte';
+	import { History, Loader2, Trash2 } from '@lucide/svelte';
 
-	let { data }: PageProps = $props();
+	const history = getHistoryContext();
 
-	let runningIds = $derived(
-		data.generations
-			.filter((item) => item.status === 'running')
-			.map((item) => item.id)
-	);
-
-	// Svelte action to manage browser EventSource connections dynamically and cleanly without $effect
-	function syncEvents(node: HTMLElement, currentIds: string[]) {
-		// eslint-disable-next-line svelte/prefer-svelte-reactivity
-		const sources = new Map<string, EventSource>();
-
-		const sync = (ids: string[]) => {
-			// 1. Close and remove any connections that are no longer running
-			for (const [id, source] of sources.entries()) {
-				if (!ids.includes(id)) {
-					source.close();
-					sources.delete(id);
-				}
-			}
-			// 2. Open new connections for newly running IDs
-			for (const id of ids) {
-				if (!sources.has(id)) {
-					const source = new EventSource(resolve(`/api/generations/${id}/events`));
-					sources.set(id, source);
-
-					source.onmessage = (message) => {
-						const event = JSON.parse(message.data);
-						if (event.type === 'final' || (event.type === 'error' && !event.outputId)) {
-							source.close();
-							sources.delete(id);
-							invalidateAll();
-						}
-					};
-				}
-			}
-		};
-
-		// Run initially on mount
-		sync(currentIds);
-
+	function loadMoreOnNearEnd(node: HTMLElement) {
+		const observer = new IntersectionObserver((observed) => {
+			if (observed.some((entry) => entry.isIntersecting)) void history.loadMore();
+		});
+		observer.observe(node);
 		return {
-			update(newIds: string[]) {
-				// Svelte calls this hook automatically when the runningIds array updates
-				sync(newIds);
-			},
 			destroy() {
-				// Clean up all active connections when the component is unmounted
-				for (const source of sources.values()) {
-					source.close();
-				}
-				sources.clear();
+				observer.disconnect();
 			}
 		};
 	}
@@ -67,72 +24,94 @@
 
 <svelte:head><title>History | ensemblr</title></svelte:head>
 
-<main class="relative flex-1 flex flex-col justify-start max-w-4xl mx-auto w-full px-4 py-8 space-y-6 bg-background">
+<main class="mx-auto w-full max-w-3xl flex-1 space-y-6 px-4 py-8">
 	<PageHeader
 		title="Generation history"
-		description="Inspect historical Mixture-of-Agents synthesis runs"
+		description="Review, open, or delete past mixture-of-agents runs."
 		icon={History}
-	/>
-
-	{#if data.generations.length > 0}
-		<div class="flex justify-end px-1">
-			<form method="POST" action="?/clear">
-				<Button type="submit" variant="destructive" size="sm" class="h-7.5 rounded text-[10px]">
-					<Trash2 class="size-3.5 mr-1" />
-					Clear history
-				</Button>
-			</form>
-		</div>
-	{/if}
-
-	<div class="space-y-2 px-1" use:syncEvents={runningIds}>
-			{#each data.generations as item (item.id)}
-				<article
-					class="group relative rounded border border-border bg-muted/20 p-4 hover:bg-muted/50 hover:border-foreground/30 min-w-0"
+	>
+		{#snippet actions()}
+			{#if history.entries.length > 0}
+				<form
+					method="POST"
+					action="?/clear"
+					use:enhance={() =>
+						({ update }) => {
+							history.clear();
+							return update();
+						}}
 				>
-					<!-- Stretched overlay link covering the entire card -->
-					<a 
-						href={resolve(`/history/${item.id}`)} 
-						class="absolute inset-0 rounded z-0"
-						aria-label="Open details for prompt: {item.prompt}"
-					></a>
+					<Button type="submit" variant="destructive" size="sm">
+						<Trash2 class="size-3.5" />
+						Clear history
+					</Button>
+				</form>
+			{/if}
+		{/snippet}
+	</PageHeader>
 
-					<div class="relative z-10 pointer-events-none flex flex-col sm:flex-row sm:items-start justify-between gap-3 w-full">
-						<div class="space-y-2 min-w-0 flex-1">
-							<p class="line-clamp-2 font-mono text-xs text-foreground/80 group-hover:text-foreground break-words leading-relaxed">
-								{item.prompt}
-							</p>
-							<div class="flex flex-wrap items-center gap-3 text-[10px] text-muted-foreground font-mono uppercase tracking-wider">
-								<span class="flex items-center gap-1">
-									<Calendar class="size-3 text-muted-foreground/60" />
-									<span class="font-mono tabular-nums text-[9px]">{new Date(item.createdAt).toLocaleString()}</span>
-								</span>
-								<span class="font-mono text-[9px] lowercase bg-card px-1.5 py-0.5 rounded border border-border">
-									id: {item.id.slice(0, 8)}...
-								</span>
-							</div>
-						</div>
+	<div class="space-y-2">
+		{#each history.entries as item (item.id)}
+			<article
+				class="group relative min-w-0 rounded-lg border border-border bg-card p-4 hover:border-foreground/25 hover:bg-muted/40"
+			>
+				<a
+					href={resolve(`/history/${item.id}`)}
+					class="absolute inset-0 z-0 rounded-lg"
+					aria-label="Open details for prompt: {item.prompt}"
+				></a>
 
-						<div class="shrink-0 flex flex-wrap items-center gap-2 pointer-events-auto relative z-20">
-							<GenerationStatus status={item.status} />
-							<form method="POST" action="?/delete">
-								<input type="hidden" name="id" value={item.id} />
-								<Button type="submit" variant="destructive" size="xs" class="rounded text-[10px]">
-									<Trash2 class="size-3 mr-1" />
-									Delete
-								</Button>
-							</form>
-						</div>
+				<div
+					class="pointer-events-none relative z-10 flex w-full flex-col justify-between gap-3 sm:flex-row sm:items-start"
+				>
+					<div class="min-w-0 flex-1 space-y-1.5">
+						<p class="line-clamp-2 text-sm leading-relaxed break-words text-foreground">
+							{item.prompt}
+						</p>
+						<p class="text-xs text-muted-foreground tabular-nums">
+							{item.createdAt.toLocaleString()}
+						</p>
 					</div>
-				</article>
-			{:else}
-				<div class="flex flex-col items-center justify-center py-20 text-center">
-					<History class="size-7 text-muted-foreground/30 mb-2 stroke-[1.5]" />
-					<h3 class="text-xs font-mono font-bold text-foreground">Archive Empty</h3>
-					<p class="text-[10px] font-mono text-muted-foreground mt-1 max-w-xs leading-relaxed">
-						You haven't run any Mixture-of-Agents generations yet. Go to the Workspace dashboard to trigger your first run!
-					</p>
+
+					<div class="pointer-events-auto relative z-20 flex shrink-0 items-center gap-2">
+						<GenerationStatus status={item.status} />
+						<form
+							method="POST"
+							action="?/delete"
+							use:enhance={() =>
+								({ update }) => {
+									history.remove(item.id);
+									return update();
+								}}
+						>
+							<input type="hidden" name="id" value={item.id} />
+							<Button type="submit" variant="destructive" size="xs">
+								<Trash2 class="size-3" />
+								Delete
+							</Button>
+						</form>
+					</div>
 				</div>
-			{/each}
-		</div>
-	</main>
+			</article>
+		{:else}
+			<div class="flex flex-col items-center justify-center gap-2 py-20 text-center">
+				<History class="size-7 text-muted-foreground" />
+				<h2 class="text-sm font-medium text-foreground">No generations yet</h2>
+				<p class="max-w-xs text-sm leading-relaxed text-muted-foreground">
+					Run your first mixture-of-agents generation from the workspace and it will show up here.
+				</p>
+			</div>
+		{/each}
+
+		{#if history.nextCursor !== null}
+			<div class="flex justify-center py-3" use:loadMoreOnNearEnd>
+				{#if history.loadingMore}
+					<Loader2 class="size-4 animate-spin text-muted-foreground" />
+					<span class="sr-only">Loading more generations</span>
+				{:else}
+					<Button variant="outline" size="sm" onclick={() => history.loadMore()}>Load more</Button>
+				{/if}
+			</div>
+		{/if}
+	</div>
+</main>

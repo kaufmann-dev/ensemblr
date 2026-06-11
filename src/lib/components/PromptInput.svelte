@@ -9,34 +9,55 @@
 		value = $bindable(''),
 		placeholder = '',
 		disabled = false,
-		minHeight = '96px', // Standard height (96px = min-h-24)
-		maxHeight = '256px', // Standard cutoff (256px = max-h-64)
+		minHeight = '72px',
+		maxHeight = '256px',
 		showCharCount = false,
+		onsubmit = undefined,
 		class: className = ''
+	}: {
+		id?: string;
+		name?: string;
+		label?: string;
+		value?: string;
+		placeholder?: string;
+		disabled?: boolean;
+		minHeight?: string;
+		maxHeight?: string;
+		showCharCount?: boolean;
+		onsubmit?: () => void;
+		class?: string;
 	} = $props();
+
+	function onkeydown(event: KeyboardEvent) {
+		if (onsubmit && event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
+			event.preventDefault();
+			onsubmit();
+		}
+	}
 </script>
 
 <div class="space-y-2 {className}">
 	{#if label || showCharCount}
-		<div class="flex justify-between items-center">
+		<div class="flex items-center justify-between">
 			{#if label}
 				<Label for={id}>{label}</Label>
 			{/if}
 			{#if showCharCount}
-				<span class="text-[9px] font-mono text-muted-foreground/60 tabular-nums">
-					{value.length} chars
+				<span class="text-xs text-muted-foreground tabular-nums">
+					{value.length} characters
 				</span>
 			{/if}
 		</div>
 	{/if}
-	
+
 	<Textarea
 		{id}
 		{name}
-		class="resize-none font-mono text-xs p-3"
+		class="resize-none p-3 text-sm"
 		style="min-height: {minHeight} !important; max-height: {maxHeight} !important;"
 		{placeholder}
 		{disabled}
+		{onkeydown}
 		bind:value
 	/>
 </div>
