@@ -223,7 +223,7 @@
 
 	{#if loading}
 		<div class="flex flex-col items-center justify-center py-20 text-center">
-			<Loader2 class="mb-3 inline-block size-6 animate-spin stroke-[1.5] text-foreground/75" />
+			<Loader2 class="mb-3 inline-block size-6 animate-spin stroke-[1.5] text-foreground" />
 			<p class="font-mono text-xs text-muted-foreground">
 				Synchronizing provider model catalogs...
 			</p>
@@ -237,7 +237,7 @@
 				<!-- Provider Search -->
 				<div class="relative w-full">
 					<Search
-						class="absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground/70"
+						class="absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground"
 					/>
 					<Input
 						type="text"
@@ -251,7 +251,7 @@
 							type="button"
 							variant="ghost"
 							size="icon"
-							class="absolute top-1/2 right-1.5 size-5 -translate-y-1/2 rounded text-muted-foreground/60 transition-all hover:text-foreground active:scale-95"
+							class="absolute top-1/2 right-1.5 size-5 -translate-y-1/2 rounded text-muted-foreground transition-all hover:text-foreground active:scale-95"
 							onclick={() => handleProviderInput('')}
 							aria-label="Clear provider search"
 						>
@@ -263,7 +263,7 @@
 				<!-- Model Search -->
 				<div class="relative w-full">
 					<Search
-						class="absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground/70"
+						class="absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground"
 					/>
 					<Input
 						type="text"
@@ -384,7 +384,7 @@
 				<div
 					class="flex flex-col items-center justify-center rounded border border-dashed border-border bg-muted/10 py-16 text-center"
 				>
-					<Cpu class="mb-2 size-7 stroke-[1.5] text-muted-foreground/30" />
+					<Cpu class="mb-2 size-7 stroke-[1.5] text-muted-foreground" />
 					<p class="font-mono text-xs text-muted-foreground">
 						No matching models or providers found.
 					</p>
@@ -482,7 +482,7 @@
 															'size-3.5 shrink-0 transition-colors',
 															allowedSet.has(row.value)
 																? 'text-foreground'
-																: 'text-muted-foreground/60'
+																: 'text-muted-foreground'
 														)}
 													/>
 													<span class="truncate">{row.modelName}</span>
