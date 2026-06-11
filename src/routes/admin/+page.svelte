@@ -287,7 +287,7 @@
 						<!-- Intermediate Prompt Template -->
 						<div class="space-y-2">
 							<div class="flex items-center gap-1.5">
-								<Sliders class="size-3.5 text-foreground/75" />
+								<Sliders class="size-3.5 text-foreground" />
 								<Label>Intermediate Synthesis Layer Template</Label>
 							</div>
 							<PromptInput
@@ -307,7 +307,7 @@
 						<!-- Judge Prompt Template -->
 						<div class="space-y-2 pt-3">
 							<div class="flex items-center gap-1.5">
-								<Shield class="size-3.5 text-foreground/75" />
+								<Shield class="size-3.5 text-foreground" />
 								<Label>Final Judge Synthesis Template</Label>
 							</div>
 							<PromptInput
@@ -340,7 +340,7 @@
 						{#await demoModelsComponent}
 							<div class="flex flex-col items-center justify-center py-20 text-center">
 								<Loader2
-									class="mb-3 inline-block size-6 animate-spin stroke-[1.5] text-foreground/75"
+									class="mb-3 inline-block size-6 animate-spin stroke-[1.5] text-foreground"
 								/>
 								<p class="font-mono text-xs text-muted-foreground">
 									Loading demo model controls...
@@ -384,7 +384,7 @@
 					<div class="space-y-5">
 						<div>
 							<div class="flex items-center gap-1.5">
-								<Gauge class="size-3.5 text-foreground/75" />
+								<Gauge class="size-3.5 text-foreground" />
 								<h3 class="font-mono text-xs font-bold tracking-tight text-foreground uppercase">
 									Demo generation rate limits
 								</h3>
@@ -397,7 +397,7 @@
 						<div class="grid gap-4 md:grid-cols-3">
 							<div class="space-y-2">
 								<div class="flex items-center gap-1.5">
-									<Clock class="size-3.5 text-foreground/75" />
+									<Clock class="size-3.5 text-foreground" />
 									<Label for="demoRateLimitWindowMinutes">Window minutes</Label>
 								</div>
 								<Input
@@ -416,7 +416,7 @@
 
 							<div class="space-y-2">
 								<div class="flex items-center gap-1.5">
-									<Network class="size-3.5 text-foreground/75" />
+									<Network class="size-3.5 text-foreground" />
 									<Label for="demoRateLimitPerIp">Per IP limit</Label>
 								</div>
 								<Input
@@ -435,7 +435,7 @@
 
 							<div class="space-y-2">
 								<div class="flex items-center gap-1.5">
-									<Globe2 class="size-3.5 text-foreground/75" />
+									<Globe2 class="size-3.5 text-foreground" />
 									<Label for="demoRateLimitGlobal">Global limit</Label>
 								</div>
 								<Input
