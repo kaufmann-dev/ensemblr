@@ -179,7 +179,7 @@
 
 <svelte:head><title>Workspace | ensemblr</title></svelte:head>
 
-<main class="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-8 px-4 py-8">
+<main class="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-4 px-4 py-5 sm:gap-6 sm:py-8">
 	<PageHeader
 		title="Mixture workspace"
 		description="Write a prompt, configure the mixture, and read the synthesis."
@@ -198,7 +198,10 @@
 	</PageHeader>
 
 	<section
-		class="flex min-h-[20rem] flex-1 flex-col justify-center gap-6"
+		class={[
+			'order-3 flex flex-1 flex-col gap-6 md:order-2 md:min-h-[20rem] md:justify-center',
+			!conversation.userMessage && 'hidden md:flex'
+		]}
 		aria-label="Active conversation"
 	>
 		{#if conversation.userMessage}
@@ -223,7 +226,7 @@
 	</section>
 
 	<section
-		class="sticky bottom-0 z-10 space-y-3 border-t border-border bg-background/95 pt-4 pb-2 backdrop-blur"
+		class="order-2 space-y-3 md:sticky md:bottom-0 md:z-10 md:border-t md:border-border md:bg-background/95 md:pt-4 md:pb-2 md:backdrop-blur"
 		aria-label="Synthesis composer"
 	>
 		<PromptInput
@@ -232,10 +235,10 @@
 			placeholder="What would you like the mixture to synthesize?"
 			bind:value={prompt}
 			disabled={running}
-			minHeight="112px"
+			minHeight="88px"
 			showCharCount={true}
 			monospace={false}
-			class="rounded border border-border bg-card p-4"
+			class="rounded border border-border bg-card p-3 sm:p-4"
 		/>
 
 		<MixtureConfiguration
