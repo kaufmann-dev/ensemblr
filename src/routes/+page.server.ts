@@ -1,17 +1,28 @@
-import { eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import { db } from '$lib/server/db';
-import { providerApiKey } from '$lib/server/db/schema';
+import { generation, providerApiKey } from '$lib/server/db/schema';
+import { visibleGenerationsFor } from '$lib/server/generation-access';
 import { requireUser } from '$lib/server/authz';
 import { getCatalog } from '$lib/server/models/catalog';
 import type { CatalogProvider } from '$lib/server/models/catalog';
 import { getSettings } from '$lib/server/settings';
 
+const RECENT_RUNS_LIMIT = 5;
+
 export async function load({ locals }) {
 	const user = requireUser(locals);
-	const keys = await db
-		.select({ providerId: providerApiKey.providerId })
-		.from(providerApiKey)
-		.where(eq(providerApiKey.userId, user.id));
+	const [keys, history] = await Promise.all([
+		db
+			.select({ providerId: providerApiKey.providerId })
+			.from(providerApiKey)
+			.where(eq(providerApiKey.userId, user.id)),
+		db
+			.select()
+			.from(generation)
+			.where(visibleGenerationsFor(user, locals.session!.id))
+			.orderBy(desc(generation.createdAt))
+			.limit(RECENT_RUNS_LIMIT + 1)
+	]);
 	const keyProviders = keys.map((key) => key.providerId);
 	const configuredProviders = new Set(keyProviders);
 
@@ -41,7 +52,8 @@ export async function load({ locals }) {
 				.filter((model) => model.enabled)
 				.map((model) => ({
 					id: model.id,
-					name: model.name
+					name: model.name,
+					enabled: model.enabled
 				}))
 		}))
 		.filter((provider) => provider.models.length > 0);
@@ -49,6 +61,7 @@ export async function load({ locals }) {
 	return {
 		catalog: workspaceCatalog,
 		keyProviders,
+		history,
 		userRole: user.role
 	};
 }

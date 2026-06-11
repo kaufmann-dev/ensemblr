@@ -1,7 +1,7 @@
 import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import tailwindcss from '@tailwindcss/vite';
 import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from 'vite';
 
 export default defineConfig({
 	plugins: [
@@ -12,9 +12,5 @@ export default defineConfig({
 	build: {
 		sourcemap: false,
 		minify: true
-	},
-	test: {
-		include: ['src/**/*.test.ts'],
-		environment: 'node'
 	}
 });

@@ -5,7 +5,6 @@
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import { Loader2 } from '@lucide/svelte';
 
 	let email = $state('');
 	let password = $state('');
@@ -40,62 +39,76 @@
 
 <svelte:head><title>Login | ensemblr</title></svelte:head>
 
-<main class="grid flex-1 place-items-center bg-background px-4 py-12">
-	<div class="w-full max-w-[380px]">
+<main class="relative grid flex-1 place-items-center bg-background px-4 py-12">
+	<div class="relative w-full max-w-[380px] px-1 py-4 sm:px-2">
+		<!-- Dynamic Logo Branding above Card -->
 		<div class="mb-6 text-center">
-			<span class="text-3xl font-bold tracking-tight text-foreground">ensemblr</span>
-			<p class="mt-1.5 text-sm text-muted-foreground">Mixture-of-agents orchestration</p>
+			<span class="font-mono tracking-tighter text-3xl font-extrabold text-foreground">
+				ensemblr
+			</span>
+			<p class="mt-1.5 text-xs text-muted-foreground font-mono tracking-tight">
+				mixture-of-agents orchestration
+			</p>
 		</div>
 
-		<Card class="w-full">
-			<CardHeader>
-				<CardTitle class="text-base font-semibold text-foreground">Sign in</CardTitle>
-				<p class="text-sm text-muted-foreground">
-					Use your account or start an instant demo session.
+		<Card class="w-full border border-border bg-card rounded shadow-xs p-1">
+			<CardHeader class="pb-3 pt-4 px-5">
+				<CardTitle class="text-base font-bold font-mono tracking-tight text-foreground">
+					Sign in
+				</CardTitle>
+				<p class="text-[11px] font-mono text-muted-foreground mt-0.5">
+					Authenticate or run an instant demo instance.
 				</p>
 			</CardHeader>
-			<CardContent>
+			<CardContent class="px-5 pb-5">
 				<form class="space-y-3.5" onsubmit={submit}>
+					<!-- Email Field -->
 					<div class="space-y-1">
 						<Label for="email">Email</Label>
-						<Input
-							id="email"
-							type="email"
-							autocomplete="email"
+						<Input 
+							id="email" 
+							type="email" 
+							autocomplete="email" 
 							bind:value={email}
 							placeholder="you@domain.com"
+							class="text-xs font-mono"
 							required
 						/>
 					</div>
 
+					<!-- Password Field -->
 					<div class="space-y-1">
 						<Label for="password">Password</Label>
-						<Input
-							id="password"
-							type="password"
-							autocomplete="current-password"
+						<Input 
+							id="password" 
+							type="password" 
+							autocomplete="current-password" 
 							bind:value={password}
 							placeholder="••••••••"
+							class="text-xs font-mono"
 							required
 						/>
 					</div>
 
+					<!-- Error Message -->
 					{#if error}
-						<div
-							class="rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm text-destructive"
-							role="alert"
-						>
+						<div class="rounded border border-destructive/20 bg-destructive/5 px-3 py-2 text-[11px] font-mono text-destructive">
 							{error}
 						</div>
 					{/if}
 
-					<div class="grid gap-2.5 pt-1.5">
-						<Button class="w-full" type="submit" disabled={busy}>
+					<!-- Action Buttons -->
+					<div class="pt-1.5 grid gap-2.5">
+						<Button 
+							class="w-full h-8.5 font-mono text-xs font-bold rounded shadow-none" 
+							type="submit" 
+							disabled={busy}
+						>
 							{#if busy}
-								<Loader2 class="size-4 animate-spin" />
-								Signing in…
+								<span class="animate-spin mr-2 size-3.5 border-2 border-primary-foreground border-t-transparent rounded-full"></span>
+								Authenticating...
 							{:else}
-								Sign in
+								Authenticate
 							{/if}
 						</Button>
 
@@ -103,42 +116,27 @@
 							<div class="absolute inset-0 flex items-center">
 								<div class="w-full border-t border-border"></div>
 							</div>
-							<span class="relative bg-card px-2 text-xs text-muted-foreground">or</span>
+							<span class="relative bg-card px-2 text-[9px] uppercase font-mono tracking-widest text-muted-foreground">
+								Or
+							</span>
 						</div>
 
 						<Button
-							class="w-full"
+							class="w-full h-8.5 font-mono text-xs font-bold rounded border-border hover:bg-muted/50"
 							type="button"
 							variant="outline"
 							disabled={busy}
 							onclick={loginAsDemo}
 						>
-							Start demo session
+							Launch Demo Session
 						</Button>
 					</div>
 				</form>
 			</CardContent>
 		</Card>
 
-		<nav
-			class="mt-5 flex items-center justify-center gap-3 text-xs text-muted-foreground"
-			aria-label="Legal links"
-		>
-			<a
-				class="underline-offset-4 hover:text-foreground hover:underline"
-				href="https://legal.kaufmann.dev/privacy?site=ensemblr.kaufmann.dev"
-				rel="noreferrer"
-			>
-				Privacy
-			</a>
-			<span aria-hidden="true" class="text-muted-foreground/40">·</span>
-			<a
-				class="underline-offset-4 hover:text-foreground hover:underline"
-				href="https://legal.kaufmann.dev/imprint?site=ensemblr.kaufmann.dev"
-				rel="noreferrer"
-			>
-				Imprint
-			</a>
-		</nav>
+		<div class="mt-5 text-center font-mono text-[10px] text-muted-foreground/70">
+			Better Auth session active · SSL secure
+		</div>
 	</div>
 </main>

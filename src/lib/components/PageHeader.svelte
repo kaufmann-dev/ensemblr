@@ -2,55 +2,45 @@
 	import type { Component, Snippet } from 'svelte';
 	import { ArrowLeft } from '@lucide/svelte';
 	import { resolve } from '$app/paths';
-	import type { Pathname } from '$app/types';
 
 	let {
 		title,
 		description,
 		icon: Icon = undefined,
 		backHref = undefined,
-		badge = undefined,
-		actions = undefined
+		badge = undefined
 	}: {
 		title: string;
 		description: string;
 		icon?: Component<{ class?: string }>;
 		backHref?: string;
 		badge?: Snippet;
-		actions?: Snippet;
 	} = $props();
 </script>
 
-<div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-1">
 	<div class="flex items-center gap-3">
 		{#if backHref}
 			<a
-				href={resolve(backHref as Pathname)}
-				class="flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-muted/20 text-muted-foreground hover:bg-muted hover:text-foreground"
+				href={resolve(backHref as any)}
+				class="flex size-9 items-center justify-center rounded border border-border bg-muted/20 hover:bg-muted text-muted-foreground hover:text-foreground active:scale-95 transition-all shrink-0"
 				aria-label="Go back"
 			>
-				<ArrowLeft class="size-4" />
+				<ArrowLeft class="size-4.5" />
 			</a>
 		{:else if Icon}
-			<div
-				class="flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-muted/20 text-foreground"
-			>
-				<Icon class="size-4" />
+			<div class="flex size-9 items-center justify-center rounded border border-border bg-muted/20 text-foreground shrink-0">
+				<Icon class="size-4.5" />
 			</div>
 		{/if}
 		<div>
-			<h1 class="flex items-center gap-2.5 text-base font-semibold text-foreground">
+			<h1 class="text-base font-bold font-mono uppercase tracking-tight text-foreground flex items-center gap-2.5">
 				{title}
 				{#if badge}
 					{@render badge()}
 				{/if}
 			</h1>
-			<p class="mt-0.5 text-sm text-muted-foreground">{description}</p>
+			<p class="text-xs font-mono text-muted-foreground mt-0.5">{description}</p>
 		</div>
 	</div>
-	{#if actions}
-		<div class="flex shrink-0 items-center gap-2">
-			{@render actions()}
-		</div>
-	{/if}
 </div>

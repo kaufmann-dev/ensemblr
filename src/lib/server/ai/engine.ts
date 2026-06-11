@@ -12,7 +12,12 @@ import { decryptSecret } from '$lib/server/crypto';
 import { findCatalogModel } from '$lib/server/models/catalog';
 import { getSettings } from '$lib/server/settings';
 import { createLanguageModel } from './providers';
-import { publishGenerationEvent, sse, startGeneration, type RunEvent } from './generation-events';
+import {
+	publishGenerationEvent,
+	sse,
+	startGeneration,
+	type RunEvent
+} from './generation-events';
 import type { GenerateRequest } from '$lib/validation';
 
 type SuccessfulAnswer = {
