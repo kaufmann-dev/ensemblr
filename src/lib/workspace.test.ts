@@ -38,11 +38,11 @@ test('validates mixture configuration independently from the prompt', () => {
 	assert.equal(isMixtureConfigurationValid({ ...validState, hasModels: false }), false);
 });
 
-test('forces invalid mixture configuration open and restores a valid collapsed preference', () => {
+test('collapses mixture configuration by default when model options are available', () => {
 	assert.equal(MIXTURE_CONFIG_COLLAPSED_KEY, 'ensemblr:mixture-config-collapsed');
 	assert.equal(readMixtureCollapsedPreference('true'), true);
 	assert.equal(readMixtureCollapsedPreference('false'), false);
-	assert.equal(readMixtureCollapsedPreference(null), false);
+	assert.equal(readMixtureCollapsedPreference(null), true);
 	assert.equal(isMixtureConfigurationCollapsed(false, true), false);
 	assert.equal(isMixtureConfigurationCollapsed(true, true), true);
 	assert.equal(isMixtureConfigurationCollapsed(true, false), false);

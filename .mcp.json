@@ -7,6 +7,11 @@
     "shadcn-svelte": {
       "type": "http",
       "url": "https://shadcn-svelte.mastra.cloud/api/mcp/shadcn/mcp"
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "pnpm",
+      "args": ["dlx", "@playwright/mcp@latest"]
     }
   }
 }

@@ -37,7 +37,7 @@
 		running: boolean;
 	} = $props();
 
-	let collapsedPreference = $state(false);
+	let collapsedPreference = $state(true);
 
 	let modelOptions = $derived(
 		catalog.flatMap((provider) =>
@@ -50,8 +50,7 @@
 	);
 	let selectedWorkers = $derived(workers.filter((worker) => worker.value));
 	let hasModelOptions = $derived(modelOptions.length > 0);
-	let valid = $derived(hasModelOptions && selectedWorkers.length >= 2 && Boolean(judgeId));
-	let collapsed = $derived(isMixtureConfigurationCollapsed(valid, collapsedPreference));
+	let collapsed = $derived(isMixtureConfigurationCollapsed(hasModelOptions, collapsedPreference));
 	let emptyModelsMessage = $derived(
 		userRole === 'demo'
 			? 'No demo models are currently enabled.'
@@ -59,6 +58,17 @@
 				? 'Add an API key before selecting models.'
 				: 'None of your saved providers currently have enabled models.'
 	);
+	let configurationSummary = $derived.by(() => {
+		if (!hasModelOptions) return emptyModelsMessage;
+
+		const workerSummary =
+			selectedWorkers.length >= 2
+				? `${selectedWorkers.length} workers`
+				: `${selectedWorkers.length}/2 workers`;
+		const judgeSummary = judgeId ? modelTriggerLabel(judgeId, 'Judge selected') : 'Judge needed';
+
+		return `${workerSummary} · ${judgeSummary} · ${rounds} ${rounds === 1 ? 'round' : 'rounds'}`;
+	});
 
 	onMount(() => {
 		collapsedPreference = readMixtureCollapsedPreference(
@@ -72,7 +82,7 @@
 	}
 
 	function toggleCollapsed() {
-		if (!valid) return;
+		if (!hasModelOptions) return;
 		collapsedPreference = !collapsed;
 		sessionStorage.setItem(MIXTURE_CONFIG_COLLAPSED_KEY, String(collapsedPreference));
 	}
@@ -81,9 +91,9 @@
 <section class="rounded border border-border bg-card" aria-labelledby="mixture-config-heading">
 	<button
 		type="button"
-		class="flex w-full items-start justify-between gap-4 rounded px-4 py-3 text-left hover:bg-muted/30 disabled:cursor-default disabled:hover:bg-transparent"
+		class="flex w-full items-start justify-between gap-4 rounded px-3 py-3 text-left hover:bg-muted/30 disabled:cursor-default disabled:hover:bg-transparent sm:px-4"
 		onclick={toggleCollapsed}
-		disabled={!valid}
+		disabled={!hasModelOptions}
 		aria-expanded={!collapsed}
 		aria-controls="mixture-config-content"
 	>
@@ -93,16 +103,13 @@
 			</h2>
 			{#if collapsed}
 				<p class="mt-1 truncate text-xs text-muted-foreground">
-					{selectedWorkers.length} workers · {modelTriggerLabel(judgeId, 'No judge')} · {rounds}
-					{rounds === 1 ? 'round' : 'rounds'}
+					{configurationSummary}
 				</p>
 			{:else}
-				<p class="mt-1 text-xs text-muted-foreground">
-					Choose at least two workers, a synthesizing judge, and the number of rounds.
-				</p>
+				<p class="mt-1 text-xs text-muted-foreground">{configurationSummary}</p>
 			{/if}
 		</div>
-		{#if valid}
+		{#if hasModelOptions}
 			{#if collapsed}
 				<ChevronDown class="mt-0.5 size-4 shrink-0 text-muted-foreground" />
 			{:else}
@@ -112,9 +119,9 @@
 	</button>
 
 	{#if !collapsed}
-		<div id="mixture-config-content" class="border-t border-border px-4 py-4">
+		<div id="mixture-config-content" class="border-t border-border px-3 py-3 sm:px-4 sm:py-4">
 			{#if hasModelOptions}
-				<div class="grid gap-4 md:grid-cols-2">
+				<div class="grid gap-3 sm:gap-4 md:grid-cols-2">
 					{#each workers as worker, index (worker.id)}
 						<div class="space-y-1.5">
 							<div class="flex items-center gap-1.5">
