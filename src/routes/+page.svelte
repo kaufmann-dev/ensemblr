@@ -1,10 +1,13 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import ConversationMessage from '$lib/components/ConversationMessage.svelte';
 	import MixtureConfiguration from '$lib/components/MixtureConfiguration.svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PromptInput from '$lib/components/PromptInput.svelte';
 	import SecondaryOutputs from '$lib/components/SecondaryOutputs.svelte';
 	import { Button } from '$lib/components/ui/button';
+	import { getAppShellContext } from '$lib/app-shell';
+	import { getSidebarHistory } from '$lib/sidebar-history.svelte';
 	import {
 		RUN_DISABLED_REASON_ID,
 		buildConversationView,
@@ -18,6 +21,8 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	const appShell = getAppShellContext();
+	const sidebarHistory = getSidebarHistory();
 
 	type Selection = { providerId: string; modelId: string };
 	type WorkerSelection = { id: string; value: string };
@@ -38,6 +43,7 @@
 	let errorTitle = $state('');
 	let errorDetail = $state('');
 	let outputs = $state<WorkspaceOutput[]>([]);
+	let activeRunToken = 0;
 
 	let hasModelOptions = $derived(data.catalog.some((provider) => provider.models.length > 0));
 	let selectedWorkers = $derived(workers.filter((worker) => worker.value));
@@ -100,16 +106,34 @@
 		});
 	}
 
+	function resetWorkspace() {
+		activeRunToken += 1;
+		prompt = '';
+		activePrompt = '';
+		final = '';
+		outputs = [];
+		error = '';
+		errorTitle = '';
+		errorDetail = '';
+		running = false;
+	}
+
+	onMount(() => appShell.registerWorkspaceReset(resetWorkspace));
+
 	async function run() {
 		if (!canRun) return;
 
+		const runToken = (activeRunToken += 1);
 		activePrompt = prompt;
+		const submittedPrompt = activePrompt;
 		error = '';
 		errorTitle = '';
 		errorDetail = '';
 		final = '';
 		outputs = [];
 		running = true;
+
+		const currentRunActive = () => runToken === activeRunToken;
 
 		try {
 			const response = await fetch('/api/generate', {
@@ -124,6 +148,7 @@
 			});
 
 			if (!response.ok || !response.body) {
+				if (!currentRunActive()) return;
 				error = await response.text();
 				if (response.status === 429) {
 					const retryAfterSeconds = Number(response.headers.get('retry-after'));
@@ -153,6 +178,17 @@
 					const line = chunk.split('\n').find((item) => item.startsWith('data: '));
 					if (!line) continue;
 					const event = JSON.parse(line.slice(6));
+					if (event.type === 'generation') {
+						sidebarHistory.startGeneration({
+							id: event.generationId,
+							prompt: submittedPrompt,
+							status: 'running',
+							createdAt: new Date().toISOString()
+						});
+						continue;
+					}
+
+					if (!currentRunActive()) continue;
 					if (event.type === 'status') upsertOutput(event);
 					if (event.type === 'text') {
 						upsertOutput(event);
@@ -169,10 +205,11 @@
 				}
 			}
 		} catch {
+			if (!currentRunActive()) return;
 			errorTitle = 'Generation could not start';
 			error = 'Generation could not be started. Try again.';
 		} finally {
-			running = false;
+			if (currentRunActive()) running = false;
 		}
 	}
 </script>
