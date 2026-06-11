@@ -15,24 +15,24 @@
 	--primary: oklch(0.09 0 0);
 	--primary-foreground: oklch(0.99 0 0);
 	--secondary: oklch(0.96 0 0);
-	--secondary-foreground: oklch(0.20 0 0);
+	--secondary-foreground: oklch(0.2 0 0);
 	--muted: oklch(0.96 0 0);
 	--muted-foreground: oklch(0.45 0 0);
 	--accent: oklch(0.94 0 0);
 	--accent-foreground: oklch(0.15 0 0);
 	--destructive: oklch(0.55 0.15 25);
-	--border: oklch(0.90 0 0);
+	--border: oklch(0.9 0 0);
 	--input: oklch(0.92 0 0);
 	--ring: oklch(0.09 0 0 / 20%);
 	--radius: 0.5rem;
-	
+
 	--sidebar: oklch(0.98 0 0);
 	--sidebar-foreground: oklch(0.12 0 0);
 	--sidebar-primary: oklch(0.09 0 0);
 	--sidebar-primary-foreground: oklch(0.99 0 0);
 	--sidebar-accent: oklch(0.94 0 0);
 	--sidebar-accent-foreground: oklch(0.12 0 0);
-	--sidebar-border: oklch(0.90 0 0);
+	--sidebar-border: oklch(0.9 0 0);
 	--sidebar-ring: oklch(0.09 0 0 / 20%);
 }
 
@@ -46,16 +46,16 @@
 	--primary: oklch(0.98 0 0);
 	--primary-foreground: oklch(0.15 0 0);
 	--secondary: oklch(0.22 0 0);
-	--secondary-foreground: oklch(0.90 0 0);
+	--secondary-foreground: oklch(0.9 0 0);
 	--muted: oklch(0.22 0 0);
 	--muted-foreground: oklch(0.55 0 0);
 	--accent: oklch(0.23 0 0);
 	--accent-foreground: oklch(0.98 0 0);
-	--destructive: oklch(0.50 0.15 20);
+	--destructive: oklch(0.5 0.15 20);
 	--border: oklch(0.24 0 0);
 	--input: oklch(0.21 0 0);
 	--ring: oklch(0.98 0 0 / 20%);
-	
+
 	--sidebar: oklch(0.17 0 0);
 	--sidebar-foreground: oklch(0.98 0 0);
 	--sidebar-primary: oklch(0.98 0 0);
@@ -109,14 +109,18 @@
 	}
 	*:focus-visible {
 		outline: none !important;
-		box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--foreground) !important;
+		box-shadow:
+			0 0 0 2px var(--background),
+			0 0 0 4px var(--foreground) !important;
 	}
 	/* Focus whole accordion item card when trigger is focused to prevent focus ring clipping */
-	[data-slot="accordion-item"]:has([data-slot="accordion-trigger"]:focus-visible) {
+	[data-slot='accordion-item']:has([data-slot='accordion-trigger']:focus-visible) {
 		outline: none !important;
-		box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--foreground) !important;
+		box-shadow:
+			0 0 0 2px var(--background),
+			0 0 0 4px var(--foreground) !important;
 	}
-	[data-slot="accordion-item"] [data-slot="accordion-trigger"]:focus-visible {
+	[data-slot='accordion-item'] [data-slot='accordion-trigger']:focus-visible {
 		outline: none !important;
 		box-shadow: none !important;
 	}
@@ -126,32 +130,15 @@
 	html {
 		@apply font-sans;
 	}
-}
-
-/* Minimalist technical card/panel definitions */
-.glass-panel {
-	@apply bg-card border border-border;
-}
-
-.glass-card {
-	@apply bg-card border border-border hover:border-muted-foreground/30;
-}
-
-.premium-glow-purple {
-	box-shadow: none !important;
-}
-
-.premium-glow-cyan {
-	box-shadow: none !important;
-}
-
-.neon-text-gradient {
-	@apply text-foreground font-bold tracking-tight;
-}
-
-/* Monospace / Code area customized styles */
-.code-area {
-	@apply font-mono text-[13px] leading-relaxed selection:bg-foreground/10 antialiased;
+	/* Recursive is the sole font family; its MONO variation axis is used
+	   for code and technical identifiers instead of a second typeface. */
+	code,
+	kbd,
+	samp,
+	pre,
+	.font-mono {
+		font-variation-settings: 'MONO' 1;
+	}
 }
 
 /* Scrollbars styling */
@@ -165,7 +152,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-	@apply bg-muted-foreground/20 rounded hover:bg-muted-foreground/35 transition-colors;
+	@apply rounded bg-muted-foreground/20 transition-colors hover:bg-muted-foreground/35;
 }
 
 /* Technical shimmer loader */

@@ -97,9 +97,7 @@ export async function getRunnableModelKeys() {
 	const catalog = await getCatalog();
 	return new Set(
 		catalog.flatMap((provider) =>
-			provider.models
-				.filter((model) => model.enabled)
-				.map((model) => `${provider.id}/${model.id}`)
+			provider.models.filter((model) => model.enabled).map((model) => `${provider.id}/${model.id}`)
 		)
 	);
 }
