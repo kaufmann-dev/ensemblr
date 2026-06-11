@@ -222,7 +222,7 @@
 		</CardHeader>
 		<CardContent class="p-0 bg-muted/5">
 			<div class="max-h-52 w-full overflow-y-auto" tabindex="-1">
-				<pre class="code-area p-5 text-foreground/80 break-words whitespace-pre-wrap select-text outline-none">{generation.prompt}</pre>
+				<MarkdownOutput source={generation.prompt} class="p-5" />
 			</div>
 		</CardContent>
 	</Card>
