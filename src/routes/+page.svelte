@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import GenerationStatus from '$lib/components/GenerationStatus.svelte';
+	import MarkdownOutput from '$lib/markdown/MarkdownOutput.svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import {
@@ -536,7 +537,7 @@
 			<CardContent class="p-0 flex-1 flex flex-col bg-muted/5 border-t border-border">
 				<ScrollArea class="h-80 lg:h-[26rem] w-full">
 					{#if final}
-						<pre class="code-area p-5 text-foreground/90 whitespace-pre-wrap selection:bg-foreground/10 break-words select-text outline-none">{final}</pre>
+						<MarkdownOutput source={final} class="p-5" />
 					{:else if running}
 						<div class="flex flex-col items-center justify-center p-20 text-center h-full">
 							<Loader2 class="size-6 text-muted-foreground animate-spin mb-3 stroke-[1.5]" />
@@ -579,7 +580,7 @@
 							</Accordion.Trigger>
 							<Accordion.Content class="p-0 border-t border-border bg-muted/5">
 								<div class="max-h-96 w-full overflow-y-auto" tabindex="-1">
-									<pre class="code-area p-4 text-foreground/85 whitespace-pre-wrap break-words bg-muted/10 selection:bg-foreground/10 outline-none">{output.error ?? output.text}</pre>
+									<MarkdownOutput source={output.error ?? output.text} class="bg-muted/10 p-4" />
 								</div>
 							</Accordion.Content>
 						</Accordion.Item>

@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { fromAction } from 'svelte/attachments';
 	import GenerationStatus from '$lib/components/GenerationStatus.svelte';
+	import MarkdownOutput from '$lib/markdown/MarkdownOutput.svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '$lib/components/ui/card';
@@ -185,7 +187,10 @@
 {#key data.generation.id}
 <main
 	class="relative flex-1 flex flex-col justify-start max-w-5xl mx-auto w-full px-4 py-8 space-y-6 bg-background"
-	use:generationStream={{ generationId: data.generation.id, running: generation.status === 'running' }}
+	{@attach fromAction(generationStream, () => ({
+		generationId: data.generation.id,
+		running: generation.status === 'running'
+	}))}
 >
 	<PageHeader
 		title="Saved generation"
@@ -250,7 +255,7 @@
 		</CardHeader>
 		<CardContent class="p-0 bg-muted/5">
 			<div class="max-h-[30rem] w-full overflow-y-auto" tabindex="-1">
-				<pre class="code-area p-5 text-foreground whitespace-pre-wrap selection:bg-foreground/10 break-words select-text outline-none">{generation.finalOutput ?? generation.error ?? 'No final output saved.'}</pre>
+				<MarkdownOutput source={generation.finalOutput ?? generation.error ?? 'No final output saved.'} class="p-5" />
 			</div>
 		</CardContent>
 	</Card>
@@ -279,7 +284,7 @@
 					</Accordion.Trigger>
 					<Accordion.Content class="p-0 border-t border-border bg-muted/5">
 						<div class="max-h-96 w-full overflow-y-auto" tabindex="-1">
-							<pre class="code-area p-4 text-foreground/85 whitespace-pre-wrap break-words bg-muted/10 selection:bg-foreground/10 outline-none">{output.error ?? output.output}</pre>
+							<MarkdownOutput source={output.error ?? output.output} class="bg-muted/10 p-4" />
 						</div>
 					</Accordion.Content>
 				</Accordion.Item>
