@@ -8,7 +8,7 @@
 
 <div class="flex min-h-7 items-center" aria-live="polite" aria-atomic="true">
 	{#if controller.error}
-		<div class="flex items-center gap-2 text-xs text-destructive">
+		<div class="flex items-center gap-2 font-mono text-[10px] text-destructive">
 			<AlertCircle class="size-3.5 shrink-0" />
 			<span>{controller.error}</span>
 			<Button
@@ -22,12 +22,12 @@
 			</Button>
 		</div>
 	{:else if controller.saving || controller.dirty}
-		<div class="flex items-center gap-2 text-xs text-muted-foreground">
+		<div class="flex items-center gap-2 font-mono text-[10px] text-muted-foreground">
 			<Loader2 class="size-3.5 animate-spin" />
 			<span>Saving</span>
 		</div>
 	{:else if controller.saved}
-		<div class="flex items-center gap-2 text-xs text-muted-foreground">
+		<div class="flex items-center gap-2 font-mono text-[10px] text-muted-foreground">
 			<CheckCircle2 class="size-3.5" />
 			<span>All changes saved</span>
 		</div>

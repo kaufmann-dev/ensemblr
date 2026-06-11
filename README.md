@@ -8,9 +8,9 @@ SvelteKit app for running mixture-of-agents generations across models from the l
 
 ### Prerequisites
 
-- Node.js 22.13+
+- Node.js 22.12+
 - pnpm
-- Podman or Docker (for local PostgreSQL)
+- Docker (for local PostgreSQL)
 
 ### 1. Install dependencies
 
@@ -44,7 +44,7 @@ openssl rand -base64 32
 ### 3. Start the development database
 
 ```bash
-podman run -d \
+docker run -d \
   --name postgres-sveltekit \
   -e POSTGRES_USER=postgres \
   -e POSTGRES_PASSWORD=postgres \
@@ -76,7 +76,6 @@ The app will be available at `http://localhost:5173`.
 | Command            | Description                      |
 | ------------------ | -------------------------------- |
 | `pnpm dev`         | Start the Vite dev server        |
-| `pnpm test`        | Run the Vitest unit tests        |
 | `pnpm check`       | Run Svelte type checking         |
 | `pnpm lint`        | Run Prettier and ESLint          |
 | `pnpm build`       | Build for production             |
@@ -91,7 +90,7 @@ The app will be available at `http://localhost:5173`.
 
 This project is built with SvelteKit and the Node adapter (`@sveltejs/adapter-node`), so it deploys as a standard Node.js application.
 
-The repository includes `nixpacks.toml` to pin a nixpkgs archive with Node.js 22.13+ support. This is required because Nixpacks only selects Node by major version, and the default Node 22 archive may be too old for the Svelte/Vite toolchain.
+The repository includes `nixpacks.toml` to pin a nixpkgs archive with Node.js 22.12+ support. This is required because Nixpacks only selects Node by major version, and the default Node 22 archive may be too old for the Svelte/Vite toolchain.
 
 ### 1. Create a PostgreSQL database
 
@@ -164,14 +163,12 @@ Or by temporarily updating the **Build Command** to include `pnpm db:migrate` an
 ## App Overview
 
 - **Login**: `/login` — supports admin email/password authentication and one-click demo access via Better Auth
-- **Workspace**: `/` — conversation-style view for running mixture-of-agents generations: the submitted prompt and the streamed judge response appear as chat messages, worker outputs are available as expandable steps, and worker/judge/round selection lives in a collapsible "Configure mixture" panel above the composer
-- **History**: `/history` — view, delete, or clear past generation runs; loads incrementally in pages of 25
+- **Workspace**: `/` — create and run mixture-of-agents generations
+- **History**: `/history` — view, delete, or clear past generation runs
 - **Settings**: `/settings` — manage provider API keys (encrypted at rest)
 - **Admin**: `/admin` — configure prompt templates, demo model access, demo API keys, and demo rate limits (admin only). Prompt templates, demo model selections, and rate limits autosave; demo API credential creation and deletion remain explicit actions.
 
 Model and provider options are fetched live from `https://models.dev/api.json`. Workspace selectors show only models from providers the current user has configured with an API key; demo users see only the admin-approved demo model list.
 For demo users, generation uses admin-managed provider credentials from the environment variables advertised by the selected provider in the live catalog, such as `OPENAI_API_KEY` for OpenAI.
-Demo generation history is scoped to the current login session, so visitors using the shared demo account do not see history entries from other demo sessions.
+Demo generation history is scoped to the current login session, so visitors using the shared demo account do not see Recent runs or history entries from other demo sessions.
 Demo generation is rate-limited before provider API calls are started. Defaults are 5 generations per IP and 25 total demo generations per 60-minute window; admins can change these values in the Admin console. In production behind a reverse proxy, configure SvelteKit's trusted client-address settings (`ADDRESS_HEADER` and, for `X-Forwarded-For`, `XFF_DEPTH`) so per-IP limits use visitor IPs instead of the proxy address.
-
-A persistent sidebar (collapsible to icons on desktop, an off-canvas drawer on mobile) provides the "New generation" action, navigation, an incrementally loaded generation history with live status updates, and a user menu with light/dark/system theme selection and sign out. Model responses are rendered as sanitized Markdown (raw HTML, images, and unsafe link protocols are stripped).

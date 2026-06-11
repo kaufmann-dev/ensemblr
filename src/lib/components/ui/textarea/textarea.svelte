@@ -10,9 +10,6 @@
 		...restProps
 	}: WithoutChildren<WithElementRef<HTMLTextareaAttributes>> = $props();
 
-	// The parameter is unused but re-creates the attachment whenever the
-	// bound value changes programmatically (not just on input events).
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function autoExpand(_value: typeof value) {
 		return (node: HTMLTextAreaElement) => {
 			const updateHeight = () => {

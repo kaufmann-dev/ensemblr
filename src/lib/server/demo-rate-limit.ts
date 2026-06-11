@@ -38,21 +38,14 @@ async function incrementCounter(
 	return row.count <= limit;
 }
 
-export async function checkDemoGenerationRateLimit(
-	clientAddress: string
-): Promise<RateLimitResult> {
+export async function checkDemoGenerationRateLimit(clientAddress: string): Promise<RateLimitResult> {
 	const settings = await getSettings();
 	const now = new Date();
 	const windowMs = settings.demoRateLimitWindowMinutes * 60 * 1000;
 	const window = windowStart(now, windowMs);
 	const retryAfterSeconds = Math.ceil((window.getTime() + windowMs - now.getTime()) / 1000);
 
-	const ipAllowed = await incrementCounter(
-		'ip',
-		clientAddress,
-		window,
-		settings.demoRateLimitPerIp
-	);
+	const ipAllowed = await incrementCounter('ip', clientAddress, window, settings.demoRateLimitPerIp);
 	if (!ipAllowed) {
 		return {
 			allowed: false,
@@ -61,12 +54,7 @@ export async function checkDemoGenerationRateLimit(
 		};
 	}
 
-	const globalAllowed = await incrementCounter(
-		'global',
-		'all',
-		window,
-		settings.demoRateLimitGlobal
-	);
+	const globalAllowed = await incrementCounter('global', 'all', window, settings.demoRateLimitGlobal);
 	if (!globalAllowed) {
 		return {
 			allowed: false,
