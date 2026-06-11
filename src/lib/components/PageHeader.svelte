@@ -18,29 +18,35 @@
 	} = $props();
 </script>
 
-<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-1">
-	<div class="flex items-center gap-3">
+<div class="flex flex-col justify-between gap-4 px-1 sm:flex-row sm:items-center">
+	<div class="flex min-w-0 items-start gap-3 sm:items-center">
 		{#if backHref}
 			<a
 				href={resolve(backHref as any)}
-				class="flex size-9 items-center justify-center rounded border border-border bg-muted/20 hover:bg-muted text-muted-foreground hover:text-foreground active:scale-95 transition-all shrink-0"
+				class="flex size-9 shrink-0 items-center justify-center rounded border border-border bg-muted/20 text-muted-foreground transition-all hover:bg-muted hover:text-foreground active:scale-95"
 				aria-label="Go back"
 			>
 				<ArrowLeft class="size-4.5" />
 			</a>
 		{:else if Icon}
-			<div class="flex size-9 items-center justify-center rounded border border-border bg-muted/20 text-foreground shrink-0">
+			<div
+				class="flex size-9 shrink-0 items-center justify-center rounded border border-border bg-muted/20 text-foreground"
+			>
 				<Icon class="size-4.5" />
 			</div>
 		{/if}
-		<div>
-			<h1 class="text-base font-bold font-mono uppercase tracking-tight text-foreground flex items-center gap-2.5">
+		<div class="min-w-0">
+			<h1
+				class="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-base font-bold tracking-tight text-foreground uppercase"
+			>
 				{title}
 				{#if badge}
 					{@render badge()}
 				{/if}
 			</h1>
-			<p class="text-xs font-mono text-muted-foreground mt-0.5">{description}</p>
+			<p class="mt-0.5 text-xs leading-snug font-mono break-words text-muted-foreground">
+				{description}
+			</p>
 		</div>
 	</div>
 </div>
