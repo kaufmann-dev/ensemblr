@@ -10,7 +10,7 @@ SvelteKit app for running mixture-of-agents generations across models from the l
 
 - Node.js 22.12+
 - pnpm
-- Docker (for local PostgreSQL)
+- Podman (for local PostgreSQL)
 
 ### 1. Install dependencies
 
@@ -21,19 +21,7 @@ cp .env.example .env
 
 ### 2. Configure environment variables
 
-Edit `.env`:
-
-```bash
-DATABASE_URL="postgres://postgres:postgres@localhost:5432/postgres"
-ORIGIN="http://localhost:5173"
-BETTER_AUTH_SECRET="a-long-random-secret-min-32-chars"
-API_KEY_ENCRYPTION_SECRET="another-long-random-secret"
-ADMIN_EMAIL="admin@example.com"
-ADMIN_PASSWORD="your-admin-password"
-ADMIN_NAME="Admin"
-DEMO_NAME="Demo"
-DEMO_ALLOWED_MODELS="openai/gpt-4o-mini,anthropic/claude-3-5-haiku-latest"
-```
+Edit `.env` using the variables documented under [Production environment variables](#4-configure-environment-variables). For local development, set `ORIGIN` to `http://localhost:5173` and use the callback URL `http://localhost:5173/api/auth/oauth2/callback/oidc` in the OIDC client.
 
 Generate strong secrets for production:
 
@@ -44,7 +32,7 @@ openssl rand -base64 32
 ### 3. Start the development database
 
 ```bash
-docker run -d \
+podman run -d \
   --name postgres-sveltekit \
   -e POSTGRES_USER=postgres \
   -e POSTGRES_PASSWORD=postgres \
@@ -54,14 +42,14 @@ docker run -d \
   postgres:16-alpine
 ```
 
-### 4. Apply database schema and seed accounts
+### 4. Apply database schema and seed demo data
 
 ```bash
 pnpm db:migrate
 pnpm db:seed
 ```
 
-The seed script creates the admin account from your `.env` values, ensures the one-click demo account exists, and creates initial app settings if they do not exist yet. It is idempotent — safe to run multiple times. Existing prompt templates and admin-selected demo models are preserved on later seed runs.
+The seed script ensures the credential-free demo account exists and creates initial app settings if they do not exist yet. It is idempotent — safe to run multiple times. Existing prompt templates and admin-selected demo models are preserved on later seed runs. An administrator account is created by the first admitted OIDC login; on an upgraded installation, that identity is attached to the sole existing admin row so its keys and history remain available.
 
 ### 5. Start the development server
 
@@ -83,6 +71,22 @@ The app will be available at `http://localhost:5173`.
 | `pnpm db:migrate`  | Run pending migrations           |
 | `pnpm db:seed`     | Run the idempotent seed script   |
 | `pnpm db:studio`   | Open Drizzle Studio              |
+
+---
+
+## Authentication Setup
+
+Administrator access uses Better Auth's server-side OpenID Connect Authorization Code flow with PKCE S256. The provider's access policy is the sole administrator admission control; Ensemblr then creates an HttpOnly local session with a 24-hour sliding idle timeout, refreshed only by trusted browser interaction, and a fixed seven-day lifetime. The separate demo button remains credential-free and does not authenticate with the provider.
+
+- **Public Client:** Off
+- **Grant:** Authorization Code with PKCE S256
+- **Token endpoint authentication:** `client_secret_basic`
+- **Scopes:** `openid profile email` (do not grant `offline_access`)
+- **Callback path:** `/api/auth/oauth2/callback/oidc`
+- **Application logout path:** `/logout` (POST)
+- **Allowed post-logout redirect path:** `/login`
+
+Configure all authentication environment variables in [Production environment variables](#4-configure-environment-variables). The provider must publish an `end_session_endpoint` in its discovery document for RP-Initiated Logout. Apply the provider's access policy to this client; do not configure an application identity or claim allowlist.
 
 ---
 
@@ -120,19 +124,19 @@ If you prefer to run migrations automatically on every deploy, use:
 
 Add the following environment variables in Coolify (or import them from a file):
 
-| Variable                    | Required | Description                                                                                                        |
-| --------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------ |
-| `DATABASE_URL`              | **Yes**  | PostgreSQL connection string, e.g. `postgres://user:pass@host:5432/db`                                             |
-| `ORIGIN`                    | **Yes**  | The public URL of your app, e.g. `https://ensemblr.yourdomain.com`                                                 |
-| `BETTER_AUTH_SECRET`        | **Yes**  | High-entropy secret for auth session signing. Generate with `openssl rand -base64 32`                              |
-| `API_KEY_ENCRYPTION_SECRET` | **Yes**  | High-entropy secret for encrypting stored provider API keys. Generate with `openssl rand -base64 32`               |
-| `ADMIN_EMAIL`               | **Yes**  | Email address for the initial admin account                                                                        |
-| `ADMIN_PASSWORD`            | **Yes**  | Password for the initial admin account. Must be at least 8 characters                                              |
-| `ADMIN_NAME`                | No       | Display name for the admin account (default: `Admin`)                                                              |
-| `DEMO_NAME`                 | No       | Display name for the demo account (default: `Demo`)                                                                |
-| `DEMO_ALLOWED_MODELS`       | No       | Initial comma-separated `provider/model` IDs for demo users. Used only when the app settings row is first created. |
-| `ADDRESS_HEADER`            | No       | Trusted proxy header for client IP detection, e.g. `X-Forwarded-For`                                               |
-| `XFF_DEPTH`                 | No       | Number of trusted proxies when `ADDRESS_HEADER=X-Forwarded-For`                                                    |
+| Variable                    | Required | Description                                                                                                                                                                                  |
+| --------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`              | **Yes**  | PostgreSQL connection string, e.g. `postgres://user:pass@host:5432/db`                                                                                                                       |
+| `ORIGIN`                    | **Yes**  | Public application origin without a path, query, or fragment, e.g. `https://ensemblr.yourdomain.com`; HTTPS is required except on localhost and it also derives the post-logout `/login` URL |
+| `BETTER_AUTH_SECRET`        | **Yes**  | High-entropy secret for signing local session cookies. Generate with `openssl rand -base64 32`                                                                                               |
+| `OIDC_ISSUER_URL`           | **Yes**  | Exact OIDC issuer URL without `/.well-known/openid-configuration`; HTTPS is required except on localhost                                                                                     |
+| `OIDC_CLIENT_ID`            | **Yes**  | Client ID for the confidential OIDC client                                                                                                                                                   |
+| `OIDC_CLIENT_SECRET`        | **Yes**  | Client secret for the confidential OIDC client                                                                                                                                               |
+| `API_KEY_ENCRYPTION_SECRET` | **Yes**  | High-entropy secret for encrypting stored provider API keys. Generate with `openssl rand -base64 32`                                                                                         |
+| `DEMO_NAME`                 | No       | Display name for the credential-free demo account (default: `Demo`)                                                                                                                          |
+| `DEMO_ALLOWED_MODELS`       | No       | Initial comma-separated `provider/model` IDs for demo users. Used only when the app settings row is first created.                                                                           |
+| `ADDRESS_HEADER`            | No       | Trusted proxy header for client IP detection, e.g. `X-Forwarded-For`                                                                                                                         |
+| `XFF_DEPTH`                 | No       | Number of trusted proxies when `ADDRESS_HEADER=X-Forwarded-For`                                                                                                                              |
 
 ### 5. Deploy
 
@@ -144,9 +148,9 @@ Click **Deploy** in Coolify. The build process will:
 4. Run the seed script (if included in the build command)
 5. Start the Node server
 
-### 6. First login
+### 6. First administrator login
 
-After the first successful deploy, sign in at `/login` with the `ADMIN_EMAIL` and `ADMIN_PASSWORD` you configured.
+After the first successful deploy, open `/login` and choose **Sign in as administrator**. The first provider-admitted identity creates the administrator on a fresh installation or binds to the sole legacy administrator on an upgraded installation. Additional provider-admitted identities receive separate administrator accounts with their own API keys and generation history.
 
 ### 7. Post-deployment database updates
 
@@ -162,7 +166,7 @@ Or by temporarily updating the **Build Command** to include `pnpm db:migrate` an
 
 ## App Overview
 
-- **Login**: `/login` — supports admin email/password authentication and one-click demo access via Better Auth
+- **Login**: `/login` — supports administrator OIDC authentication and one-click credential-free demo access
 - **Workspace**: `/` — create and run mixture-of-agents generations
 - **History**: `/history` — view, delete, or clear past generation runs
 - **Settings**: `/settings` — manage provider API keys (encrypted at rest)

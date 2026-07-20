@@ -118,6 +118,12 @@ export const demoGenerationRateLimit = pgTable(
 	]
 );
 
+export const oidcLoginState = pgTable('oidc_login_state', {
+	stateHash: text('state_hash').primaryKey(),
+	idTokenHint: text('id_token_hint').notNull(),
+	expiresAt: timestamp('expires_at').notNull()
+});
+
 export const userRelations = relations(user, ({ many }) => ({
 	apiKeys: many(providerApiKey),
 	generations: many(generation)

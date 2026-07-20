@@ -7,13 +7,13 @@
 * **Model Provider:** models.dev API for dynamic model fetching.
 
 ## Database Schema
-* **Users:** Includes role-based access control. Initially seeded with one Admin account and one Demo account to allow for easy future expansion.
+* **Users:** Includes administrator and demo roles. The demo account is seeded; administrator identities are admitted by the OIDC provider and stored locally so API keys and history remain user-owned.
 * **API Keys:** Stored with AES encryption and linked to the user ID.
 * **Generations:** Saves the original prompt, configuration parameters, all intermediate responses, and the final judge output for history persistence.
 * **Settings:** Stores the dynamic system prompts configured by the admin and the allowed models for the demo account.
 
 ## Authentication and Demo Mode
-* **Login Screen:** Features a standard admin login and a "Login as Demo" button for one-click access without credentials.
+* **Login Screen:** Features administrator sign-in through the configured OIDC provider and a "Login as Demo" button for one-click access without credentials.
 * **Demo Restrictions:** The demo account only has access to a pre-selected list of low-cost or free models. The admin configures this list in the dashboard. Users on the demo account cannot enter their own API keys.
 
 ## Core Mixture of Agents Engine

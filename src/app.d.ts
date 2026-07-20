@@ -1,6 +1,6 @@
 import type { Session } from 'better-auth';
 
-type Role = 'admin' | 'demo' | 'user';
+type Role = 'admin' | 'demo';
 type User = {
 	id: string;
 	name: string;

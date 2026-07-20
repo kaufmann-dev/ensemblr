@@ -234,10 +234,9 @@ Avoid these legacy Svelte features in new or refactored code:
 
 ## Backend and Services
 
-- **Authentication**: Always use Better Auth for authentication and session management. Check current Better Auth documentation before implementing providers, plugins, adapters, session handling, or account flows.
+- **Authentication**: Always use Better Auth for authentication and session management. Administrator login uses the generic OIDC plugin; the provider access policy is the sole administrator admission control. Check current Better Auth documentation before implementing providers, plugins, adapters, session handling, or account flows.
   - Server: `export const auth = betterAuth({ ... });`
   - Hook: `return svelteKitHandler({ event, resolve, auth, building });`
-  - Client: `export const authClient = createAuthClient();`
   - Cookies: `plugins: [sveltekitCookies(getRequestEvent)]`
 - **Forms**: Use Superforms with Zod for user-facing forms. Follow the chain: `zod schema -> superforms -> formsnap -> shadcn-svelte form components`. Use `Form.Field`, `Form.Control`, snippet props, and shadcn form error components rather than ad hoc markup.
 - **Email**: Use `better-svelte-email` for templates and Resend for delivery when email is implemented. Write templates as Svelte components, render them in server-only code, and send both HTML and plain text.
@@ -262,8 +261,7 @@ For Coolify and Nixpacks:
 - If `pnpm-workspace.yaml` exists in a single-package app, keep a non-empty `packages` list with `.` included.
 - Use `engines.node` and `nixpacks.toml` to pin compatible Node behavior when dependencies require a minimum patch version.
 - Read deployment environment variables from `process.env`. Load `.env` only after checking that the file exists.
-- Validate seed script environment variables before calling Better Auth APIs.
-- Document and enforce minimum seeded account password lengths.
+- Validate seed script environment variables before database operations.
 - Seed app settings only when they are missing; do not overwrite admin-edited settings during redeploys.
 - Let Nixpacks handle the install phase unless a project-specific reason requires otherwise.
 - Prefer explicit deploy or runtime migration and seed steps when Coolify supports them.
