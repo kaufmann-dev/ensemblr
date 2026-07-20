@@ -9,10 +9,10 @@
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
-		"test": "node --experimental-strip-types --test src/lib/markdown/parser.test.ts src/lib/workspace.test.ts",
+		"test": "node --experimental-strip-types --test src/lib/markdown/parser.test.ts src/lib/oidc-policy.test.ts src/lib/server/session-policy.test.ts src/lib/workspace.test.ts",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check": "paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide --silent && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",

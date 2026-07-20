@@ -3,6 +3,11 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { locales, localizeHref } from '$lib/paraglide/runtime';
+	import {
+		SESSION_TOUCH_HEADER,
+		SESSION_TOUCH_HEADER_VALUE,
+		shouldSendSessionTouch
+	} from '$lib/session-policy';
 	import { ModeWatcher, toggleMode } from 'mode-watcher';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import * as Sheet from '$lib/components/ui/sheet';
@@ -13,6 +18,7 @@
 
 	let { data, children } = $props();
 	let mobileMenuOpen = $state(false);
+	let lastSessionTouch = -Infinity;
 
 	let navItems = $derived([
 		{ href: resolve('/'), label: 'Workspace', icon: Settings },
@@ -26,7 +32,24 @@
 	function isActive(href: string) {
 		return page.url.pathname === href;
 	}
+
+	function touchSession(event: Event) {
+		if (!data.user) return;
+
+		const now = Date.now();
+		if (!shouldSendSessionTouch(event.isTrusted, now, lastSessionTouch)) return;
+		lastSessionTouch = now;
+
+		void fetch(resolve('/auth/session/touch'), {
+			method: 'POST',
+			headers: { [SESSION_TOUCH_HEADER]: SESSION_TOUCH_HEADER_VALUE },
+			credentials: 'same-origin',
+			keepalive: true
+		}).catch(() => {});
+	}
 </script>
+
+<svelte:window onpointerdown={touchSession} onkeydown={touchSession} onclick={touchSession} />
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
@@ -38,19 +61,25 @@
 
 <ModeWatcher />
 
-<div class="min-h-screen bg-background text-foreground flex flex-col antialiased">
+<div class="flex min-h-screen flex-col bg-background text-foreground antialiased">
 	{#if data.user}
-		<header class="sticky top-0 z-40 w-full border-b border-border bg-card transition-all duration-200">
+		<header
+			class="sticky top-0 z-40 w-full border-b border-border bg-card transition-all duration-200"
+		>
 			<div class="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
 				<!-- Brand Logo -->
-				<a 
-					href={resolve('/')} 
-					class="shrink-0 flex items-center gap-3.5 group rounded px-1 py-0.5 -mx-1 -my-0.5"
+				<a
+					href={resolve('/')}
+					class="group -mx-1 -my-0.5 flex shrink-0 items-center gap-3.5 rounded px-1 py-0.5"
 				>
-					<span class="font-mono tracking-tighter text-[16px] font-bold text-foreground transition-all">
+					<span
+						class="font-mono text-[16px] font-bold tracking-tighter text-foreground transition-all"
+					>
 						ensemblr
 					</span>
-					<span class="hidden sm:inline-flex items-center rounded border border-border bg-muted/50 px-1.5 py-0.5 text-[9px] font-mono font-medium text-muted-foreground uppercase tracking-wider">
+					<span
+						class="hidden items-center rounded border border-border bg-muted/50 px-1.5 py-0.5 font-mono text-[9px] font-medium tracking-wider text-muted-foreground uppercase sm:inline-flex"
+					>
 						mixture-of-agents
 					</span>
 				</a>
@@ -60,10 +89,10 @@
 					{#each navItems as item (item.href)}
 						<a
 							class={cn(
-								'rounded px-3 py-1.5 text-xs font-medium font-mono transition-all duration-150',
-								isActive(item.href) 
-									? 'bg-muted text-foreground border border-border shadow-xs' 
-									: 'text-muted-foreground hover:bg-muted/50 hover:text-foreground border border-transparent'
+								'rounded px-3 py-1.5 font-mono text-xs font-medium transition-all duration-150',
+								isActive(item.href)
+									? 'border border-border bg-muted text-foreground shadow-xs'
+									: 'border border-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground'
 							)}
 							aria-current={isActive(item.href) ? 'page' : undefined}
 							href={item.href}
@@ -71,8 +100,8 @@
 							{item.label}
 						</a>
 					{/each}
-					
-					<div class="h-4 w-px bg-border/80 mx-2"></div>
+
+					<div class="mx-2 h-4 w-px bg-border/80"></div>
 
 					<!-- Dark Mode Toggle -->
 					<Button
@@ -81,7 +110,7 @@
 						size="icon"
 						onclick={toggleMode}
 						aria-label="Toggle dark mode"
-						class="rounded size-8 text-muted-foreground hover:text-foreground active:scale-95 transition-all duration-150"
+						class="size-8 rounded text-muted-foreground transition-all duration-150 hover:text-foreground active:scale-95"
 					>
 						<Moon class="size-4 transition-all dark:hidden" />
 						<Sun class="hidden size-4 transition-all dark:block" />
@@ -89,11 +118,11 @@
 
 					<!-- Sign Out -->
 					<form method="POST" action={resolve('/logout')} class="ml-1">
-						<Button 
-							type="submit" 
-							variant="outline" 
+						<Button
+							type="submit"
+							variant="outline"
 							size="sm"
-							class="rounded h-8 text-xs font-mono font-medium border-border hover:bg-destructive/5 hover:text-destructive hover:border-destructive/30 active:scale-95 transition-all"
+							class="h-8 rounded border-border font-mono text-xs font-medium transition-all hover:border-destructive/30 hover:bg-destructive/5 hover:text-destructive active:scale-95"
 						>
 							Sign out
 						</Button>
@@ -108,25 +137,30 @@
 						size="icon"
 						onclick={toggleMode}
 						aria-label="Toggle dark mode"
-						class="rounded size-8 text-muted-foreground hover:text-foreground active:scale-95 transition-all"
+						class="size-8 rounded text-muted-foreground transition-all hover:text-foreground active:scale-95"
 					>
 						<Moon class="size-4 transition-all dark:hidden" />
 						<Sun class="hidden size-4 transition-all dark:block" />
 					</Button>
-					
+
 					<Sheet.Root bind:open={mobileMenuOpen}>
 						<Sheet.Trigger
 							class={cn(
 								buttonVariants({ variant: 'outline', size: 'icon' }),
-								'rounded size-8 border-border active:scale-95 transition-all'
+								'size-8 rounded border-border transition-all active:scale-95'
 							)}
 							aria-label="Open navigation"
 						>
 							<Menu class="size-3.5" />
 						</Sheet.Trigger>
-						<Sheet.Content class="w-[20rem] max-w-[calc(100vw-2rem)] border-l border-border bg-card p-0 flex flex-col" side="right">
+						<Sheet.Content
+							class="flex w-[20rem] max-w-[calc(100vw-2rem)] flex-col border-l border-border bg-card p-0"
+							side="right"
+						>
 							<Sheet.Header class="border-b border-border px-6 py-4">
-								<Sheet.Title class="text-left font-mono tracking-tighter text-[16px] font-bold text-foreground">
+								<Sheet.Title
+									class="text-left font-mono text-[16px] font-bold tracking-tighter text-foreground"
+								>
 									ensemblr
 								</Sheet.Title>
 							</Sheet.Header>
@@ -135,10 +169,10 @@
 									{@const Icon = item.icon}
 									<a
 										class={cn(
-											'flex items-center gap-3 rounded px-4 py-3 text-xs font-mono font-medium transition-all duration-150',
+											'flex items-center gap-3 rounded px-4 py-3 font-mono text-xs font-medium transition-all duration-150',
 											isActive(item.href)
-												? 'bg-muted text-foreground border border-border shadow-xs'
-												: 'text-muted-foreground hover:bg-muted/50 hover:text-foreground border border-transparent'
+												? 'border border-border bg-muted text-foreground shadow-xs'
+												: 'border border-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground'
 										)}
 										aria-current={isActive(item.href) ? 'page' : undefined}
 										href={item.href}
@@ -149,11 +183,11 @@
 									</a>
 								{/each}
 							</nav>
-							<div class="mt-auto border-t border-border p-4 bg-muted/20">
+							<div class="mt-auto border-t border-border bg-muted/20 p-4">
 								<form method="POST" action={resolve('/logout')}>
-									<Button 
-										class="w-full justify-center gap-2 rounded text-xs font-mono text-destructive hover:bg-destructive/5 hover:text-destructive border border-transparent hover:border-destructive/20 transition-all" 
-										type="submit" 
+									<Button
+										class="w-full justify-center gap-2 rounded border border-transparent font-mono text-xs text-destructive transition-all hover:border-destructive/20 hover:bg-destructive/5 hover:text-destructive"
+										type="submit"
 										variant="ghost"
 									>
 										<LogOut class="size-3.5" />
@@ -168,11 +202,11 @@
 		</header>
 	{/if}
 
-	<div class="flex-1 flex flex-col min-h-0 w-full">
+	<div class="flex min-h-0 w-full flex-1 flex-col">
 		{@render children()}
 	</div>
 
-	<footer class="px-4 pb-5 pt-2 text-center font-mono text-[10px] text-muted-foreground/70">
+	<footer class="px-4 pt-2 pb-5 text-center font-mono text-[10px] text-muted-foreground/70">
 		<nav class="inline-flex items-center gap-3" aria-label="Legal links">
 			<a
 				class="rounded px-1 py-0.5 underline-offset-4 transition-colors hover:text-foreground hover:underline"

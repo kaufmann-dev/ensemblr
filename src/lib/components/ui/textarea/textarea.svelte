@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { cn, type WithElementRef, type WithoutChildren } from '$lib/utils.js';
+	import type { Attachment } from 'svelte/attachments';
 	import type { HTMLTextareaAttributes } from 'svelte/elements';
 
 	let {
@@ -10,8 +11,18 @@
 		...restProps
 	}: WithoutChildren<WithElementRef<HTMLTextareaAttributes>> = $props();
 
-	function autoExpand(_value: typeof value) {
+	const attachRef: Attachment<HTMLTextAreaElement> = (element) => {
+		ref = element;
+
+		return () => {
+			if (ref === element) ref = null;
+		};
+	};
+
+	function autoExpand(currentValue: typeof value) {
 		return (node: HTMLTextAreaElement) => {
+			void currentValue;
+
 			const updateHeight = () => {
 				const styles = getComputedStyle(node);
 				const borderHeight =
@@ -37,7 +48,7 @@
 </script>
 
 <textarea
-	bind:this={ref}
+	{@attach attachRef}
 	data-slot={dataSlot}
 	class={cn(
 		'flex min-h-16 w-full resize-none rounded border border-border bg-card px-3 py-3 text-base transition-all duration-150 placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-40 aria-invalid:border-destructive md:text-sm',

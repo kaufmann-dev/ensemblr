@@ -4,16 +4,13 @@
 	import { type VariantProps, tv } from 'tailwind-variants';
 
 	export const buttonVariants = tv({
-		base: "inline-flex items-center justify-center rounded border border-transparent bg-clip-padding text-xs font-mono uppercase tracking-wider font-semibold active:scale-95 transition-all duration-150 select-none disabled:pointer-events-none disabled:opacity-40 [&_svg]:pointer-events-none [&_svg]:shrink-0 shadow-none",
+		base: 'inline-flex items-center justify-center rounded border border-transparent bg-clip-padding text-xs font-mono uppercase tracking-wider font-semibold active:scale-95 transition-all duration-150 select-none disabled:pointer-events-none disabled:opacity-40 [&_svg]:pointer-events-none [&_svg]:shrink-0 shadow-none',
 		variants: {
 			variant: {
 				default: 'bg-foreground text-background hover:bg-foreground/90',
-				outline:
-					'border-border bg-card hover:bg-muted hover:text-foreground text-foreground',
-				secondary:
-					'bg-secondary text-secondary-foreground hover:bg-secondary/90',
-				ghost:
-					'hover:bg-muted hover:text-foreground text-muted-foreground',
+				outline: 'border-border bg-card hover:bg-muted hover:text-foreground text-foreground',
+				secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/90',
+				ghost: 'hover:bg-muted hover:text-foreground text-muted-foreground',
 				destructive:
 					'border border-destructive/20 bg-destructive/5 text-destructive hover:bg-destructive/10',
 				link: 'text-foreground underline-offset-4 hover:underline'
@@ -47,6 +44,8 @@
 </script>
 
 <script lang="ts">
+	import type { Attachment } from 'svelte/attachments';
+
 	let {
 		class: className,
 		variant = 'default',
@@ -58,11 +57,19 @@
 		children,
 		...restProps
 	}: ButtonProps = $props();
+
+	const attachRef: Attachment<HTMLElement> = (element) => {
+		ref = element;
+
+		return () => {
+			if (ref === element) ref = null;
+		};
+	};
 </script>
 
 {#if href}
 	<a
-		bind:this={ref}
+		{@attach attachRef}
 		data-slot="button"
 		class={cn(buttonVariants({ variant, size }), className)}
 		href={disabled ? undefined : href}
@@ -75,7 +82,7 @@
 	</a>
 {:else}
 	<button
-		bind:this={ref}
+		{@attach attachRef}
 		data-slot="button"
 		class={cn(buttonVariants({ variant, size }), className)}
 		{type}

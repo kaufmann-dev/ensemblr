@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { boolean, index, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { boolean, index, pgTable, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
 	id: text('id').primaryKey(),
@@ -7,8 +7,8 @@ export const user = pgTable('user', {
 	email: text('email').notNull().unique(),
 	emailVerified: boolean('email_verified').default(false).notNull(),
 	image: text('image'),
-	role: text('role', { enum: ['admin', 'demo', 'user'] })
-		.default('user')
+	role: text('role', { enum: ['admin', 'demo'] })
+		.default('admin')
 		.notNull(),
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 	updatedAt: timestamp('updated_at')
@@ -29,6 +29,8 @@ export const session = pgTable(
 			.notNull(),
 		ipAddress: text('ip_address'),
 		userAgent: text('user_agent'),
+		lastActiveAt: timestamp('last_active_at').defaultNow().notNull(),
+		idTokenHint: text('id_token_hint'),
 		userId: text('user_id')
 			.notNull()
 			.references(() => user.id, { onDelete: 'cascade' })
@@ -57,7 +59,10 @@ export const account = pgTable(
 			.$onUpdate(() => new Date())
 			.notNull()
 	},
-	(table) => [index('account_userId_idx').on(table.userId)]
+	(table) => [
+		index('account_userId_idx').on(table.userId),
+		uniqueIndex('account_provider_account_idx').on(table.providerId, table.accountId)
+	]
 );
 
 export const verification = pgTable(
