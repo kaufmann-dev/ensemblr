@@ -145,7 +145,7 @@ export const auth = betterAuth({
 					clientSecret: requiredEnv('OIDC_CLIENT_SECRET'),
 					scopes: [...OIDC_SCOPES],
 					responseType: 'code',
-					authentication: 'basic',
+					authentication: 'post',
 					pkce: true,
 					overrideUserInfo: true,
 					getUserInfo: (tokens) => getOidcUserInfo(oidcIssuerUrl, tokens.accessToken),

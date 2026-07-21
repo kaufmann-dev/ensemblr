@@ -80,7 +80,7 @@ Administrator access uses Better Auth's server-side OpenID Connect Authorization
 
 - **Public Client:** Off
 - **Grant:** Authorization Code with PKCE S256
-- **Token endpoint authentication:** `client_secret_basic`
+- **Token endpoint authentication:** `client_secret_post`
 - **Scopes:** `openid profile email` (do not grant `offline_access`)
 - **Callback path:** `/api/auth/oauth2/callback/oidc`
 - **Application logout path:** `/logout` (POST)
