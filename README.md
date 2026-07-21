@@ -76,17 +76,13 @@ The app will be available at `http://localhost:5173`.
 
 ## Authentication Setup
 
-Administrator access uses Better Auth's server-side OpenID Connect Authorization Code flow with PKCE S256. The provider's access policy is the sole administrator admission control; Ensemblr then creates an HttpOnly local session with a 24-hour sliding idle timeout, refreshed only by trusted browser interaction, and a fixed seven-day lifetime. The separate demo button remains credential-free and does not authenticate with the provider.
+Administrator login uses Better Auth with server-side OIDC Authorization Code + PKCE; access is granted by provider policy and the first admitted identity is promoted to admin.
 
 - **Public Client:** Off
-- **Grant:** Authorization Code with PKCE S256
-- **Token endpoint authentication:** `client_secret_post`
-- **Scopes:** `openid profile email` (do not grant `offline_access`)
-- **Callback path:** `/api/auth/oauth2/callback/oidc`
-- **Application logout path:** `/logout` (POST)
-- **Allowed post-logout redirect path:** `/login`
+- **Callback URL:** `/api/auth/oauth2/callback/oidc`
+- **Logout Callback URL:** `/login`
 
-Configure all authentication environment variables in [Production environment variables](#4-configure-environment-variables). The provider must publish an `end_session_endpoint` in its discovery document for RP-Initiated Logout. Apply the provider's access policy to this client; do not configure an application identity or claim allowlist.
+All authentication variables and requiredness are listed in [Production environment variables](#4-configure-environment-variables).
 
 ---
 
