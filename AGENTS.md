@@ -27,7 +27,6 @@ pnpm drizzle-kit migrate     # Execute migrations
   - Fetch all relevant sections with `get-documentation`.
   - After writing Svelte code, run `svelte-autofixer` until it reports no issues or suggestions.
   - Generate a playground link only after the user asks for one, and only when the code was not written into the project.
-- **shadcn-svelte MCP**: Use for shadcn-svelte component docs, Bits UI docs, and Lucide Svelte icon lookup. Prefer existing local component code when implementation details differ from docs.
 - **Svelte file-editor**: Use this subagent for Svelte component/module work if available.
 - **Playwright MCP**: Use for browser automation, visual verification, and end-to-end interaction testing. Do not substitute the Playwright CLI or another browser tool for MCP browser interaction.
 - **GitHub MCP**: Use for GitHub issues, PRs, and remote repository file contents. Use local `git` for local repository state.
