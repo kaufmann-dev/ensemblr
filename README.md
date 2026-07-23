@@ -90,7 +90,7 @@ All authentication variables and requiredness are listed in [Production environm
 
 This project is built with SvelteKit and the Node adapter (`@sveltejs/adapter-node`), so it deploys as a standard Node.js application.
 
-The repository includes `nixpacks.toml` to pin a nixpkgs archive with Node.js 22.12+ support. This is required because Nixpacks only selects Node by major version, and the default Node 22 archive may be too old for the Svelte/Vite toolchain.
+The supported Node.js range is declared in `package.json`. Do not pin a separate nixpkgs archive: Coolify's Nixpacks version selects a compatible archive for that Node range, while an older repository-level archive can make the selected Node package unavailable.
 
 ### 1. Create a PostgreSQL database
 
