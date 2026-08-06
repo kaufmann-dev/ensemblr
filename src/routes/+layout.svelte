@@ -14,23 +14,23 @@
 	import { cn } from '$lib/utils';
 	import { History, Key, LogOut, Menu, Moon, Settings, Shield, Sun } from '@lucide/svelte';
 	import './layout.css';
-	import favicon from '$lib/assets/favicon.svg';
+	import logo from '$lib/assets/ensemblr-aperture.svg';
 
 	let { data, children } = $props();
 	let mobileMenuOpen = $state(false);
 	let lastSessionTouch = -Infinity;
 
 	let navItems = $derived([
-		{ href: resolve('/'), label: 'Workspace', icon: Settings },
-		{ href: resolve('/history'), label: 'History', icon: History },
-		{ href: resolve('/settings'), label: 'API Keys', icon: Key },
+		{ href: '/' as const, label: 'Workspace', icon: Settings },
+		{ href: '/history' as const, label: 'History', icon: History },
+		{ href: '/settings' as const, label: 'API Keys', icon: Key },
 		...(data.user?.role === 'admin'
-			? [{ href: resolve('/admin'), label: 'Admin', icon: Shield }]
+			? [{ href: '/admin' as const, label: 'Admin', icon: Shield }]
 			: [])
 	]);
 
-	function isActive(href: string) {
-		return page.url.pathname === href;
+	function isActive(href: Pathname) {
+		return page.url.pathname === resolve(href);
 	}
 
 	function touchSession(event: Event) {
@@ -52,7 +52,7 @@
 <svelte:window onpointerdown={touchSession} onkeydown={touchSession} onclick={touchSession} />
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
+	<link rel="icon" href={logo} />
 	<meta
 		name="description"
 		content="Ensemblr runs mixture-of-agents generations across multiple AI models and saves generation history."
@@ -70,15 +70,16 @@
 				<!-- Brand Logo -->
 				<a
 					href={resolve('/')}
-					class="group -mx-1 -my-0.5 flex shrink-0 items-center gap-3.5 rounded px-1 py-0.5"
+					class="group -mx-1 -my-0.5 flex shrink-0 items-center gap-2 rounded px-1 py-0.5"
 				>
+					<img src={logo} alt="" width="20" height="20" class="size-5 shrink-0" />
 					<span
 						class="font-mono text-[16px] font-bold tracking-tighter text-foreground transition-all"
 					>
 						ensemblr
 					</span>
 					<span
-						class="hidden items-center rounded border border-border bg-muted/50 px-1.5 py-0.5 font-mono text-[9px] font-medium tracking-wider text-muted-foreground uppercase sm:inline-flex"
+						class="ml-1.5 hidden items-center rounded border border-border bg-muted/50 px-1.5 py-0.5 font-mono text-[9px] font-medium tracking-wider text-muted-foreground uppercase sm:inline-flex"
 					>
 						mixture-of-agents
 					</span>
@@ -95,7 +96,7 @@
 									: 'border border-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground'
 							)}
 							aria-current={isActive(item.href) ? 'page' : undefined}
-							href={item.href}
+							href={resolve(item.href)}
 						>
 							{item.label}
 						</a>
@@ -159,9 +160,10 @@
 						>
 							<Sheet.Header class="border-b border-border px-6 py-4">
 								<Sheet.Title
-									class="text-left font-mono text-[16px] font-bold tracking-tighter text-foreground"
+									class="flex items-center gap-2 text-left font-mono text-[16px] font-bold tracking-tighter text-foreground"
 								>
-									ensemblr
+									<img src={logo} alt="" width="20" height="20" class="size-5 shrink-0" />
+									<span>ensemblr</span>
 								</Sheet.Title>
 							</Sheet.Header>
 							<nav class="grid gap-1 px-4 py-4">
@@ -175,7 +177,7 @@
 												: 'border border-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground'
 										)}
 										aria-current={isActive(item.href) ? 'page' : undefined}
-										href={item.href}
+										href={resolve(item.href)}
 										onclick={() => (mobileMenuOpen = false)}
 									>
 										<Icon class="size-4 shrink-0 text-muted-foreground" />

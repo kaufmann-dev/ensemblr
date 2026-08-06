@@ -2,6 +2,7 @@
 	import type { PageProps } from './$types';
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
+	import logo from '$lib/assets/ensemblr-aperture.svg';
 
 	let { data, form }: PageProps = $props();
 </script>
@@ -12,9 +13,12 @@
 	<div class="relative w-full max-w-[380px] px-1 py-4 sm:px-2">
 		<!-- Dynamic Logo Branding above Card -->
 		<div class="mb-6 text-center">
-			<span class="font-mono text-3xl font-extrabold tracking-tighter text-foreground">
-				ensemblr
-			</span>
+			<div class="flex items-center justify-center gap-3">
+				<img src={logo} alt="" width="48" height="48" class="size-12 shrink-0" />
+				<span class="font-mono text-3xl font-extrabold tracking-tighter text-foreground">
+					ensemblr
+				</span>
+			</div>
 			<p class="mt-1.5 font-mono text-xs tracking-tight text-muted-foreground">
 				mixture-of-agents orchestration
 			</p>

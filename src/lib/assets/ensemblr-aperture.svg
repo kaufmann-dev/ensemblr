@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <style>
+    svg { fill: #000000; }
+    @media (prefers-color-scheme: dark) { svg { fill: #ffffff; } }
+  </style>
+  <title id="title">Ensemblr aperture mark</title>
+  <path class="mark" d="M72 24h112l-34 52h-44L72 24ZM232 72v112l-52-34v-44l52-34ZM184 232H72l34-52h44l34 52ZM24 184V72l52 34v44l-52 34Z"/>
+  <rect class="mark" x="94" y="94" width="68" height="68" rx="8"/>
+</svg>
