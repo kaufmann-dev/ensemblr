@@ -2,7 +2,7 @@
 	import type { PageProps } from './$types';
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
-	import logo from '$lib/assets/ensemblr-aperture.svg';
+	import logo from '$lib/assets/ensemblr-aperture-fold.svg';
 
 	let { data, form }: PageProps = $props();
 </script>

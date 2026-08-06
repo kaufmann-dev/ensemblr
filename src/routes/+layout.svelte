@@ -14,7 +14,7 @@
 	import { cn } from '$lib/utils';
 	import { History, Key, LogOut, Menu, Moon, Settings, Shield, Sun } from '@lucide/svelte';
 	import './layout.css';
-	import logo from '$lib/assets/ensemblr-aperture.svg';
+	import logo from '$lib/assets/ensemblr-aperture-fold.svg';
 
 	let { data, children } = $props();
 	let mobileMenuOpen = $state(false);
