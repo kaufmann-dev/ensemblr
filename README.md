@@ -104,17 +104,7 @@ Add a new resource in Coolify and point it to this repository.
 
 In the Coolify resource settings, set:
 
-| Setting           | Value                        |
-| ----------------- | ---------------------------- |
-| **Build Command** | `pnpm install && pnpm build` |
-| **Start Command** | `node build/index.js`        |
-
-If you prefer to run migrations automatically on every deploy, use:
-
-| Setting           | Value                                                           |
-| ----------------- | --------------------------------------------------------------- |
-| **Build Command** | `pnpm install && pnpm build && pnpm db:migrate && pnpm db:seed` |
-| **Start Command** | `node build/index.js`                                           |
+Leave **Install Command**, **Build Command**, and **Start Command** empty. `nixpacks.toml` installs with the pinned pnpm 11.18.0 (`packageManager`), builds, applies migrations and the idempotent seed, and starts `node build/index.js`. Nixpacks' bundled pnpm 9 cannot read the overrides in `pnpm-workspace.yaml`, so commands entered in the Coolify UI that call plain `pnpm` fail the frozen install.
 
 ### 4. Configure environment variables
 

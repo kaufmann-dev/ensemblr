@@ -1,0 +1,13 @@
+[phases.install]
+cmds = ["npx --yes pnpm@11.18.0 install --frozen-lockfile"]
+
+# Build, then apply migrations and the idempotent seed (needs DATABASE_URL at build time).
+[phases.build]
+cmds = [
+  "npx --yes pnpm@11.18.0 run build",
+  "npx --yes pnpm@11.18.0 run db:migrate",
+  "npx --yes pnpm@11.18.0 run db:seed",
+]
+
+[start]
+cmd = "node build/index.js"
