@@ -2,13 +2,13 @@
 	import { untrack } from 'svelte';
 	import { beforeNavigate, goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { browser } from '$app/environment';
-	import { Button } from '$lib/components/ui/button';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
-	import PromptInput from '$lib/components/PromptInput.svelte';
-	import * as Tabs from '$lib/components/ui/tabs';
+	import { browser } from '$app/env';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import PageHeader from '#lib/components/PageHeader.svelte';
+	import { Input } from '#lib/components/ui/input/index.js';
+	import { Label } from '#lib/components/ui/label/index.js';
+	import PromptInput from '#lib/components/PromptInput.svelte';
+	import * as Tabs from '#lib/components/ui/tabs/index.js';
 	import {
 		Shield,
 		Sliders,
@@ -189,7 +189,7 @@
 		if (controller && !(await controller.flush())) return;
 
 		checkAndLoadTab(value);
-		await goto(resolve(`/admin?tab=${value}`), { noScroll: true, keepFocus: true });
+		await goto(resolve(`admin?tab=${value}`), { reset: false });
 	}
 
 	if (browser) {
@@ -213,6 +213,7 @@
 	}
 
 	beforeNavigate((navigation) => {
+		if (navigation.shallow) return;
 		if (!hasUnsavedChanges()) return;
 		if (navigation.willUnload) {
 			navigation.cancel();

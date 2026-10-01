@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
-import { db } from '$lib/server/db';
-import { appSetting, type ModelSelection } from '$lib/server/db/schema';
+import { db } from '#lib/server/db/index.js';
+import { appSetting, type ModelSelection } from '#lib/server/db/schema.js';
 
 export const DEFAULT_INTERMEDIATE_TEMPLATE =
 	'Original prompt:\n{{original_prompt}}\n\nPrevious answers:\n{{previous_answers}}\n\nImprove your answer using the strongest points above.';

@@ -1,9 +1,9 @@
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'node:crypto';
-import { env } from '$env/dynamic/private';
+import { API_KEY_ENCRYPTION_SECRET } from '$app/env/private';
 
 function key() {
-	if (!env.API_KEY_ENCRYPTION_SECRET) throw new Error('API_KEY_ENCRYPTION_SECRET is not set');
-	return createHash('sha256').update(env.API_KEY_ENCRYPTION_SECRET).digest();
+	if (!API_KEY_ENCRYPTION_SECRET) throw new Error('API_KEY_ENCRYPTION_SECRET is not set');
+	return createHash('sha256').update(API_KEY_ENCRYPTION_SECRET).digest();
 }
 
 export function encryptSecret(value: string) {

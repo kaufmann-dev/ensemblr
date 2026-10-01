@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { AlertCircle, CheckCircle2, Loader2 } from '@lucide/svelte';
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from '#lib/components/ui/button/index.js';
 	import type { AutosaveController } from './autosave.svelte';
 
 	let { controller }: { controller: AutosaveController } = $props();

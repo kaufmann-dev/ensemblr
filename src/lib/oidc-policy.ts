@@ -1,5 +1,5 @@
 export const OIDC_PROVIDER_ID = 'oidc';
-export const OIDC_CALLBACK_PATH = `/api/auth/oauth2/callback/${OIDC_PROVIDER_ID}`;
+export const OIDC_CALLBACK_PATH = `/api/auth/callback/${OIDC_PROVIDER_ID}`;
 export const OIDC_SCOPES = ['openid', 'profile', 'email'] as const;
 
 function isLoopbackHostname(hostname: string) {
@@ -55,16 +55,26 @@ export function getOidcDiscoveryUrl(issuerUrl: string) {
 	return `${normalizeOidcIssuerUrl(issuerUrl)}/.well-known/openid-configuration`;
 }
 
-export function getOidcPostLogoutRedirectUrl(origin: string) {
-	return new URL('/login', origin).toString();
+/** Same-origin app path to resume after login; anything else falls back to the start page. */
+export function safeReturnTo(value: string | null | undefined) {
+	if (!value || !value.startsWith('/') || value.startsWith('//') || value.includes('\\')) {
+		return '/';
+	}
+	const url = new URL(value, 'http://return-to.invalid');
+	if (url.origin !== 'http://return-to.invalid') return '/';
+	if (url.pathname === '/login' || url.pathname.startsWith('/api/auth')) return '/';
+	return `${url.pathname}${url.search}${url.hash}`;
 }
 
+/**
+ * Strip provider access and refresh tokens before persisting an account. The ID token is kept
+ * because Better Auth sends it as `id_token_hint` during RP-initiated logout.
+ */
 export function withoutAccountTokens<T extends Record<string, unknown>>(accountData: T) {
 	return {
 		...accountData,
 		accessToken: null,
 		refreshToken: null,
-		idToken: null,
 		accessTokenExpiresAt: null,
 		refreshTokenExpiresAt: null
 	};

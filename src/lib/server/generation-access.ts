@@ -1,5 +1,5 @@
 import { and, eq } from 'drizzle-orm';
-import { generation } from '$lib/server/db/schema';
+import { generation } from '#lib/server/db/schema.js';
 
 type HistoryUser = Pick<NonNullable<App.Locals['user']>, 'id' | 'role'>;
 

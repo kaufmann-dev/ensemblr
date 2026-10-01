@@ -1,12 +1,12 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
-import { db } from '$lib/server/db';
-import { appSetting, type ModelSelection, user, providerApiKey } from '$lib/server/db/schema';
-import { requireAdmin } from '$lib/server/authz';
-import { getSettings } from '$lib/server/settings';
-import { encryptSecret } from '$lib/server/crypto';
-import { getRunnableModelKeys } from '$lib/server/models/catalog';
+import { db } from '#lib/server/db/index.js';
+import { appSetting, type ModelSelection, user, providerApiKey } from '#lib/server/db/schema.js';
+import { requireAdmin } from '#lib/server/authz.js';
+import { getSettings } from '#lib/server/settings.js';
+import { encryptSecret } from '#lib/server/crypto.js';
+import { getRunnableModelKeys } from '#lib/server/models/catalog.js';
 
 const rateLimitFormSchema = z.object({
 	demoRateLimitWindowMinutes: z.coerce.number().int().min(1).max(10080),

@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { cn } from '$lib/utils.js';
-	import { Button } from '$lib/components/ui/button';
-	import { Checkbox } from '$lib/components/ui/checkbox';
-	import { Input } from '$lib/components/ui/input';
-	import * as Table from '$lib/components/ui/table';
+	import { cn } from '#lib/utils.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { Checkbox } from '#lib/components/ui/checkbox/index.js';
+	import { Input } from '#lib/components/ui/input/index.js';
+	import * as Table from '#lib/components/ui/table/index.js';
 	import { Loader2, AlertTriangle, RefreshCw, Cpu, Search, X } from '@lucide/svelte';
 
 	type CatalogModel = {

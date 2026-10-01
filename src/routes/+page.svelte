@@ -1,10 +1,10 @@
 <script lang="ts">
-	import ConversationMessage from '$lib/components/ConversationMessage.svelte';
-	import MixtureConfiguration from '$lib/components/MixtureConfiguration.svelte';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import PromptInput from '$lib/components/PromptInput.svelte';
-	import SecondaryOutputs from '$lib/components/SecondaryOutputs.svelte';
-	import { Button } from '$lib/components/ui/button';
+	import ConversationMessage from '#lib/components/ConversationMessage.svelte';
+	import MixtureConfiguration from '#lib/components/MixtureConfiguration.svelte';
+	import PageHeader from '#lib/components/PageHeader.svelte';
+	import PromptInput from '#lib/components/PromptInput.svelte';
+	import SecondaryOutputs from '#lib/components/SecondaryOutputs.svelte';
+	import { Button } from '#lib/components/ui/button/index.js';
 	import {
 		RUN_DISABLED_REASON_ID,
 		buildConversationView,
@@ -13,7 +13,7 @@
 		isFinalJudgeOutput,
 		isMixtureConfigurationValid,
 		type WorkspaceOutput
-	} from '$lib/workspace';
+	} from '#lib/workspace.js';
 	import { AlertCircle, Loader2, Play, Sparkles } from '@lucide/svelte';
 	import type { PageProps } from './$types';
 

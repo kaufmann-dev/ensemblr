@@ -1,13 +1,13 @@
 import { error } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
-import { db } from '$lib/server/db';
-import { providerApiKey } from '$lib/server/db/schema';
-import { requireUser } from '$lib/server/authz';
-import { createGeneration, streamMixture } from '$lib/server/ai/engine';
-import { getSettings } from '$lib/server/settings';
-import { getRunnableModelKeys } from '$lib/server/models/catalog';
-import { checkDemoGenerationRateLimit } from '$lib/server/demo-rate-limit';
-import { generateRequestSchema } from '$lib/validation';
+import { db } from '#lib/server/db/index.js';
+import { providerApiKey } from '#lib/server/db/schema.js';
+import { requireUser } from '#lib/server/authz.js';
+import { createGeneration, streamMixture } from '#lib/server/ai/engine.js';
+import { getSettings } from '#lib/server/settings.js';
+import { getRunnableModelKeys } from '#lib/server/models/catalog.js';
+import { checkDemoGenerationRateLimit } from '#lib/server/demo-rate-limit.js';
+import { generateRequestSchema } from '#lib/validation.js';
 
 function key(model: { providerId: string; modelId: string }) {
 	return `${model.providerId}/${model.modelId}`;

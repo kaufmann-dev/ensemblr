@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { invalidateAll } from '$app/navigation';
-	import GenerationStatus from '$lib/components/GenerationStatus.svelte';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import { Button } from '$lib/components/ui/button';
+	import GenerationStatus from '#lib/components/GenerationStatus.svelte';
+	import PageHeader from '#lib/components/PageHeader.svelte';
+	import { Button } from '#lib/components/ui/button/index.js';
 	import { History, Calendar, Trash2 } from '@lucide/svelte';
 	import type { PageProps } from './$types';
 
@@ -29,7 +29,7 @@
 			// 2. Open new connections for newly running IDs
 			for (const id of ids) {
 				if (!sources.has(id)) {
-					const source = new EventSource(resolve(`/api/generations/${id}/events`));
+					const source = new EventSource(resolve(`api/generations/${id}/events`));
 					sources.set(id, source);
 
 					source.onmessage = (message) => {
@@ -92,7 +92,7 @@
 			>
 				<!-- Stretched overlay link covering the entire card -->
 				<a
-					href={resolve(`/history/${item.id}`)}
+					href={resolve(`history/${item.id}`)}
 					class="absolute inset-0 z-0 rounded"
 					aria-label="Open details for prompt: {item.prompt}"
 				></a>
@@ -137,9 +137,9 @@
 			</article>
 		{:else}
 			<div class="flex flex-col items-center justify-center py-20 text-center">
-				<History class="size-7 text-muted-foreground mb-2 stroke-[1.5]" />
-				<h3 class="text-xs font-mono font-bold text-foreground">Archive Empty</h3>
-				<p class="text-[10px] font-mono text-muted-foreground mt-1 max-w-xs leading-relaxed">
+				<History class="mb-2 size-7 stroke-[1.5] text-muted-foreground" />
+				<h3 class="font-mono text-xs font-bold text-foreground">Archive Empty</h3>
+				<p class="mt-1 max-w-xs font-mono text-[10px] leading-relaxed text-muted-foreground">
 					You haven't run any Mixture-of-Agents generations yet. Go to the Workspace dashboard to
 					trigger your first run!
 				</p>

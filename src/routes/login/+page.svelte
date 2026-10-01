@@ -1,10 +1,29 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-	import { Button } from '$lib/components/ui/button';
-	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
-	import logo from '$lib/assets/ensemblr-aperture-fold.svg';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { Card, CardContent, CardHeader, CardTitle } from '#lib/components/ui/card/index.js';
+	import logo from '#lib/assets/ensemblr-aperture-fold.svg';
+
+	import { authClient } from '#lib/auth-client.js';
+	import { OIDC_PROVIDER_ID } from '#lib/oidc-policy.js';
 
 	let { data, form }: PageProps = $props();
+	let pending = $state(false);
+	let startError = $state(false);
+
+	async function signIn() {
+		pending = true;
+		startError = false;
+		const { error } = await authClient.signIn.social({
+			provider: OIDC_PROVIDER_ID,
+			callbackURL: data.returnTo,
+			errorCallbackURL: '/login?error=oidc'
+		});
+		if (error) {
+			startError = true;
+			pending = false;
+		}
+	}
 </script>
 
 <svelte:head><title>Login | ensemblr</title></svelte:head>
@@ -35,12 +54,15 @@
 			</CardHeader>
 			<CardContent class="px-5 pb-5">
 				<div class="space-y-3.5">
-					{#if form?.message || data.oidcError}
+					{#if form?.message || startError || data.oidcError}
 						<div
 							class="rounded border border-destructive/20 bg-destructive/5 px-3 py-2 font-mono text-[11px] text-destructive"
 							role="alert"
 						>
-							{form?.message ?? 'Administrator sign-in failed. Please try again.'}
+							{form?.message ??
+								(startError
+									? 'Unable to start administrator sign-in'
+									: 'Administrator sign-in failed. Please try again.')}
 						</div>
 					{/if}
 
@@ -48,10 +70,16 @@
 						<p class="font-mono text-[11px] text-muted-foreground">
 							Administrator access uses the configured identity provider.
 						</p>
-						<form method="POST" action="?/oidc">
+						<form
+							onsubmit={(event) => {
+								event.preventDefault();
+								void signIn();
+							}}
+						>
 							<Button
 								class="h-8.5 w-full rounded font-mono text-xs font-bold shadow-none"
 								type="submit"
+								disabled={pending}
 							>
 								Sign in as administrator
 							</Button>
@@ -71,7 +99,7 @@
 						<p class="font-mono text-[11px] text-muted-foreground">
 							Demo access needs no credentials.
 						</p>
-						<form method="POST" action="?/demo">
+						<form method="POST" action={`?/demo&returnTo=${encodeURIComponent(data.returnTo)}`}>
 							<Button
 								class="h-8.5 w-full rounded border-border font-mono text-xs font-bold hover:bg-muted/50"
 								type="submit"

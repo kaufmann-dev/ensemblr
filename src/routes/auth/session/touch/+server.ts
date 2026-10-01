@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { isUserDrivenRequest } from '$lib/session-policy';
+import { isUserDrivenRequest } from '#lib/session-policy.js';
 
 export function POST({ locals, request, url }) {
 	if (!isUserDrivenRequest(request, url)) error(403, 'Invalid session touch');

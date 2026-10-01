@@ -86,7 +86,7 @@
 	<hr class="my-5 border-border" />
 {:else if node.type === 'link'}
 	<svelte:element
-		this={'a'}
+		this={"a"}
 		href={node.url}
 		rel={node.external ? 'noopener noreferrer' : undefined}
 		class="underline underline-offset-2 hover:text-foreground"

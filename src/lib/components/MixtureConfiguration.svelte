@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
-	import * as Select from '$lib/components/ui/select';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { Input } from '#lib/components/ui/input/index.js';
+	import { Label } from '#lib/components/ui/label/index.js';
+	import * as Select from '#lib/components/ui/select/index.js';
 	import {
 		MIXTURE_CONFIG_COLLAPSED_KEY,
 		isMixtureConfigurationCollapsed,
 		readMixtureCollapsedPreference
-	} from '$lib/workspace';
+	} from '#lib/workspace.js';
 	import { ChevronDown, ChevronUp, Cpu, Key, Layers, ShieldCheck } from '@lucide/svelte';
 	import { onMount } from 'svelte';
 
@@ -224,7 +224,7 @@
 					</div>
 					{#if userRole !== 'demo'}
 						<Button
-							href={resolve('/settings')}
+							href={resolve('settings')}
 							variant="outline"
 							size="sm"
 							class="h-8 shrink-0 rounded text-xs"

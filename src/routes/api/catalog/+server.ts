@@ -1,8 +1,7 @@
-import { json } from '@sveltejs/kit';
-import { requireUser } from '$lib/server/authz';
-import { getCatalog } from '$lib/server/models/catalog';
+import { requireUser } from '#lib/server/authz.js';
+import { getCatalog } from '#lib/server/models/catalog.js';
 
 export async function GET({ locals }) {
 	requireUser(locals);
-	return json({ providers: await getCatalog() });
+	return Response.json({ providers: await getCatalog() });
 }

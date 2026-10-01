@@ -1,36 +1,37 @@
 <script lang="ts">
-	import type { Pathname } from '$app/types';
+	import { signOut } from '#lib/auth-client.js';
+	import type { Path } from '$app/types';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import { locales, localizeHref } from '$lib/paraglide/runtime';
+	import { locales, localizeHref } from '#lib/paraglide/runtime.js';
 	import {
 		SESSION_TOUCH_HEADER,
 		SESSION_TOUCH_HEADER_VALUE,
 		shouldSendSessionTouch
-	} from '$lib/session-policy';
+	} from '#lib/session-policy.js';
 	import { ModeWatcher, toggleMode } from 'mode-watcher';
-	import { Button, buttonVariants } from '$lib/components/ui/button';
-	import * as Sheet from '$lib/components/ui/sheet';
-	import { cn } from '$lib/utils';
+	import { Button, buttonVariants } from '#lib/components/ui/button/index.js';
+	import * as Sheet from '#lib/components/ui/sheet/index.js';
+	import { cn } from '#lib/utils.js';
 	import { History, Key, LogOut, Menu, Moon, Settings, Shield, Sun } from '@lucide/svelte';
 	import './layout.css';
-	import logo from '$lib/assets/ensemblr-aperture-fold.svg';
+	import logo from '#lib/assets/ensemblr-aperture-fold.svg';
 
 	let { data, children } = $props();
 	let mobileMenuOpen = $state(false);
 	let lastSessionTouch = -Infinity;
 
 	let navItems = $derived([
-		{ href: '/' as const, label: 'Workspace', icon: Settings },
-		{ href: '/history' as const, label: 'History', icon: History },
-		{ href: '/settings' as const, label: 'API Keys', icon: Key },
+		{ href: resolve('/'), label: 'Workspace', icon: Settings },
+		{ href: resolve('/history'), label: 'History', icon: History },
+		{ href: resolve('/settings'), label: 'API Keys', icon: Key },
 		...(data.user?.role === 'admin'
-			? [{ href: '/admin' as const, label: 'Admin', icon: Shield }]
+			? [{ href: resolve('/admin'), label: 'Admin', icon: Shield }]
 			: [])
 	]);
 
-	function isActive(href: Pathname) {
-		return page.url.pathname === resolve(href);
+	function isActive(href: string) {
+		return page.url.pathname === href;
 	}
 
 	function touchSession(event: Event) {
@@ -40,7 +41,7 @@
 		if (!shouldSendSessionTouch(event.isTrusted, now, lastSessionTouch)) return;
 		lastSessionTouch = now;
 
-		void fetch(resolve('/auth/session/touch'), {
+		void fetch(resolve('auth/session/touch'), {
 			method: 'POST',
 			headers: { [SESSION_TOUCH_HEADER]: SESSION_TOUCH_HEADER_VALUE },
 			credentials: 'same-origin',
@@ -96,7 +97,7 @@
 									: 'border border-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground'
 							)}
 							aria-current={isActive(item.href) ? 'page' : undefined}
-							href={resolve(item.href)}
+							href={item.href}
 						>
 							{item.label}
 						</a>
@@ -118,16 +119,17 @@
 					</Button>
 
 					<!-- Sign Out -->
-					<form method="POST" action={resolve('/logout')} class="ml-1">
+
+					<div class="ml-1">
 						<Button
-							type="submit"
+							onclick={signOut}
 							variant="outline"
 							size="sm"
 							class="h-8 rounded border-border font-mono text-xs font-medium transition-all hover:border-destructive/30 hover:bg-destructive/5 hover:text-destructive active:scale-95"
 						>
 							Sign out
 						</Button>
-					</form>
+					</div>
 				</nav>
 
 				<!-- Mobile Navigation Trigger -->
@@ -177,7 +179,7 @@
 												: 'border border-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground'
 										)}
 										aria-current={isActive(item.href) ? 'page' : undefined}
-										href={resolve(item.href)}
+										href={item.href}
 										onclick={() => (mobileMenuOpen = false)}
 									>
 										<Icon class="size-4 shrink-0 text-muted-foreground" />
@@ -185,17 +187,18 @@
 									</a>
 								{/each}
 							</nav>
+
 							<div class="mt-auto border-t border-border bg-muted/20 p-4">
-								<form method="POST" action={resolve('/logout')}>
+								<div>
 									<Button
 										class="w-full justify-center gap-2 rounded border border-transparent font-mono text-xs text-destructive transition-all hover:border-destructive/20 hover:bg-destructive/5 hover:text-destructive"
-										type="submit"
+										onclick={signOut}
 										variant="ghost"
 									>
 										<LogOut class="size-3.5" />
 										<span>Sign out</span>
 									</Button>
-								</form>
+								</div>
 							</div>
 						</Sheet.Content>
 					</Sheet.Root>
@@ -231,6 +234,6 @@
 
 <div style="display:none">
 	{#each locales as locale (locale)}
-		<a href={resolve(localizeHref(page.url.pathname, { locale }) as Pathname)}>{locale}</a>
+		<a href={resolve(localizeHref(page.url.pathname, { locale }).slice(1) as Path)}>{locale}</a>
 	{/each}
 </div>

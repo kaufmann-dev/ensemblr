@@ -1,9 +1,9 @@
 import { and, asc, eq } from 'drizzle-orm';
 import { error } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import { generation, generationOutput } from '$lib/server/db/schema';
-import { visibleGenerationsFor } from '$lib/server/generation-access';
-import { requireUser } from '$lib/server/authz';
+import { db } from '#lib/server/db/index.js';
+import { generation, generationOutput } from '#lib/server/db/schema.js';
+import { visibleGenerationsFor } from '#lib/server/generation-access.js';
+import { requireUser } from '#lib/server/authz.js';
 
 export async function load({ locals, params }) {
 	const user = requireUser(locals);

@@ -1,4 +1,4 @@
-import type { ModelSelection } from '$lib/server/db/schema';
+import type { ModelSelection } from '#lib/server/db/schema.js';
 
 export type GenerationStatus = 'running' | 'completed' | 'failed';
 

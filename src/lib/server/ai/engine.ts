@@ -1,19 +1,18 @@
 import { and, eq } from 'drizzle-orm';
 import { streamText } from 'ai';
-import { env } from '$env/dynamic/private';
-import { db } from '$lib/server/db';
+import { db } from '#lib/server/db/index.js';
 import {
 	generation,
 	generationOutput,
 	providerApiKey,
 	type ModelSelection
-} from '$lib/server/db/schema';
-import { decryptSecret } from '$lib/server/crypto';
-import { findCatalogModel } from '$lib/server/models/catalog';
-import { getSettings } from '$lib/server/settings';
+} from '#lib/server/db/schema.js';
+import { decryptSecret } from '#lib/server/crypto.js';
+import { findCatalogModel } from '#lib/server/models/catalog.js';
+import { getSettings } from '#lib/server/settings.js';
 import { createLanguageModel } from './providers';
 import { publishGenerationEvent, sse, startGeneration, type RunEvent } from './generation-events';
-import type { GenerateRequest } from '$lib/validation';
+import type { GenerateRequest } from '#lib/validation.js';
 
 type SuccessfulAnswer = {
 	model: ModelSelection;
@@ -46,7 +45,8 @@ async function getApiKey(
 	if (key) return decryptSecret(key.encryptedKey);
 
 	if (user.role === 'demo') {
-		const managedKey = provider.env?.map((name) => env[name]).find(Boolean);
+		// Provider key variable names come from the model catalog, so they are read dynamically.
+		const managedKey = provider.env?.map((name) => process.env[name]).find(Boolean);
 		if (managedKey) return managedKey;
 		throw new Error(`No admin-managed API key configured for ${provider.name}`);
 	}

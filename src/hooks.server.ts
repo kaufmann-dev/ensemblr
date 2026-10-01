@@ -1,27 +1,27 @@
-import { sequence } from '@sveltejs/kit/hooks';
-import { building } from '$app/environment';
-import { auth, authSessionCookie } from '$lib/server/auth';
+import { sequence, type Handle } from '@sveltejs/kit/hooks';
+import { building } from '$app/env';
+import { auth, authSessionCookie } from '#lib/server/auth.js';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
-import type { Handle } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
-import { getTextDirection } from '$lib/paraglide/runtime';
-import { paraglideMiddleware } from '$lib/paraglide/server';
-import { db } from '$lib/server/db';
-import { session as sessionTable } from '$lib/server/db/auth.schema';
-import { getSessionExpiry, isSessionExpired, isUserDrivenRequest } from '$lib/session-policy';
+import { getTextDirection } from '#lib/paraglide/runtime.js';
+import { paraglideMiddleware } from '#lib/paraglide/server.js';
+import { db } from '#lib/server/db/index.js';
+import { session as sessionTable } from '#lib/server/db/auth.schema.js';
+import { getSessionExpiry, isSessionExpired, isUserDrivenRequest } from '#lib/session-policy.js';
 
 const handleParaglide: Handle = ({ event, resolve }) =>
-	paraglideMiddleware(event.request, ({ request, locale }) => {
-		event.request = request;
-
-		return resolve(event, {
-			transformPageChunk: ({ html }) =>
-				html
-					.replace('%paraglide.lang%', locale)
-					.replace('%paraglide.dir%', getTextDirection(locale)),
-			preload: ({ type }) => type === 'js' || type === 'font'
-		});
-	});
+	paraglideMiddleware(event.request, ({ request, locale }) =>
+		resolve(
+			{ ...event, request },
+			{
+				transformPageChunk: ({ html }) =>
+					html
+						.replace('%paraglide.lang%', locale)
+						.replace('%paraglide.dir%', getTextDirection(locale)),
+				preload: ({ type }) => type === 'js' || type === 'font'
+			}
+		)
+	);
 
 const handleBetterAuth: Handle = async ({ event, resolve }) => {
 	const session = await auth.api.getSession({

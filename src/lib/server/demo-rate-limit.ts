@@ -1,7 +1,7 @@
 import { sql } from 'drizzle-orm';
-import { db } from '$lib/server/db';
-import { demoGenerationRateLimit } from '$lib/server/db/schema';
-import { getSettings } from '$lib/server/settings';
+import { db } from '#lib/server/db/index.js';
+import { demoGenerationRateLimit } from '#lib/server/db/schema.js';
+import { getSettings } from '#lib/server/settings.js';
 
 type RateLimitScope = 'ip' | 'global';
 

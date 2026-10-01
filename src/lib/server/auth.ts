@@ -5,17 +5,17 @@ import { getCookies, setSessionCookie } from 'better-auth/cookies';
 import { genericOAuth } from 'better-auth/plugins';
 import { sveltekitCookies } from 'better-auth/svelte-kit';
 import { eq } from 'drizzle-orm';
-import { env } from '$env/dynamic/private';
-import { getRequestEvent } from '$app/server';
-import { db } from '$lib/server/db';
-import { user } from '$lib/server/db/auth.schema';
 import {
-	bindFirstOidcAdmin,
-	consumeOidcIdToken,
-	getOidcCallbackState,
-	getOidcUserInfo,
-	stageOidcIdToken
-} from '$lib/server/oidc';
+	BETTER_AUTH_SECRET,
+	OIDC_CLIENT_ID,
+	OIDC_CLIENT_SECRET,
+	OIDC_ISSUER_URL,
+	ORIGIN
+} from '$app/env/private';
+import { getRequestEvent } from '$app/server';
+import { db } from '#lib/server/db/index.js';
+import { user } from '#lib/server/db/auth.schema.js';
+import { bindFirstOidcAdmin } from '#lib/server/oidc.js';
 import {
 	OIDC_PROVIDER_ID,
 	OIDC_SCOPES,
@@ -23,46 +23,35 @@ import {
 	normalizeApplicationOrigin,
 	normalizeOidcIssuerUrl,
 	withoutAccountTokens
-} from '$lib/oidc-policy';
-import { SESSION_IDLE_TIMEOUT_MS } from '$lib/session-policy';
+} from '#lib/oidc-policy.js';
+import { SESSION_IDLE_TIMEOUT_MS } from '#lib/session-policy.js';
 
-function requiredEnv(
-	name:
-		'ORIGIN' | 'BETTER_AUTH_SECRET' | 'OIDC_ISSUER_URL' | 'OIDC_CLIENT_ID' | 'OIDC_CLIENT_SECRET'
-) {
-	const value = env[name];
+function requiredEnv(name: string, value: string | undefined) {
 	if (!value) throw new Error(`${name} is required`);
 	return value;
 }
 
-const origin = normalizeApplicationOrigin(requiredEnv('ORIGIN'));
-const oidcIssuerUrl = normalizeOidcIssuerUrl(requiredEnv('OIDC_ISSUER_URL'));
+const origin = normalizeApplicationOrigin(requiredEnv('ORIGIN', ORIGIN));
+const oidcIssuerUrl = normalizeOidcIssuerUrl(requiredEnv('OIDC_ISSUER_URL', OIDC_ISSUER_URL));
 
 export const authSessionCookie = getCookies({
 	baseURL: origin,
 	session: { expiresIn: SESSION_IDLE_TIMEOUT_MS / 1000 }
 }).sessionToken;
 
-async function stageAccountIdToken(
-	accountData: Record<string, unknown>,
-	context: Parameters<typeof getOidcCallbackState>[0]
-) {
-	const state = getOidcCallbackState(context);
-	if (!state) return;
-	if (typeof accountData.idToken !== 'string' || !accountData.idToken) {
-		throw new APIError('BAD_REQUEST', {
-			message: 'OIDC token response did not include an ID token'
-		});
-	}
+type AuthHookContext = { path?: string; params?: Record<string, unknown> } | null;
 
-	await stageOidcIdToken(state, accountData.idToken);
-	return { data: withoutAccountTokens(accountData) };
+function isOidcCallback(context: AuthHookContext) {
+	return (
+		context?.path?.startsWith('/callback/') === true && context.params?.id === OIDC_PROVIDER_ID
+	);
 }
 
 export const auth = betterAuth({
 	baseURL: origin,
-	secret: requiredEnv('BETTER_AUTH_SECRET'),
+	secret: requiredEnv('BETTER_AUTH_SECRET', BETTER_AUTH_SECRET),
 	database: drizzleAdapter(db, { provider: 'pg' }),
+	emailAndPassword: { enabled: false },
 	user: {
 		additionalFields: {
 			role: {
@@ -83,12 +72,6 @@ export const auth = betterAuth({
 				defaultValue: () => new Date(),
 				input: false,
 				returned: false
-			},
-			idTokenHint: {
-				type: 'string',
-				required: false,
-				input: false,
-				returned: false
 			}
 		}
 	},
@@ -99,22 +82,13 @@ export const auth = betterAuth({
 	},
 	databaseHooks: {
 		account: {
-			create: {
-				before: (accountData, context) => stageAccountIdToken(accountData, context)
-			},
-			update: {
-				before: (accountData, context) => stageAccountIdToken(accountData, context)
-			}
+			create: { before: async (accountData) => ({ data: withoutAccountTokens(accountData) }) },
+			update: { before: async (accountData) => ({ data: withoutAccountTokens(accountData) }) }
 		},
 		session: {
 			create: {
 				before: async (session, context) => {
-					const state = getOidcCallbackState(context);
-					if (!state) return;
-					const idTokenHint = await consumeOidcIdToken(state);
-					if (!idTokenHint) {
-						throw new APIError('BAD_REQUEST', { message: 'OIDC login state expired' });
-					}
+					if (!isOidcCallback(context)) return;
 
 					const now = new Date();
 					await db.update(user).set({ role: 'admin' }).where(eq(user.id, session.userId));
@@ -122,8 +96,7 @@ export const auth = betterAuth({
 						data: {
 							...session,
 							expiresAt: new Date(now.getTime() + SESSION_IDLE_TIMEOUT_MS),
-							lastActiveAt: now,
-							idTokenHint
+							lastActiveAt: now
 						}
 					};
 				}
@@ -136,18 +109,16 @@ export const auth = betterAuth({
 				{
 					providerId: OIDC_PROVIDER_ID,
 					discoveryUrl: getOidcDiscoveryUrl(oidcIssuerUrl),
-					issuer: oidcIssuerUrl,
-					clientId: requiredEnv('OIDC_CLIENT_ID'),
-					clientSecret: requiredEnv('OIDC_CLIENT_SECRET'),
+					requireIdTokenVerification: true,
+					clientId: requiredEnv('OIDC_CLIENT_ID', OIDC_CLIENT_ID),
+					clientSecret: requiredEnv('OIDC_CLIENT_SECRET', OIDC_CLIENT_SECRET),
 					scopes: [...OIDC_SCOPES],
-					responseType: 'code',
-					authentication: 'post',
-					pkce: true,
 					overrideUserInfo: true,
-					getUserInfo: (tokens) => getOidcUserInfo(oidcIssuerUrl, tokens.accessToken),
 					mapProfileToUser: async (profile) => {
-						const subject = typeof profile.id === 'string' ? profile.id : undefined;
-						if (!subject) throw new Error('OIDC userinfo did not include a subject');
+						const subject = profile.sub ?? profile.id;
+						if (typeof subject !== 'string' || !subject) {
+							throw new Error('OIDC profile did not include a subject');
+						}
 						await bindFirstOidcAdmin(subject);
 						return {};
 					}

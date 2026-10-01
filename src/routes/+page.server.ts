@@ -1,10 +1,10 @@
 import { eq } from 'drizzle-orm';
-import { db } from '$lib/server/db';
-import { providerApiKey } from '$lib/server/db/schema';
-import { requireUser } from '$lib/server/authz';
-import { getCatalog } from '$lib/server/models/catalog';
-import type { CatalogProvider } from '$lib/server/models/catalog';
-import { getSettings } from '$lib/server/settings';
+import { db } from '#lib/server/db/index.js';
+import { providerApiKey } from '#lib/server/db/schema.js';
+import { requireUser } from '#lib/server/authz.js';
+import { getCatalog } from '#lib/server/models/catalog.js';
+import type { CatalogProvider } from '#lib/server/models/catalog.js';
+import { getSettings } from '#lib/server/settings.js';
 
 export async function load({ locals }) {
 	const user = requireUser(locals);

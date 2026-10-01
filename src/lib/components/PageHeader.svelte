@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Component, Snippet } from 'svelte';
-	import type { Pathname } from '$app/types';
+	import type { Path } from '$app/types';
 	import { ArrowLeft } from '@lucide/svelte';
 	import { resolve } from '$app/paths';
 
@@ -14,7 +14,7 @@
 		title: string;
 		description: string;
 		icon?: Component<{ class?: string }>;
-		backHref?: Pathname;
+		backHref?: Path;
 		badge?: Snippet;
 	} = $props();
 </script>

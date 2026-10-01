@@ -4,19 +4,19 @@ import {
 	OIDC_CALLBACK_PATH,
 	OIDC_SCOPES,
 	getOidcDiscoveryUrl,
-	getOidcPostLogoutRedirectUrl,
 	normalizeApplicationOrigin,
 	normalizeOidcIssuerUrl,
+	safeReturnTo,
 	withoutAccountTokens
 } from './oidc-policy.ts';
 
 test('uses the fixed OIDC callback and minimum interactive scopes', () => {
-	assert.equal(OIDC_CALLBACK_PATH, '/api/auth/oauth2/callback/oidc');
+	assert.equal(OIDC_CALLBACK_PATH, '/api/auth/callback/oidc');
 	assert.deepEqual(OIDC_SCOPES, ['openid', 'profile', 'email']);
 	assert.equal(OIDC_SCOPES.includes('offline_access' as never), false);
 });
 
-test('derives discovery and post-logout URLs from configured public URLs', () => {
+test('derives the discovery URL from configured public URLs', () => {
 	assert.equal(
 		normalizeOidcIssuerUrl('https://id.example.com/realm/'),
 		'https://id.example.com/realm'
@@ -24,10 +24,6 @@ test('derives discovery and post-logout URLs from configured public URLs', () =>
 	assert.equal(
 		getOidcDiscoveryUrl('https://id.example.com/realm/'),
 		'https://id.example.com/realm/.well-known/openid-configuration'
-	);
-	assert.equal(
-		getOidcPostLogoutRedirectUrl('https://ensemblr.example.com'),
-		'https://ensemblr.example.com/login'
 	);
 	assert.throws(() => normalizeOidcIssuerUrl('https://id.example.com/?tenant=one'));
 	assert.throws(() => normalizeOidcIssuerUrl('https://id.example.com/#issuer'));
@@ -45,7 +41,7 @@ test('derives discovery and post-logout URLs from configured public URLs', () =>
 	assert.throws(() => normalizeApplicationOrigin('https://ensemblr.example.com/app'));
 });
 
-test('removes every provider token before account persistence', () => {
+test('removes provider access tokens but keeps the ID token for RP-initiated logout', () => {
 	assert.deepEqual(
 		withoutAccountTokens({
 			providerId: 'oidc',
@@ -61,9 +57,19 @@ test('removes every provider token before account persistence', () => {
 			accountId: 'subject',
 			accessToken: null,
 			refreshToken: null,
-			idToken: null,
+			idToken: 'id',
 			accessTokenExpiresAt: null,
 			refreshTokenExpiresAt: null
 		}
 	);
+});
+
+test('keeps only same-origin return destinations outside the auth flow', () => {
+	assert.equal(safeReturnTo('/history?page=2#top'), '/history?page=2#top');
+	assert.equal(safeReturnTo(null), '/');
+	assert.equal(safeReturnTo('https://evil.example.com/'), '/');
+	assert.equal(safeReturnTo('//evil.example.com/'), '/');
+	assert.equal(safeReturnTo('/\\evil.example.com/'), '/');
+	assert.equal(safeReturnTo('/login?returnTo=/history'), '/');
+	assert.equal(safeReturnTo('/api/auth/sign-out'), '/');
 });

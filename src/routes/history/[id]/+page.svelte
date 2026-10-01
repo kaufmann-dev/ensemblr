@@ -1,18 +1,18 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
+	import { browser } from '$app/env';
 	import { fromAction } from 'svelte/attachments';
-	import GenerationStatus from '$lib/components/GenerationStatus.svelte';
-	import MarkdownOutput from '$lib/markdown/MarkdownOutput.svelte';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import { Button } from '$lib/components/ui/button';
+	import GenerationStatus from '#lib/components/GenerationStatus.svelte';
+	import MarkdownOutput from '#lib/markdown/MarkdownOutput.svelte';
+	import PageHeader from '#lib/components/PageHeader.svelte';
+	import { Button } from '#lib/components/ui/button/index.js';
 	import {
 		Card,
 		CardContent,
 		CardHeader,
 		CardTitle,
 		CardDescription
-	} from '$lib/components/ui/card';
-	import * as Accordion from '$lib/components/ui/accordion';
+	} from '#lib/components/ui/card/index.js';
+	import * as Accordion from '#lib/components/ui/accordion/index.js';
 	import { Copy, Check, Layers, FileText, ShieldCheck, Trash2 } from '@lucide/svelte';
 	import { resolve } from '$app/paths';
 	import type { PageProps } from './$types';
@@ -22,7 +22,11 @@
 	type Generation = PageProps['data']['generation'];
 	type GenerationOutput = PageProps['data']['outputs'][number];
 	type StreamEvent =
-		| { type: 'snapshot'; generation: Generation; outputs: GenerationOutput[] }
+		| {
+				type: 'snapshot';
+				generation: Generation;
+				outputs: GenerationOutput[];
+		  }
 		| { type: 'generation'; generationId: string }
 		| {
 				type: 'status';
@@ -161,7 +165,7 @@
 
 		function connect() {
 			if (!params.running || source) return;
-			source = new EventSource(resolve(`/api/generations/${params.generationId}/events`));
+			source = new EventSource(resolve(`api/generations/${params.generationId}/events`));
 			source.onmessage = (message) => {
 				applyStreamEvent(JSON.parse(message.data));
 			};
@@ -205,7 +209,7 @@
 		<PageHeader
 			title="Saved generation"
 			description="Review mixture configurations and generated LLM responses"
-			backHref="/history"
+			backHref="history"
 		>
 			{#snippet badge()}
 				<GenerationStatus status={generation.status} class="ml-2.5" />
@@ -213,7 +217,7 @@
 		</PageHeader>
 
 		<div class="flex justify-end px-1">
-			<form method="POST" action={`${resolve('/history')}?/delete`}>
+			<form method="POST" action={`${resolve('history')}?/delete`}>
 				<input type="hidden" name="id" value={generation.id} />
 				<Button type="submit" variant="destructive" size="sm" class="h-7.5 rounded text-[10px]">
 					<Trash2 class="mr-1 size-3.5" />
@@ -318,7 +322,7 @@
 					</Accordion.Item>
 				{:else}
 					<div
-						class="border border-dashed border-border rounded bg-card/40 p-6 text-center text-xs font-mono text-muted-foreground"
+						class="rounded border border-dashed border-border bg-card/40 p-6 text-center font-mono text-xs text-muted-foreground"
 					>
 						No detailed step outputs were archived for this run.
 					</div>

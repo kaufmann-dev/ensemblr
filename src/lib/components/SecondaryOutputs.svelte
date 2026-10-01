@@ -1,7 +1,7 @@
 <script lang="ts">
-	import GenerationStatus from '$lib/components/GenerationStatus.svelte';
-	import MarkdownOutput from '$lib/markdown/MarkdownOutput.svelte';
-	import * as Accordion from '$lib/components/ui/accordion';
+	import GenerationStatus from '#lib/components/GenerationStatus.svelte';
+	import MarkdownOutput from '#lib/markdown/MarkdownOutput.svelte';
+	import * as Accordion from '#lib/components/ui/accordion/index.js';
 	import { Layers } from '@lucide/svelte';
 
 	type SecondaryOutput = {

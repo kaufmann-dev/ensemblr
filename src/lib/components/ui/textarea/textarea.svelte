@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { cn, type WithElementRef, type WithoutChildren } from '$lib/utils.js';
+	import { cn, type WithElementRef, type WithoutChildren } from '#lib/utils.js';
 	import type { Attachment } from 'svelte/attachments';
 	import type { HTMLTextareaAttributes } from 'svelte/elements';
 
@@ -56,5 +56,4 @@
 	)}
 	bind:value
 	{@attach autoExpand(value)}
-	{...restProps}
-></textarea>
+	{...restProps}></textarea>

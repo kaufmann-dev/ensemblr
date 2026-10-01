@@ -12,7 +12,7 @@ import { createTogetherAI } from '@ai-sdk/togetherai';
 import { createXai } from '@ai-sdk/xai';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import type { LanguageModel } from 'ai';
-import type { CatalogProvider } from '$lib/server/models/catalog';
+import type { CatalogProvider } from '#lib/server/models/catalog.js';
 
 type ProviderFactory = (
 	apiKey: string,

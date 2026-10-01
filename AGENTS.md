@@ -178,7 +178,7 @@ Use modern Svelte replacements over legacy features:
 - Use keyed `{#each}` blocks with stable object identifiers. Never use the index as a key. Avoid destructuring if mutating the item.
 - Use CSS custom properties for parent-to-child styling boundaries.
 - Use `createContext` for typed context instead of unscoped shared module state when state must be per request or per tree.
-- Enable `experimental.async` in `svelte.config.js` before using await expressions or hydratable behavior, and only when the installed Svelte version supports it.
+- Enable `compilerOptions.experimental.async` in the `sveltekit()` plugin options in `vite.config.ts` before using await expressions or hydratable behavior, and only when the installed Svelte version supports it.
 
 For large or rarely used UI sections, especially admin tabs, live catalogs, and long model/provider lists:
 
@@ -202,7 +202,7 @@ Avoid these legacy Svelte features in new or refactored code:
 ## UI and Styling
 
 - **shadcn-svelte**: Components are source files copied into `src/lib/components/ui/`. Never import components from a package named `shadcn-svelte`.
-  - Import components only from local `$lib/components/ui/...` paths.
+  - Import components only from local `#lib/components/ui/...` paths (SvelteKit 3 subpath imports, with explicit `.js`/`.svelte` extensions).
   - Use local component source as the final source of truth once a component has been copied into the project.
   - Customize with Tailwind classes through `class`, using the local `cn()` helper when conditional class merging is needed.
   - Never run the CLI to install components, and never delete unused shadcn components during cleanup.

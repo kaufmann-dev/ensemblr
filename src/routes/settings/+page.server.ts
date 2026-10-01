@@ -1,10 +1,10 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { and, eq } from 'drizzle-orm';
-import { db } from '$lib/server/db';
-import { providerApiKey } from '$lib/server/db/schema';
-import { requireUser } from '$lib/server/authz';
-import { encryptSecret } from '$lib/server/crypto';
-import { getCatalog } from '$lib/server/models/catalog';
+import { db } from '#lib/server/db/index.js';
+import { providerApiKey } from '#lib/server/db/schema.js';
+import { requireUser } from '#lib/server/authz.js';
+import { encryptSecret } from '#lib/server/crypto.js';
+import { getCatalog } from '#lib/server/models/catalog.js';
 
 export async function load({ locals }) {
 	const user = requireUser(locals);

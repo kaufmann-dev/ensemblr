@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
-	import * as Select from '$lib/components/ui/select';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import PageHeader from '#lib/components/PageHeader.svelte';
+	import { Input } from '#lib/components/ui/input/index.js';
+	import { Label } from '#lib/components/ui/label/index.js';
+	import * as Select from '#lib/components/ui/select/index.js';
 	import { Key, Eye, EyeOff, ShieldAlert, CheckCircle, Trash2 } from '@lucide/svelte';
 	import type { PageProps } from './$types';
 
@@ -165,10 +165,10 @@
 						</div>
 					{:else}
 						<div
-							class="flex flex-col items-center justify-center py-12 text-center border border-dashed border-border rounded bg-muted/10"
+							class="flex flex-col items-center justify-center rounded border border-dashed border-border bg-muted/10 py-12 text-center"
 						>
-							<Key class="size-7 text-muted-foreground mb-2 stroke-[1.5]" />
-							<p class="text-[11px] font-mono text-muted-foreground">
+							<Key class="mb-2 size-7 stroke-[1.5] text-muted-foreground" />
+							<p class="font-mono text-[11px] text-muted-foreground">
 								No credentials saved yet. Add a key above to activate models.
 							</p>
 						</div>

@@ -8,7 +8,7 @@ SvelteKit app for running mixture-of-agents generations across models from the l
 
 ### Prerequisites
 
-- Node.js 22.12+
+- Node.js 22.17+
 - pnpm
 - Podman (for local PostgreSQL)
 
@@ -21,7 +21,7 @@ cp .env.example .env
 
 ### 2. Configure environment variables
 
-Edit `.env` using the variables documented under [Production environment variables](#4-configure-environment-variables). For local development, set `ORIGIN` to `http://localhost:5173` and use the callback URL `http://localhost:5173/api/auth/oauth2/callback/oidc` in the OIDC client.
+Edit `.env` using the variables documented under [Production environment variables](#4-configure-environment-variables). For local development, set `ORIGIN` to `http://localhost:5173` and use the callback URL `http://localhost:5173/api/auth/callback/oidc` in the OIDC client.
 
 Generate strong secrets for production:
 
@@ -76,10 +76,10 @@ The app will be available at `http://localhost:5173`.
 
 ## Authentication Setup
 
-Administrator login uses Better Auth with server-side OIDC Authorization Code + PKCE; access is granted by provider policy and the first admitted identity is promoted to admin.
+The login screen starts Better Auth's generic OIDC flow (Authorization Code + PKCE S256, `client_secret_post`) and returns to the originally requested page; access is granted by provider policy and the first admitted identity is promoted to admin. Logout ends the local session and the provider SSO session via RP-initiated logout.
 
 - **Public Client:** Off
-- **Callback URL:** `/api/auth/oauth2/callback/oidc`
+- **Callback URL:** `/api/auth/callback/oidc`
 - **Logout Callback URL:** `/login`
 
 All authentication variables and requiredness are listed in [Production environment variables](#4-configure-environment-variables).
@@ -120,19 +120,19 @@ If you prefer to run migrations automatically on every deploy, use:
 
 Add the following environment variables in Coolify (or import them from a file):
 
-| Variable                    | Required | Description                                                                                                                                                                                  |
-| --------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `DATABASE_URL`              | **Yes**  | PostgreSQL connection string, e.g. `postgres://user:pass@host:5432/db`                                                                                                                       |
-| `ORIGIN`                    | **Yes**  | Public application origin without a path, query, or fragment, e.g. `https://ensemblr.yourdomain.com`; HTTPS is required except on localhost and it also derives the post-logout `/login` URL |
-| `BETTER_AUTH_SECRET`        | **Yes**  | High-entropy secret for signing local session cookies. Generate with `openssl rand -base64 32`                                                                                               |
-| `OIDC_ISSUER_URL`           | **Yes**  | Exact OIDC issuer URL without `/.well-known/openid-configuration`; HTTPS is required except on localhost                                                                                     |
-| `OIDC_CLIENT_ID`            | **Yes**  | Client ID for the confidential OIDC client                                                                                                                                                   |
-| `OIDC_CLIENT_SECRET`        | **Yes**  | Client secret for the confidential OIDC client                                                                                                                                               |
-| `API_KEY_ENCRYPTION_SECRET` | **Yes**  | High-entropy secret for encrypting stored provider API keys. Generate with `openssl rand -base64 32`                                                                                         |
-| `DEMO_NAME`                 | No       | Display name for the credential-free demo account (default: `Demo`)                                                                                                                          |
-| `DEMO_ALLOWED_MODELS`       | No       | Initial comma-separated `provider/model` IDs for demo users. Used only when the app settings row is first created.                                                                           |
-| `ADDRESS_HEADER`            | No       | Trusted proxy header for client IP detection, e.g. `X-Forwarded-For`                                                                                                                         |
-| `XFF_DEPTH`                 | No       | Number of trusted proxies when `ADDRESS_HEADER=X-Forwarded-For`                                                                                                                              |
+| Variable                    | Required | Description                                                                                                                                                                                                                       |
+| --------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`              | **Yes**  | PostgreSQL connection string, e.g. `postgres://user:pass@host:5432/db`                                                                                                                                                            |
+| `ORIGIN`                    | **Yes**  | Public application origin without a path, query, or fragment, e.g. `https://ensemblr.yourdomain.com`; HTTPS is required except on localhost; it must also be available at build time, where it becomes SvelteKit's `paths.origin` |
+| `BETTER_AUTH_SECRET`        | **Yes**  | High-entropy secret for signing local session cookies. Generate with `openssl rand -base64 32`                                                                                                                                    |
+| `OIDC_ISSUER_URL`           | **Yes**  | Exact OIDC issuer URL without `/.well-known/openid-configuration`; HTTPS is required except on localhost                                                                                                                          |
+| `OIDC_CLIENT_ID`            | **Yes**  | Client ID for the confidential OIDC client                                                                                                                                                                                        |
+| `OIDC_CLIENT_SECRET`        | **Yes**  | Client secret for the confidential OIDC client                                                                                                                                                                                    |
+| `API_KEY_ENCRYPTION_SECRET` | **Yes**  | High-entropy secret for encrypting stored provider API keys. Generate with `openssl rand -base64 32`                                                                                                                              |
+| `DEMO_NAME`                 | No       | Display name for the credential-free demo account (default: `Demo`)                                                                                                                                                               |
+| `DEMO_ALLOWED_MODELS`       | No       | Initial comma-separated `provider/model` IDs for demo users. Used only when the app settings row is first created.                                                                                                                |
+| `ADDRESS_HEADER`            | No       | Trusted proxy header for client IP detection, e.g. `X-Forwarded-For`                                                                                                                                                              |
+| `XFF_DEPTH`                 | No       | Number of trusted proxies when `ADDRESS_HEADER=X-Forwarded-For`                                                                                                                                                                   |
 
 ### 5. Deploy
 
