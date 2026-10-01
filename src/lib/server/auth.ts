@@ -28,11 +28,7 @@ import { SESSION_IDLE_TIMEOUT_MS } from '$lib/session-policy';
 
 function requiredEnv(
 	name:
-		| 'ORIGIN'
-		| 'BETTER_AUTH_SECRET'
-		| 'OIDC_ISSUER_URL'
-		| 'OIDC_CLIENT_ID'
-		| 'OIDC_CLIENT_SECRET'
+		'ORIGIN' | 'BETTER_AUTH_SECRET' | 'OIDC_ISSUER_URL' | 'OIDC_CLIENT_ID' | 'OIDC_CLIENT_SECRET'
 ) {
 	const value = env[name];
 	if (!value) throw new Error(`${name} is required`);

@@ -6,8 +6,7 @@ import { getSettings } from '$lib/server/settings';
 type RateLimitScope = 'ip' | 'global';
 
 type RateLimitResult =
-	| { allowed: true }
-	| { allowed: false; message: string; retryAfterSeconds: number };
+	{ allowed: true } | { allowed: false; message: string; retryAfterSeconds: number };
 
 function windowStart(now: Date, windowMs: number) {
 	return new Date(Math.floor(now.getTime() / windowMs) * windowMs);
