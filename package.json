@@ -78,7 +78,7 @@
 		"@ai-sdk/togetherai": "^3.0.62",
 		"@ai-sdk/xai": "^5.0.14",
 		"@fontsource-variable/inter": "^5.3.0",
-		"@fontsource-variable/recursive": "^5.3.0",
+		"@fontsource-variable/jetbrains-mono": "^5.3.0",
 		"@openrouter/ai-sdk-provider": "^3.1.0",
 		"ai": "^7.0.124",
 		"mode-watcher": "^1.1.0",

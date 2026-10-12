@@ -51,11 +51,3 @@
 		<pre class="font-sans leading-relaxed whitespace-pre-wrap">{fallback}</pre>
 	{/if}
 </div>
-
-<style>
-	.markdown-output :global(code),
-	.markdown-output :global(pre code) {
-		font-family: 'Recursive Variable', sans-serif;
-		font-variation-settings: 'MONO' 1;
-	}
-</style>
