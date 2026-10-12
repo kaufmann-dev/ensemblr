@@ -53,10 +53,6 @@
 </div>
 
 <style>
-	.markdown-output {
-		font-variation-settings: 'MONO' 0;
-	}
-
 	.markdown-output :global(code),
 	.markdown-output :global(pre code) {
 		font-family: 'Recursive Variable', sans-serif;
