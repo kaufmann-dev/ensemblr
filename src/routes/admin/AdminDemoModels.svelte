@@ -213,10 +213,8 @@
 	{/each}
 
 	<div>
-		<h3 class="font-mono text-xs font-bold tracking-tight text-foreground uppercase">
-			Demo allowed models
-		</h3>
-		<p class="mt-0.5 font-mono text-xs text-muted-foreground/80">
+		<h3 class="text-xs font-bold tracking-tight text-foreground">Demo allowed models</h3>
+		<p class="mt-0.5 text-xs text-muted-foreground/80">
 			Select which catalog models are accessible to demo role users
 		</p>
 	</div>
@@ -224,9 +222,7 @@
 	{#if loading}
 		<div class="flex flex-col items-center justify-center py-20 text-center">
 			<Loader2 class="mb-3 inline-block size-6 animate-spin stroke-[1.5] text-foreground" />
-			<p class="font-mono text-xs text-muted-foreground">
-				Synchronizing provider model catalogs...
-			</p>
+			<p class="text-xs text-muted-foreground">Synchronizing provider model catalogs...</p>
 		</div>
 	{:else}
 		<!-- Search & Stats Bar -->
@@ -244,7 +240,7 @@
 						placeholder="Search providers..."
 						value={providerInput}
 						oninput={(e) => handleProviderInput(e.currentTarget.value)}
-						class="w-full pr-8 pl-8 font-mono text-xs"
+						class="w-full pr-8 pl-8 text-xs"
 					/>
 					{#if providerInput}
 						<Button
@@ -270,7 +266,7 @@
 						placeholder="Search models..."
 						value={modelInput}
 						oninput={(e) => handleModelInput(e.currentTarget.value)}
-						class="w-full pr-8 pl-8 font-mono text-xs"
+						class="w-full pr-8 pl-8 text-xs"
 					/>
 					{#if modelInput}
 						<Button
@@ -293,7 +289,7 @@
 						<button
 							type="button"
 							class={cn(
-								'h-7 flex-1 rounded-sm px-3.5 font-mono text-xs transition-colors md:flex-initial',
+								'h-7 flex-1 rounded-sm px-3.5 text-xs transition-colors md:flex-initial',
 								activationFilter === option.value
 									? 'bg-foreground/15 text-foreground'
 									: 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
@@ -312,7 +308,7 @@
 
 			<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 				<!-- Dynamic stats badge -->
-				<div class="shrink-0 self-start font-mono text-[10px] text-muted-foreground sm:self-center">
+				<div class="shrink-0 self-start text-xs text-muted-foreground sm:self-center">
 					{#if providerSearch || modelSearch || activationFilter !== 'all'}
 						Found <span class="font-bold text-foreground">{filteredModels.length}</span> matching models
 					{:else}
@@ -328,13 +324,11 @@
 			>
 				<AlertTriangle class="size-6 stroke-[1.5] text-destructive" />
 				<div class="space-y-1">
-					<h4 class="font-mono text-xs font-bold tracking-tight text-destructive uppercase">
-						Catalog loading failed
-					</h4>
-					<p class="max-w-sm font-mono text-xs leading-relaxed text-muted-foreground/85">{error}</p>
+					<h4 class="text-xs font-bold tracking-tight text-destructive">Catalog loading failed</h4>
+					<p class="max-w-sm text-xs leading-relaxed text-muted-foreground/85">{error}</p>
 				</div>
 				<Button
-					class="h-9 gap-2 rounded border border-border bg-card px-4 font-mono text-xs font-bold tracking-wider text-foreground uppercase shadow-none hover:bg-muted"
+					class="h-9 gap-2 rounded border border-border bg-card px-4 text-xs font-bold text-foreground shadow-none hover:bg-muted"
 					type="button"
 					onclick={retry}
 				>
@@ -348,10 +342,10 @@
 					<div class="flex items-start gap-2.5">
 						<AlertTriangle class="mt-0.5 size-4 shrink-0 text-destructive" />
 						<div class="min-w-0 space-y-1">
-							<h4 class="font-mono text-xs font-bold tracking-tight text-destructive uppercase">
+							<h4 class="text-xs font-bold tracking-tight text-destructive">
 								Unavailable demo selections
 							</h4>
-							<p class="font-mono text-[10px] leading-relaxed text-destructive/85">
+							<p class="text-xs leading-relaxed text-destructive/85">
 								{staleAllowed.length + unavailableAllowed.length} saved selection{staleAllowed.length +
 									unavailableAllowed.length ===
 								1
@@ -385,12 +379,10 @@
 					class="flex flex-col items-center justify-center rounded border border-dashed border-border bg-muted/10 py-16 text-center"
 				>
 					<Cpu class="mb-2 size-7 stroke-[1.5] text-muted-foreground" />
-					<p class="font-mono text-xs text-muted-foreground">
-						No matching models or providers found.
-					</p>
+					<p class="text-xs text-muted-foreground">No matching models or providers found.</p>
 					<Button
 						variant="ghost"
-						class="mt-2 h-7 rounded font-mono text-[10px] text-muted-foreground hover:bg-muted hover:text-foreground"
+						class="mt-2 h-7 rounded text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
 						onclick={() => {
 							handleProviderInput('');
 							handleModelInput('');
@@ -412,13 +404,11 @@
 					<Table.Root>
 						<Table.Header class="hover:bg-transparent">
 							<Table.Row class="border-border hover:bg-transparent">
-								<Table.Head
-									class="w-[35%] py-3 font-mono text-xs font-bold tracking-tight text-foreground uppercase"
-									>PROVIDER</Table.Head
+								<Table.Head class="w-[35%] py-3 text-xs font-bold tracking-tight text-foreground"
+									>Provider</Table.Head
 								>
-								<Table.Head
-									class="w-[65%] py-3 font-mono text-xs font-bold tracking-tight text-foreground uppercase"
-									>MODEL</Table.Head
+								<Table.Head class="w-[65%] py-3 text-xs font-bold tracking-tight text-foreground"
+									>Model</Table.Head
 								>
 							</Table.Row>
 						</Table.Header>
@@ -438,17 +428,14 @@
 												/>
 											</div>
 											<div class="flex min-w-0 flex-col">
-												<strong
-													class="truncate font-mono text-xs font-bold tracking-tight text-foreground uppercase"
+												<strong class="truncate text-xs font-bold tracking-tight text-foreground"
 													>{row.providerName}</strong
 												>
-												<span
-													class="mt-0.5 font-mono text-[9px] font-bold tracking-wider uppercase"
-												>
+												<span class="mt-0.5 text-xs font-bold">
 													{#if row.providerEnabled}
-														<span class="text-emerald-500">ACTIVE</span>
+														<span class="text-emerald-500">Active</span>
 													{:else}
-														<span class="text-muted-foreground/75">CATALOG ONLY</span>
+														<span class="text-muted-foreground/75">Catalog only</span>
 													{/if}
 												</span>
 											</div>
@@ -474,7 +461,7 @@
 												class="rounded border-border/60 data-[state=checked]:border-foreground data-[state=checked]:bg-foreground data-[state=checked]:text-background"
 											/>
 											<div
-												class="flex min-w-0 flex-1 cursor-pointer items-center justify-between gap-1.5 font-mono text-[11px] font-bold text-foreground/85 select-none"
+												class="flex min-w-0 flex-1 cursor-pointer items-center justify-between gap-1.5 text-xs font-bold text-foreground/85 select-none"
 											>
 												<div class="flex min-w-0 items-center gap-1.5">
 													<Cpu

@@ -13,7 +13,7 @@
 
 <span
 	class={cn(
-		'rounded border px-1.5 py-0.5 font-mono text-[9px] font-medium tracking-wide uppercase',
+		'rounded border px-1.5 py-0.5 text-[11px] font-medium capitalize',
 		status === 'completed'
 			? 'border-border bg-foreground/5 text-foreground'
 			: status === 'failed'

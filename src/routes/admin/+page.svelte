@@ -245,25 +245,25 @@
 				>
 					<Tabs.Trigger
 						value="prompts"
-						class="shrink-0 rounded border-b-2 border-transparent px-1 pt-1 pb-3 font-mono text-xs font-bold tracking-wider text-muted-foreground uppercase data-[state=active]:border-foreground data-[state=active]:bg-transparent! data-[state=active]:text-foreground dark:data-[state=active]:bg-transparent!"
+						class="shrink-0 rounded border-b-2 border-transparent px-1 pt-1 pb-3 text-xs font-bold text-muted-foreground data-[state=active]:border-foreground data-[state=active]:bg-transparent! data-[state=active]:text-foreground dark:data-[state=active]:bg-transparent!"
 					>
 						Prompt templates
 					</Tabs.Trigger>
 					<Tabs.Trigger
 						value="demo"
-						class="shrink-0 rounded border-b-2 border-transparent px-1 pt-1 pb-3 font-mono text-xs font-bold tracking-wider text-muted-foreground uppercase data-[state=active]:border-foreground data-[state=active]:bg-transparent! data-[state=active]:text-foreground dark:data-[state=active]:bg-transparent!"
+						class="shrink-0 rounded border-b-2 border-transparent px-1 pt-1 pb-3 text-xs font-bold text-muted-foreground data-[state=active]:border-foreground data-[state=active]:bg-transparent! data-[state=active]:text-foreground dark:data-[state=active]:bg-transparent!"
 					>
 						Demo models
 					</Tabs.Trigger>
 					<Tabs.Trigger
 						value="demo-keys"
-						class="shrink-0 rounded border-b-2 border-transparent px-1 pt-1 pb-3 font-mono text-xs font-bold tracking-wider text-muted-foreground uppercase data-[state=active]:border-foreground data-[state=active]:bg-transparent! data-[state=active]:text-foreground dark:data-[state=active]:bg-transparent!"
+						class="shrink-0 rounded border-b-2 border-transparent px-1 pt-1 pb-3 text-xs font-bold text-muted-foreground data-[state=active]:border-foreground data-[state=active]:bg-transparent! data-[state=active]:text-foreground dark:data-[state=active]:bg-transparent!"
 					>
 						Demo API Keys
 					</Tabs.Trigger>
 					<Tabs.Trigger
 						value="rate-limits"
-						class="shrink-0 rounded border-b-2 border-transparent px-1 pt-1 pb-3 font-mono text-xs font-bold tracking-wider text-muted-foreground uppercase data-[state=active]:border-foreground data-[state=active]:bg-transparent! data-[state=active]:text-foreground dark:data-[state=active]:bg-transparent!"
+						class="shrink-0 rounded border-b-2 border-transparent px-1 pt-1 pb-3 text-xs font-bold text-muted-foreground data-[state=active]:border-foreground data-[state=active]:bg-transparent! data-[state=active]:text-foreground dark:data-[state=active]:bg-transparent!"
 					>
 						Rate limits
 					</Tabs.Trigger>
@@ -299,7 +299,7 @@
 								minHeight="128px"
 								maxHeight="320px"
 							/>
-							<p class="font-mono text-[10px] leading-relaxed text-muted-foreground">
+							<p class="text-xs leading-relaxed text-muted-foreground">
 								Configures how intermediate rounds synthesize context from previous worker results
 								before final consolidation.
 							</p>
@@ -319,7 +319,7 @@
 								minHeight="128px"
 								maxHeight="320px"
 							/>
-							<p class="font-mono text-[10px] leading-relaxed text-muted-foreground">
+							<p class="text-xs leading-relaxed text-muted-foreground">
 								Instructs the final judge model on how to compare, evaluate, and consolidate the
 								worker responses into a single high-quality response.
 							</p>
@@ -343,9 +343,7 @@
 								<Loader2
 									class="mb-3 inline-block size-6 animate-spin stroke-[1.5] text-foreground"
 								/>
-								<p class="font-mono text-xs text-muted-foreground">
-									Loading demo model controls...
-								</p>
+								<p class="text-xs text-muted-foreground">Loading demo model controls...</p>
 							</div>
 						{:then { default: AdminDemoModels }}
 							<AdminDemoModels
@@ -386,11 +384,11 @@
 						<div>
 							<div class="flex items-center gap-1.5">
 								<Gauge class="size-3.5 text-foreground" />
-								<h3 class="font-mono text-xs font-bold tracking-tight text-foreground uppercase">
+								<h3 class="text-xs font-bold tracking-tight text-foreground">
 									Demo generation rate limits
 								</h3>
 							</div>
-							<p class="mt-0.5 font-mono text-xs text-muted-foreground/80">
+							<p class="mt-0.5 text-xs text-muted-foreground/80">
 								Control how often demo users can start paid API generations
 							</p>
 						</div>
@@ -408,9 +406,9 @@
 									min="1"
 									step="1"
 									bind:value={demoRateLimitWindowMinutes}
-									class="font-mono text-xs"
+									class="text-xs"
 								/>
-								<p class="font-mono text-[10px] leading-relaxed text-muted-foreground">
+								<p class="text-xs leading-relaxed text-muted-foreground">
 									Length of each shared quota window.
 								</p>
 							</div>
@@ -427,9 +425,9 @@
 									min="1"
 									step="1"
 									bind:value={demoRateLimitPerIp}
-									class="font-mono text-xs"
+									class="text-xs"
 								/>
-								<p class="font-mono text-[10px] leading-relaxed text-muted-foreground">
+								<p class="text-xs leading-relaxed text-muted-foreground">
 									Maximum demo generations per client address.
 								</p>
 							</div>
@@ -446,16 +444,16 @@
 									min="1"
 									step="1"
 									bind:value={demoRateLimitGlobal}
-									class="font-mono text-xs"
+									class="text-xs"
 								/>
-								<p class="font-mono text-[10px] leading-relaxed text-muted-foreground">
+								<p class="text-xs leading-relaxed text-muted-foreground">
 									Maximum total demo generations across all visitors.
 								</p>
 							</div>
 						</div>
 
 						<div class="rounded border border-border bg-muted/20 p-3">
-							<p class="font-mono text-[10px] leading-relaxed text-muted-foreground">
+							<p class="text-xs leading-relaxed text-muted-foreground">
 								Current policy: <span class="font-bold text-foreground">{demoRateLimitPerIp}</span>
 								per IP and <span class="font-bold text-foreground">{demoRateLimitGlobal}</span>
 								total every
@@ -472,8 +470,8 @@
 						>
 							<AlertCircle class="mt-0.5 size-4.5 shrink-0 text-destructive" />
 							<div class="space-y-1">
-								<h4 class="font-mono text-xs font-bold text-destructive">Demo Account Not Found</h4>
-								<p class="mt-0.5 font-mono text-[10px] leading-relaxed text-destructive/90">
+								<h4 class="text-xs font-bold text-destructive">Demo Account Not Found</h4>
+								<p class="mt-0.5 text-xs leading-relaxed text-destructive/90">
 									The demo account has not been configured in the database yet. Please ensure the
 									database is properly seeded before adding API keys.
 								</p>
@@ -485,7 +483,7 @@
 								<Loader2
 									class="mb-3 inline-block size-6 animate-spin stroke-[1.5] text-foreground/75"
 								/>
-								<p class="font-mono text-xs text-muted-foreground">Loading demo keys controls...</p>
+								<p class="text-xs text-muted-foreground">Loading demo keys controls...</p>
 							</div>
 						{:then { default: AdminDemoKeys }}
 							{#if catalogLoading}
@@ -493,7 +491,7 @@
 									<Loader2
 										class="mb-3 inline-block size-6 animate-spin stroke-[1.5] text-foreground/75"
 									/>
-									<p class="font-mono text-xs text-muted-foreground">Loading catalog...</p>
+									<p class="text-xs text-muted-foreground">Loading catalog...</p>
 								</div>
 							{:else if catalogError}
 								<div
@@ -501,13 +499,13 @@
 								>
 									<AlertCircle class="size-6 stroke-[1.5] text-destructive" />
 									<div class="max-w-sm space-y-1">
-										<p class="font-mono text-xs font-bold text-destructive">Catalog Error</p>
-										<p class="font-mono text-[10px] text-destructive/80">{catalogError}</p>
+										<p class="text-xs font-bold text-destructive">Catalog Error</p>
+										<p class="text-xs text-destructive/80">{catalogError}</p>
 									</div>
 									<Button
 										variant="outline"
 										size="sm"
-										class="mt-2 h-7 font-mono text-[10px]"
+										class="mt-2 h-7 text-xs"
 										onclick={retryCatalog}
 									>
 										Retry

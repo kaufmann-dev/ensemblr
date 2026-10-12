@@ -50,14 +50,14 @@
 		>
 			<content.icon class="size-5" />
 		</div>
-		<p class="font-mono text-xs font-medium tracking-wider text-muted-foreground uppercase">
+		<p class="text-xs font-medium text-muted-foreground">
 			Error {page.status}
 		</p>
 		<h1 class="text-xl font-semibold tracking-tight">{content.title}</h1>
 		<p class="text-sm text-muted-foreground">{content.description}</p>
 		<div class="mt-2 flex flex-wrap justify-center gap-2">
 			{#if page.status >= 500}
-				<Button class="rounded font-mono text-xs" onclick={() => location.reload()}>
+				<Button class="rounded text-xs" onclick={() => location.reload()}>
 					<RotateCcw class="size-3.5" />
 					Try again
 				</Button>
@@ -65,7 +65,7 @@
 			<Button
 				href={resolve('/')}
 				variant={page.status >= 500 ? 'outline' : 'default'}
-				class="rounded font-mono text-xs"
+				class="rounded text-xs"
 			>
 				Back to workspace
 			</Button>

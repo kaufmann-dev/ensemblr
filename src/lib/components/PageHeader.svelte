@@ -38,14 +38,14 @@
 		{/if}
 		<div class="min-w-0">
 			<h1
-				class="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-base font-bold tracking-tight text-foreground uppercase"
+				class="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-base font-bold tracking-tight text-foreground"
 			>
 				{title}
 				{#if badge}
 					{@render badge()}
 				{/if}
 			</h1>
-			<p class="mt-0.5 font-mono text-xs leading-snug break-words text-muted-foreground">
+			<p class="mt-0.5 text-xs leading-snug break-words text-muted-foreground">
 				{description}
 			</p>
 		</div>

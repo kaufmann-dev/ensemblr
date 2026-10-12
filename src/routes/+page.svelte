@@ -237,7 +237,6 @@
 			disabled={running}
 			minHeight="88px"
 			showCharCount={true}
-			monospace={false}
 			class="rounded border border-border bg-card p-3 sm:p-4"
 		/>
 

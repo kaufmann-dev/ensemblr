@@ -80,7 +80,7 @@
 						ensemblr
 					</span>
 					<span
-						class="ml-1.5 hidden items-center rounded border border-border bg-muted/50 px-1.5 py-0.5 font-mono text-[9px] font-medium tracking-wider text-muted-foreground uppercase sm:inline-flex"
+						class="ml-1.5 hidden items-center rounded border border-border bg-muted/50 px-1.5 py-0.5 text-xs font-medium text-muted-foreground sm:inline-flex"
 					>
 						mixture-of-agents
 					</span>
@@ -91,7 +91,7 @@
 					{#each navItems as item (item.href)}
 						<a
 							class={cn(
-								'rounded px-3 py-1.5 font-mono text-xs font-medium transition-all duration-150',
+								'rounded px-3 py-1.5 text-xs font-medium transition-all duration-150',
 								isActive(item.href)
 									? 'border border-border bg-muted text-foreground shadow-xs'
 									: 'border border-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground'
@@ -125,7 +125,7 @@
 							onclick={signOut}
 							variant="outline"
 							size="sm"
-							class="h-8 rounded border-border font-mono text-xs font-medium transition-all hover:border-destructive/30 hover:bg-destructive/5 hover:text-destructive active:scale-95"
+							class="h-8 rounded border-border text-xs font-medium transition-all hover:border-destructive/30 hover:bg-destructive/5 hover:text-destructive active:scale-95"
 						>
 							Sign out
 						</Button>
@@ -173,7 +173,7 @@
 									{@const Icon = item.icon}
 									<a
 										class={cn(
-											'flex items-center gap-3 rounded px-4 py-3 font-mono text-xs font-medium transition-all duration-150',
+											'flex items-center gap-3 rounded px-4 py-3 text-xs font-medium transition-all duration-150',
 											isActive(item.href)
 												? 'border border-border bg-muted text-foreground shadow-xs'
 												: 'border border-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground'
@@ -191,7 +191,7 @@
 							<div class="mt-auto border-t border-border bg-muted/20 p-4">
 								<div>
 									<Button
-										class="w-full justify-center gap-2 rounded border border-transparent font-mono text-xs text-destructive transition-all hover:border-destructive/20 hover:bg-destructive/5 hover:text-destructive"
+										class="w-full justify-center gap-2 rounded border border-transparent text-xs text-destructive transition-all hover:border-destructive/20 hover:bg-destructive/5 hover:text-destructive"
 										onclick={signOut}
 										variant="ghost"
 									>
@@ -211,7 +211,7 @@
 		{@render children()}
 	</div>
 
-	<footer class="px-4 pt-2 pb-5 text-center font-mono text-[10px] text-muted-foreground/70">
+	<footer class="px-4 pt-2 pb-5 text-center text-xs text-muted-foreground/70">
 		<nav class="inline-flex items-center gap-3" aria-label="Legal links">
 			<a
 				class="rounded px-1 py-0.5 underline-offset-4 transition-colors hover:text-foreground hover:underline"

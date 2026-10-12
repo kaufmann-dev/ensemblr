@@ -102,17 +102,14 @@
 				>
 					<div class="min-w-0 flex-1 space-y-2">
 						<p
-							class="line-clamp-2 font-mono text-xs leading-relaxed break-words text-foreground/80 group-hover:text-foreground"
+							class="line-clamp-2 text-xs leading-relaxed break-words text-foreground/80 group-hover:text-foreground"
 						>
 							{item.prompt}
 						</p>
-						<div
-							class="flex flex-wrap items-center gap-3 font-mono text-[10px] tracking-wider text-muted-foreground uppercase"
-						>
+						<div class="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
 							<span class="flex items-center gap-1">
 								<Calendar class="size-3 text-muted-foreground" />
-								<span class="font-mono text-[9px] tabular-nums"
-									>{new Date(item.createdAt).toLocaleString()}</span
+								<span class="text-xs tabular-nums">{new Date(item.createdAt).toLocaleString()}</span
 								>
 							</span>
 							<span
@@ -138,8 +135,8 @@
 		{:else}
 			<div class="flex flex-col items-center justify-center py-20 text-center">
 				<History class="mb-2 size-7 stroke-[1.5] text-muted-foreground" />
-				<h3 class="font-mono text-xs font-bold text-foreground">Archive Empty</h3>
-				<p class="mt-1 max-w-xs font-mono text-[10px] leading-relaxed text-muted-foreground">
+				<h3 class="text-xs font-bold text-foreground">Archive Empty</h3>
+				<p class="mt-1 max-w-xs text-xs leading-relaxed text-muted-foreground">
 					You haven't run any Mixture-of-Agents generations yet. Go to the Workspace dashboard to
 					trigger your first run!
 				</p>

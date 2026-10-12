@@ -33,8 +33,8 @@
 			<div class="flex items-start gap-3 rounded border border-border bg-muted/40 p-4">
 				<ShieldAlert class="mt-0.5 size-4.5 shrink-0 text-foreground" />
 				<div class="space-y-1">
-					<h4 class="font-mono text-xs font-bold text-foreground">Demo Environment Restrictions</h4>
-					<p class="mt-0.5 font-mono text-[10px] leading-relaxed text-muted-foreground">
+					<h4 class="text-xs font-bold text-foreground">Demo Environment Restrictions</h4>
+					<p class="mt-0.5 text-xs leading-relaxed text-muted-foreground">
 						Demo accounts run Mixture-of-Agents generations using shared, admin-managed credentials.
 						You do not need to add your own API keys to explore the sandbox!
 					</p>
@@ -52,7 +52,7 @@
 				<div class="space-y-1.5">
 					<Label for="provider">LLM Provider</Label>
 					<Select.Root type="single" bind:value={providerId}>
-						<Select.Trigger id="provider" class="font-mono text-xs">
+						<Select.Trigger id="provider" class="text-xs">
 							<span class="truncate">{selectedProviderName}</span>
 						</Select.Trigger>
 						<Select.Content class="p-1">
@@ -61,7 +61,7 @@
 									value={provider.id}
 									label={provider.name}
 									disabled={!provider.enabled}
-									class="mx-0.5 cursor-pointer rounded-sm px-2 py-1.5 font-mono text-xs"
+									class="mx-0.5 cursor-pointer rounded-sm px-2 py-1.5 text-xs"
 								>
 									<span class="truncate font-medium">{provider.name}</span>
 								</Select.Item>
@@ -80,7 +80,7 @@
 							type={showApiKey ? 'text' : 'password'}
 							autocomplete="new-password"
 							placeholder="Paste your API key here..."
-							class="pr-8 font-mono text-xs"
+							class="pr-8 text-xs"
 							required
 						/>
 						<Button
@@ -101,14 +101,14 @@
 				</div>
 
 				<!-- Action Button -->
-				<Button class="h-8.5 rounded px-4 font-mono text-xs font-bold shadow-none" type="submit">
+				<Button class="h-8.5 rounded px-4 text-xs font-bold shadow-none" type="submit">
 					Save credential
 				</Button>
 			</form>
 
 			{#if form?.message}
 				<div
-					class="rounded border border-destructive/20 bg-destructive/5 px-3 py-2 font-mono text-[11px] text-destructive"
+					class="rounded border border-destructive/20 bg-destructive/5 px-3 py-2 text-xs text-destructive"
 				>
 					{form.message}
 				</div>
@@ -118,7 +118,7 @@
 		{#if data.role !== 'demo'}
 			<!-- Saved Credentials Section -->
 			<div class="space-y-3">
-				<h3 class="font-mono text-xs font-bold tracking-widest text-muted-foreground/90 uppercase">
+				<h3 class="text-xs font-bold text-muted-foreground/90">
 					Configured Providers ({savedProviders.length})
 				</h3>
 				<div class="grid gap-2">
@@ -137,15 +137,10 @@
 									/>
 								</div>
 								<div class="min-w-0">
-									<span class="truncate font-mono text-xs font-bold text-foreground"
-										>{provider.name}</span
-									>
+									<span class="truncate text-xs font-bold text-foreground">{provider.name}</span>
 									<div class="mt-0.5 flex items-center gap-1.5">
 										<CheckCircle class="size-3 text-foreground" />
-										<span
-											class="font-mono text-[9px] tracking-widest text-muted-foreground uppercase"
-											>Credential Active</span
-										>
+										<span class="text-xs text-muted-foreground">Credential Active</span>
 									</div>
 								</div>
 							</div>
@@ -153,7 +148,7 @@
 							<form method="POST" action="?/delete" class="shrink-0">
 								<input type="hidden" name="providerId" value={provider.id} />
 								<Button
-									class="h-7.5 w-full rounded border-border font-mono text-[10px] transition-all hover:border-destructive/20 hover:bg-destructive/5 hover:text-destructive sm:w-auto"
+									class="h-7.5 w-full rounded border-border text-xs transition-all hover:border-destructive/20 hover:bg-destructive/5 hover:text-destructive sm:w-auto"
 									type="submit"
 									variant="outline"
 									size="sm"
@@ -168,7 +163,7 @@
 							class="flex flex-col items-center justify-center rounded border border-dashed border-border bg-muted/10 py-12 text-center"
 						>
 							<Key class="mb-2 size-7 stroke-[1.5] text-muted-foreground" />
-							<p class="font-mono text-[11px] text-muted-foreground">
+							<p class="text-xs text-muted-foreground">
 								No credentials saved yet. Add a key above to activate models.
 							</p>
 						</div>

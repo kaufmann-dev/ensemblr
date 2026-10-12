@@ -231,7 +231,7 @@
 			<CardHeader class="border-b border-border px-5 pt-4 pb-3">
 				<div class="flex items-center gap-2">
 					<FileText class="size-3.5 text-foreground" />
-					<CardTitle class="font-mono text-sm font-bold tracking-tight">Source prompt</CardTitle>
+					<CardTitle class="text-sm font-bold tracking-tight">Source prompt</CardTitle>
 				</div>
 			</CardHeader>
 			<CardContent class="bg-muted/5 p-0">
@@ -249,10 +249,8 @@
 				<div class="flex items-center gap-2">
 					<ShieldCheck class="size-4 text-foreground" />
 					<div>
-						<CardTitle class="font-mono text-sm font-bold tracking-tight"
-							>Synthesized output</CardTitle
-						>
-						<CardDescription class="mt-0.5 font-mono text-[10px] text-muted-foreground"
+						<CardTitle class="text-sm font-bold tracking-tight">Synthesized output</CardTitle>
+						<CardDescription class="mt-0.5 text-xs text-muted-foreground"
 							>Final synthesized response</CardDescription
 						>
 					</div>
@@ -287,7 +285,7 @@
 		<div class="space-y-3">
 			<div class="flex items-center gap-2 px-1">
 				<Layers class="size-4 text-foreground" />
-				<h3 class="font-mono text-xs font-bold tracking-widest text-muted-foreground/90 uppercase">
+				<h3 class="text-xs font-bold text-muted-foreground/90">
 					Worker Mixture Steps ({outputs.length})
 				</h3>
 			</div>
@@ -299,11 +297,11 @@
 						class="overflow-hidden rounded border border-border bg-card"
 					>
 						<Accordion.Trigger
-							class="flex w-full min-w-0 items-center justify-between gap-4 px-4 py-2.5 font-mono text-xs font-medium transition-colors hover:bg-muted/40 hover:no-underline"
+							class="flex w-full min-w-0 items-center justify-between gap-4 px-4 py-2.5 text-xs font-medium transition-colors hover:bg-muted/40 hover:no-underline"
 						>
 							<div class="flex min-w-0 items-center gap-2.5">
 								<span
-									class="shrink-0 rounded-sm border border-border bg-muted px-1.5 py-0.5 font-mono text-[9px] tracking-wide whitespace-nowrap text-muted-foreground uppercase"
+									class="shrink-0 rounded-sm border border-border bg-muted px-1.5 py-0.5 text-xs whitespace-nowrap text-muted-foreground"
 								>
 									{output.phase} · Round {output.round}
 								</span>
@@ -322,7 +320,7 @@
 					</Accordion.Item>
 				{:else}
 					<div
-						class="rounded border border-dashed border-border bg-card/40 p-6 text-center font-mono text-xs text-muted-foreground"
+						class="rounded border border-dashed border-border bg-card/40 p-6 text-center text-xs text-muted-foreground"
 					>
 						No detailed step outputs were archived for this run.
 					</div>

@@ -38,17 +38,15 @@
 					ensemblr
 				</span>
 			</div>
-			<p class="mt-1.5 font-mono text-xs tracking-tight text-muted-foreground">
+			<p class="mt-1.5 text-xs tracking-tight text-muted-foreground">
 				mixture-of-agents orchestration
 			</p>
 		</div>
 
 		<Card class="w-full rounded border border-border bg-card p-1 shadow-xs">
 			<CardHeader class="px-5 pt-4 pb-3">
-				<CardTitle class="font-mono text-base font-bold tracking-tight text-foreground">
-					Sign in
-				</CardTitle>
-				<p class="mt-0.5 font-mono text-[11px] text-muted-foreground">
+				<CardTitle class="text-base font-bold tracking-tight text-foreground">Sign in</CardTitle>
+				<p class="mt-0.5 text-xs text-muted-foreground">
 					Authenticate or run an instant demo instance.
 				</p>
 			</CardHeader>
@@ -56,7 +54,7 @@
 				<div class="space-y-3.5">
 					{#if form?.message || startError || data.oidcError}
 						<div
-							class="rounded border border-destructive/20 bg-destructive/5 px-3 py-2 font-mono text-[11px] text-destructive"
+							class="rounded border border-destructive/20 bg-destructive/5 px-3 py-2 text-xs text-destructive"
 							role="alert"
 						>
 							{form?.message ??
@@ -67,7 +65,7 @@
 					{/if}
 
 					<div class="grid gap-2.5 pt-1.5">
-						<p class="font-mono text-[11px] text-muted-foreground">
+						<p class="text-xs text-muted-foreground">
 							Administrator access uses the configured identity provider.
 						</p>
 						<form
@@ -77,7 +75,7 @@
 							}}
 						>
 							<Button
-								class="h-8.5 w-full rounded font-mono text-xs font-bold shadow-none"
+								class="h-8.5 w-full rounded text-xs font-bold shadow-none"
 								type="submit"
 								disabled={pending}
 							>
@@ -89,19 +87,13 @@
 							<div class="absolute inset-0 flex items-center">
 								<div class="w-full border-t border-border"></div>
 							</div>
-							<span
-								class="relative bg-card px-2 font-mono text-[9px] tracking-widest text-muted-foreground uppercase"
-							>
-								Or
-							</span>
+							<span class="relative bg-card px-2 text-xs text-muted-foreground"> Or </span>
 						</div>
 
-						<p class="font-mono text-[11px] text-muted-foreground">
-							Demo access needs no credentials.
-						</p>
+						<p class="text-xs text-muted-foreground">Demo access needs no credentials.</p>
 						<form method="POST" action={`?/demo&returnTo=${encodeURIComponent(data.returnTo)}`}>
 							<Button
-								class="h-8.5 w-full rounded border-border font-mono text-xs font-bold hover:bg-muted/50"
+								class="h-8.5 w-full rounded border-border text-xs font-bold hover:bg-muted/50"
 								type="submit"
 								variant="outline"
 							>
@@ -113,7 +105,7 @@
 			</CardContent>
 		</Card>
 
-		<div class="mt-5 text-center font-mono text-[10px] text-muted-foreground/70">
+		<div class="mt-5 text-center text-xs text-muted-foreground/70">
 			Better Auth session active · SSL secure
 		</div>
 	</div>
