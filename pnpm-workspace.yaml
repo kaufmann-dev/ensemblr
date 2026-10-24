@@ -13,3 +13,4 @@ minimumReleaseAgeExclude:
 
 overrides:
   '@esbuild-kit/core-utils>esbuild': ^0.28.1
+  '@ai-sdk/provider-utils>undici': ^7.30.1
