@@ -7,10 +7,5 @@ allowBuilds:
   better-sqlite3: false
   esbuild: true
 
-minimumReleaseAgeExclude:
-  - '@sveltejs/adapter-node@6.0.0'
-  - '@sveltejs/kit@3.0.0'
-
 overrides:
   '@esbuild-kit/core-utils>esbuild': ^0.28.1
-  '@ai-sdk/provider-utils>undici': ^7.30.1

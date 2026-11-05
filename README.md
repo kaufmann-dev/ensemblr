@@ -8,8 +8,8 @@ SvelteKit app for running mixture-of-agents generations across models from the l
 
 ### Prerequisites
 
-- Node.js 22.17+
-- pnpm
+- Node.js 26
+- pnpm 12
 - Podman (for local PostgreSQL)
 
 ### 1. Install dependencies
