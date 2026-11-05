@@ -90,7 +90,7 @@ All authentication variables and requiredness are listed in [Production environm
 
 This project is built with SvelteKit and the Node adapter (`@sveltejs/adapter-node`), so it deploys as a standard Node.js application.
 
-The supported Node.js range is declared in `package.json`. Do not pin a separate nixpkgs archive: Coolify's Nixpacks version selects a compatible archive for that Node range, while an older repository-level archive can make the selected Node package unavailable.
+The supported Node.js range is declared in `package.json`, and Railpack selects Node from it. Do not set `RAILPACK_NODE_VERSION` or add Node to `railpack.json`: a second version source overrides `package.json`.
 
 ### 1. Create a PostgreSQL database
 
@@ -102,9 +102,7 @@ Add a new resource in Coolify and point it to this repository.
 
 ### 3. Configure the build and start commands
 
-In the Coolify resource settings, set:
-
-Leave **Install Command**, **Build Command**, and **Start Command** empty. `nixpacks.toml` installs with the pinned pnpm 11.18.0 (`packageManager`), builds, applies migrations and the idempotent seed, and starts `node build/index.js`. Nixpacks' bundled pnpm 9 cannot read the overrides in `pnpm-workspace.yaml`, so commands entered in the Coolify UI that call plain `pnpm` fail the frozen install.
+In the Coolify resource settings, set **Build Pack** to **Railpack** and leave **Install Command**, **Build Command**, and **Start Command** empty. Railpack installs and builds with the pnpm version from `packageManager`; `railpack.json` adds the migrations and the idempotent seed to the build step and starts `node build/index.js`. Because the build migrates and seeds the database, keep `DATABASE_URL` available at build time (Coolify's default).
 
 ### 4. Configure environment variables
 

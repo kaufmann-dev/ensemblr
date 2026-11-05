@@ -1,0 +1,11 @@
+{
+	"$schema": "https://schema.railpack.com",
+	"steps": {
+		"build": {
+			"commands": ["...", "pnpm run db:migrate", "pnpm run db:seed"]
+		}
+	},
+	"deploy": {
+		"startCommand": "node build/index.js"
+	}
+}
