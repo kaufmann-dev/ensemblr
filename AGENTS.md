@@ -264,4 +264,4 @@ For Coolify and Railpack:
 - Seed app settings only when they are missing; do not overwrite admin-edited settings during redeploys.
 - Let Railpack handle the install phase unless a project-specific reason requires otherwise.
 - Prefer explicit deploy or runtime migration and seed steps when Coolify supports them.
-- Keep build-time migration and seed scripts idempotent when they must run during image builds.
+- Run migrations and seed at container start, not in Railpack build steps: the BuildKit builder cannot reach databases on the Coolify network. Keep both idempotent.

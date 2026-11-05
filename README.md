@@ -102,7 +102,7 @@ Add a new resource in Coolify and point it to this repository.
 
 ### 3. Configure the build and start commands
 
-In the Coolify resource settings, set **Build Pack** to **Railpack** and leave **Install Command**, **Build Command**, and **Start Command** empty. Railpack installs and builds with the pnpm version from `packageManager`; `railpack.json` adds the migrations and the idempotent seed to the build step and starts `node build/index.js`. Because the build migrates and seeds the database, keep `DATABASE_URL` available at build time (Coolify's default).
+In the Coolify resource settings, set **Build Pack** to **Railpack** and leave **Install Command**, **Build Command**, and **Start Command** empty. Railpack installs and builds with the pnpm version from `packageManager`. `railpack.json` sets the start command to apply pending migrations, run the idempotent seed, and then start `node build/index.js`. Migrations run when the container starts, not during the build, because the Railpack BuildKit builder cannot reach databases on the Coolify network.
 
 ### 4. Configure environment variables
 
@@ -128,23 +128,17 @@ Click **Deploy** in Coolify. The build process will:
 
 1. Install dependencies
 2. Build the SvelteKit app into `build/`
-3. Run migrations (if included in the build command)
-4. Run the seed script (if included in the build command)
+3. On container start, run pending migrations
+4. On container start, run the seed script
 5. Start the Node server
 
 ### 6. First administrator login
 
 After the first successful deploy, open `/login` and choose **Sign in as administrator**. The first provider-admitted identity creates the administrator on a fresh installation or binds to the sole legacy administrator on an upgraded installation. Additional provider-admitted identities receive separate administrator accounts with their own API keys and generation history.
 
-### 7. Post-deployment database updates
+### 7. Database updates
 
-If you add new Drizzle migrations in the future, you must run them against the production database. You can do this via Coolify's **Execute Command** feature:
-
-```bash
-pnpm db:migrate
-```
-
-Or by temporarily updating the **Build Command** to include `pnpm db:migrate` and redeploying.
+New Drizzle migrations are applied automatically the next time the container starts, so redeploying is enough.
 
 ---
 
