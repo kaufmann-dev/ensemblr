@@ -1,12 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
-  <style>
-    svg { fill: #000000; }
-    @media (prefers-color-scheme: dark) { svg { fill: #ffffff; } }
-  </style>
-  <title id="title">Ensemblr folded aperture mark</title>
-  <path fill-rule="evenodd" d="M56 20h144l-42 68H98L56 20Zm72 13-22 40h44l-22-40Z"/>
-  <path fill-rule="evenodd" d="M236 56v144l-68-42V98l68-42Zm-13 72-40-22v44l40-22Z"/>
-  <path fill-rule="evenodd" d="M200 236H56l42-68h60l42 68Zm-72-13 22-40h-44l22 40Z"/>
-  <path fill-rule="evenodd" d="M20 200V56l68 42v60l-68 42Zm13-72 40 22v-44l-40 22Z"/>
-  <path d="m128 94 34 34-34 34-34-34 34-34Z"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><title>Ensemblr</title><defs><linearGradient id="g" x1="3" y1="3" x2="29" y2="29" gradientUnits="userSpaceOnUse"><stop class="g-a"/><stop class="g-b" offset="1"/></linearGradient></defs><style>.g-a{stop-color:#069fa6}.g-b{stop-color:#01729f}@media (prefers-color-scheme:dark){.g-a{stop-color:#0de2eb}.g-b{stop-color:#03abec}}</style><g stroke-width="3" stroke-linecap="butt" stroke-linejoin="miter"><path d="M7 2.5L25 2.5L19.75 11L12.25 11Z" fill="url(#g)"/><path d="M29.5 7L29.5 25L21 19.75L21 12.25Z" fill="url(#g)"/><path d="M25 29.5L7 29.5L12.25 21L19.75 21Z" fill="url(#g)"/><path d="M2.5 25L2.5 7L11 12.25L11 19.75Z" fill="url(#g)"/></g></svg>
